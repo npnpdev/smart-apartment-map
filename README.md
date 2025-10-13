@@ -1,2 +1,2 @@
 # smart-apartment-map
-AI-powered apartment search with environmental context scoring and interactive mapping
+See develop branch for active development
