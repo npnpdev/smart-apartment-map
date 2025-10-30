@@ -1,0 +1,28 @@
+site_name: smart-apartament-map-mkdocs
+site_url: https://twoja-org.github.io/your-repo/
+repo_url: https://github.com/twoja-org/your-repo
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - content.code.copy
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+          options:
+            docstring_style: google
+            separate_signature: true
+            show_source: true
+            extensions:
+              - griffe_pydantic
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.highlight
+  - pymdownx.superfences
+nav:
+  - Wprowadzenie: index.md
+  - API: reference.md
