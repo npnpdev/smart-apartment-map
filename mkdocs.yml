@@ -1,8 +1,29 @@
-site_name: smart-apartament-map-mkdocs
-site_url: https://twoja-org.github.io/your-repo/
-repo_url: https://github.com/twoja-org/your-repo
+site_name: "🍺 Smart Apartment Map"
+repo_url: https://github.com/npnpdev/smart-apartment-map.git
 theme:
   name: material
+  font:
+    text: Inter
+    code: JetBrains Monoć
+  icon:
+    logo: material/home-city
+  palette:
+      # Dark Mode
+    - scheme: slate
+      toggle:
+        icon: material/weather-night
+        name: Dark mode
+      primary: amber
+      accent: purple
+
+      # Light mode
+    - scheme: default
+      toggle:
+        icon: material/weather-sunny
+        name: Light mode
+      primary: blue
+      accent: deep orange
+
   features:
     - navigation.sections
     - content.code.copy
@@ -21,8 +42,15 @@ plugins:
 markdown_extensions:
   - admonition
   - pymdownx.details
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
   - pymdownx.highlight
   - pymdownx.superfences
+  - attr_list
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
 nav:
-  - Wprowadzenie: index.md
-  - API: reference.md
+  - Poradnik tworzenia dokumentacji: how-to-use.md
