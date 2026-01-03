@@ -2,9 +2,30 @@ services:
   docs:
     build:
       context: .
-      target: dev
+      dockerfile: Dockerfile
     volumes:
       - ./:/work
     ports:
-      - "8000:8000"
+      - "8001:8000"
     command: ["mkdocs","serve","--dev-addr=0.0.0.0:8000"]
+
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - ./data:/app/data
+    env_file:
+      - .env
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: ["npm","run","dev","--","--host","0.0.0.0","--port","5173"]

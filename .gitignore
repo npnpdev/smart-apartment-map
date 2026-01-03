@@ -217,6 +217,29 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
+# Node / React
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Frontend build output
+frontend/dist/
+
+# Docker
+*.pid
+docker-compose.override.yml
+
+# Django static/media
+static/
+staticfiles/
+media/
+
+# Logs
+logs/
+
+
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
 #  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
