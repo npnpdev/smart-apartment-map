@@ -2,6 +2,7 @@ import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import { useEffect } from "react";
 
 import SidePanel from "./SidePanel/SidePanel";
+import styles from "./SidePanel/SidePanel.module.css";
 
 function FixMapSize() {
   const map = useMap();
@@ -33,15 +34,28 @@ export default function Map() {
         />
       </MapContainer>
 
-      <SidePanel side="right" title="Legenda / Filtry">
-        <label>
-          <input type="checkbox" /> Warstwa A
-        </label>
-        <br />
-        <label>
-          <input type="checkbox" /> Warstwa B
-        </label>
-      </SidePanel>
+     <SidePanel
+  side="right"
+  title="Gdańsk Housing"
+  subtitle="PLATFORMA ANALITYCZNA"
+  width={560}
+>
+  <div className={styles.chips}>
+    <button className={styles.chip}>Wszystkie</button>
+    <button className={styles.chip}>Ciche Strefy</button>
+    <button className={`${styles.chip} ${styles.chipActive}`}>Budżet &lt; 3500</button>
+  </div>
+
+  <div className={styles.empty}>
+    <div>
+      <div className={styles.emptyIcon}>🏢</div>
+      <div className={styles.emptyText}>
+        Wybierz budynek na mapie,<br />aby pobrać dane.
+      </div>
+    </div>
+  </div>
+</SidePanel>
+
     </div>
   );
 }
