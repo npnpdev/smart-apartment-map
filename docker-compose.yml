@@ -1,8 +1,20 @@
 services:
+  db:
+    image: postgis/postgis:16-3.4
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: smart_apartment
+      POSTGRES_USER: smart_user
+      POSTGRES_PASSWORD: smart_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
   docs:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: docs/Dockerfile
     volumes:
       - ./:/work
     ports:
@@ -29,3 +41,8 @@ services:
       - ./frontend:/app
       - /app/node_modules
     command: ["npm","run","dev","--","--host","0.0.0.0","--port","5173"]
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+
+volumes:
+  postgres_data:
