@@ -1,0 +1,78 @@
+.panel{
+  position: absolute;
+  top: 20px;
+  bottom: 20px;
+
+  border-radius: 18px;
+  background: white;
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+
+  z-index: 2000;
+  overflow: hidden;
+
+  transition: transform 220ms ease;
+  will-change: transform;
+}
+
+/* pozycja */
+.right { right: 20px; }
+.left  { left: 20px; }
+
+/* zwijanie – zostaje uchwyt 56px */
+.right.collapsed{
+  transform: translateX(calc(100% - 56px));
+}
+.left.collapsed{
+  transform: translateX(calc(-100% + 56px));
+}
+
+/* przycisk-uchwyt */
+.toggle{
+  position: absolute;
+  top: 14px;
+
+  width: 32px;
+  height: 48px;
+
+  border-radius: 14px;
+  border: 1px solid rgba(0,0,0,0.10);
+  background: white;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.10);
+
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+
+  z-index: 2100;
+}
+
+/* uchwyt wystaje poza panel */
+.right .toggle { left: -16px; }
+.left  .toggle { right: -16px; }
+
+.chevron{
+  font-size: 14px;
+  line-height: 1;
+  color: #2c3e50;
+}
+
+.header{
+  padding: 16px 18px 10px;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.title{
+  font-weight: 700;
+  font-size: 14px;
+  color: #1f2d3d;
+}
+
+.content{
+  padding: 18px;
+  height: calc(100% - 52px);
+  overflow: auto;
+}
