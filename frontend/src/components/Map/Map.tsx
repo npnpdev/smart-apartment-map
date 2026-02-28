@@ -1,11 +1,9 @@
 import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import type { LatLngExpression } from "leaflet";
-
 import { useEffect, useState } from "react";
-
-import SidePanel from "./SidePanel/SidePanel";
-import styles from "./SidePanel/SidePanel.module.css";
-import MapController from "./MapController.tsx";
+import MapController from "../MapController.tsx";
+import RightSidePanel from "../RightSidePanel/RightSidePanel.tsx";
+import LeftSidePanel from "../LeftSidePanel/LeftSidePanel.tsx";
 
 function FixMapSize() {
   const map = useMap();
@@ -28,7 +26,6 @@ const cities: { name: string; center: LatLngExpression }[] = [
 
 export default function Map() {
   const [selectedCityIdx, setSelectedCityIdx] = useState(0);
-  const [hovered, setHovered] = useState(false);
 
   function onChangeCity(): void {
     setSelectedCityIdx((prev) => (prev < cities.length - 1 ? prev + 1 : 0));
@@ -49,43 +46,11 @@ export default function Map() {
           attribution="&copy; OpenStreetMap contributors"
         />
       </MapContainer>
-
-      <SidePanel
-        side="right"
-        title="Gdańsk Housing"
-        subtitle="PLATFORMA ANALITYCZNA"
-        width={560}
-      >
-        <div>
-          <button type="button">Zaloguj</button>
-        </div>
-        <button
-          type="button"
-          onClick={onChangeCity}
-          onMouseEnter={() => setHovered(true)}
-          onMouseLeave={() => setHovered(false)}
-        >
-          {hovered ? "Zmień miasto" : cities[selectedCityIdx].name}
-        </button>
-        <div className={styles.chips}>
-          <button className={styles.chip}>Wszystkie</button>
-          <button className={styles.chip}>Ciche Strefy</button>
-          <button className={`${styles.chip} ${styles.chipActive}`}>
-            Budżet &lt; 3500
-          </button>
-        </div>
-
-        <div className={styles.empty}>
-          <div>
-            <div className={styles.emptyIcon}>🏢</div>
-            <div className={styles.emptyText}>
-              Wybierz budynek na mapie,
-              <br />
-              aby pobrać dane.
-            </div>
-          </div>
-        </div>
-      </SidePanel>
+      <RightSidePanel
+        cityName={cities[selectedCityIdx].name}
+        onChangeCity={onChangeCity}
+      />
+      <LeftSidePanel />
     </div>
   );
 }

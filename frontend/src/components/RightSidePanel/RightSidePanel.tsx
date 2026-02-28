@@ -1,4 +1,17 @@
-export default function RightSidePanel() {
+import SidePanel from "../SidePanel/SidePanel.tsx";
+import stylesSidePanel from "../SidePanel/SidePanel.module.css";
+import styles from "./RightSidePanel.module.css";
+import { useState } from "react";
+
+export default function RightSidePanel({
+  cityName,
+  onChangeCity,
+}: {
+  cityName: string;
+  onChangeCity: () => void;
+}) {
+  const [hovered, setHovered] = useState(false);
+
   return (
     <SidePanel
       side="right"
@@ -6,17 +19,14 @@ export default function RightSidePanel() {
       subtitle="PLATFORMA ANALITYCZNA"
       width={560}
     >
-      <button type="button" className={styles.chip}>
-        Zaloguj
-      </button>
       <button
-        className={stylesSidePanel.chip}
+        className={styles.chip}
         type="button"
         onClick={onChangeCity}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
-        {hovered ? "Zmień miasto" : cities[selectedCityIdx].name}
+        {hovered ? "Zmień miasto" : cityName}
       </button>
       <div className={stylesSidePanel.chips}>
         <button className={stylesSidePanel.chip}>Wszystkie</button>
