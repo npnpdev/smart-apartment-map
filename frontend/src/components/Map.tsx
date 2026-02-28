@@ -1,4 +1,6 @@
-import { MapContainer, TileLayer, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, useMap  } from "react-leaflet";
+import type {LatLngExpression} from 'leaflet';
+
 import { useEffect } from "react";
 
 import SidePanel from "./SidePanel/SidePanel";
@@ -17,7 +19,7 @@ function FixMapSize() {
 }
 
 export default function Map() {
-  const gdansk: [number, number] = [54.352, 18.6466];
+  const gdansk: LatLngExpression = [54.372158, 18.638306];
 
   return (
     // WAŻNE: relative, żeby SidePanel absolute działał "nad mapą"

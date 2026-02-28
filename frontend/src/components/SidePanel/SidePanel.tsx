@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import {type ReactNode, useState } from "react";
 import styles from "./SidePanel.module.css";
 
 type Side = "left" | "right";
