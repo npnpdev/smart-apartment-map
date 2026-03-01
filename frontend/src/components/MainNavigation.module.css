@@ -1,0 +1,43 @@
+.header {
+  max-width: 60rem;
+  margin: auto;
+  padding: 2rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.list {
+  position: relative;
+  display: flex;
+  gap: 1rem;
+  z-index:100;
+}
+
+.list a,
+.list button {
+  text-decoration: none;
+  color: var(--color-primary-400);
+  background-color: unset;
+  border: none;
+  outline: none;
+  font: unset;
+  padding: unset;
+}
+
+.list buttona {
+  text-decoration: none;
+  color: var(--color-primary-400);
+  background-color: unset;
+}
+
+.list a.active {
+  color: var(--color-primary-900);
+  background-color: var(--color-gray-700);
+}
+
+.list a:hover,
+.list button:hover {
+  color: var(--color-primary-800);
+  background-color: var(--color-gray-500);
+}
+
