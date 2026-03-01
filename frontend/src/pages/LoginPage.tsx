@@ -1,8 +1,8 @@
-import SidePanel from "../SidePanel/SidePanel.tsx";
-import styles from "./LeftSidePanel.module.css";
-import { useState } from "react";
+import { useState } from 'react';
+import SidePanel from '../components/SidePanel/SidePanel.tsx';
+import styles from './LoginPage.module.css';
 
-export default function LeftSidePanel() {
+export default function LoginPage() {
   const [loggedIn, setLoggedIn] = useState(false);
 
   function handleLoginClick(): void {
@@ -43,7 +43,7 @@ export default function LeftSidePanel() {
           className={styles.loginButton}
           onClick={handleLoginClick}
         >
-          {loggedIn ? "Wyloguj" : "Zaloguj"}
+          {loggedIn ? 'Wyloguj' : 'Zaloguj'}
         </button>
       </div>
     </SidePanel>
