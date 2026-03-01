@@ -143,10 +143,16 @@ CORS_ALLOWED_ORIGINS = [
 #CORS_URLS_REGEX = r"^/api/.*$"
 
 # DRF 
+# domyslnie wymaga logowania, publiczne trzeba oznaczac wyjatkami
 REST_FRAMEWORK = {
-    "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.AllowAny",
-    ],
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.IsAuthenticated",
+    ),
 }
+
+#czasy zycia tokenow - narazie domyslne
 
 AUTH_USER_MODEL = "accounts.User"
