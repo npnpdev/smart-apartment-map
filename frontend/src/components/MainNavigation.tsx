@@ -1,7 +1,13 @@
-import { NavLink } from "react-router-dom";
-import classes from "./MainNavigation.module.css";
+import { NavLink } from 'react-router-dom';
+import classes from './MainNavigation.module.css';
+import { useAppContext } from '../context/AppContext';
 
 function MainNavigation() {
+  const { email } = useAppContext();
+
+  console.log('main navigation');
+  console.log(email);
+
   return (
     <header className={classes.header}>
       <nav>
@@ -37,16 +43,30 @@ function MainNavigation() {
               Wyniki
             </NavLink>
           </li>
-          <li>
-            <NavLink
-              to="/login"
-              className={({ isActive }) =>
-                isActive ? classes.active : undefined
-              }
-            >
-              Zaloguj
-            </NavLink>
-          </li>
+          {!email && (
+            <li>
+              <NavLink
+                to="/login"
+                className={({ isActive }) =>
+                  isActive ? classes.active : undefined
+                }
+              >
+                Zaloguj
+              </NavLink>
+            </li>
+          )}
+          {email && (
+            <li>
+              <NavLink
+                to="/logout"
+                className={({ isActive }) =>
+                  isActive ? classes.active : undefined
+                }
+              >
+                {email + ' Wyloguj'}
+              </NavLink>
+            </li>
+          )}
         </ul>
       </nav>
     </header>
