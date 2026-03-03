@@ -25,7 +25,5 @@ terminal w VS Code jest “z kontenera”
 
 Pylance widzi importy z kontenera (Django itd.)
 
-python manage.py ... działa bez instalowania czegokolwiek lokalnie (u Was manage.py odpala projekt config.settings). 
-
 manage
 */
