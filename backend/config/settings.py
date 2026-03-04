@@ -139,8 +139,6 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5173",
 ]
 
-# ogranicz CORS tylko do /api
-#CORS_URLS_REGEX = r"^/api/.*$"
 
 # DRF 
 # domyslnie wymaga logowania, publiczne trzeba oznaczac wyjatkami

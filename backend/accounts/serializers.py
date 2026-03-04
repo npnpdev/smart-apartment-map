@@ -9,12 +9,6 @@ class MeSerializer(serializers.ModelSerializer):
         model = User
         fields = ("id", "email", "username")
 
-from django.contrib.auth import get_user_model
-from django.contrib.auth.password_validation import validate_password
-from rest_framework import serializers
-
-User = get_user_model()
-
 class RegisterSerializer(serializers.Serializer):
     email = serializers.EmailField()
     username = serializers.CharField(min_length=3, max_length=150)
