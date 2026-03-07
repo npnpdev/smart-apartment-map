@@ -1,71 +1,93 @@
-html, body, #root {
-  height: 100%;
-  margin: 0;
-}
-
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --bg-base: #ebe7df;
+
+  --glass-bg: rgba(255, 251, 245, 0.72);
+  --glass-bg-strong: rgba(255, 251, 245, 0.88);
+  --glass-elevated: rgba(255, 255, 255, 0.52);
+
+  --text-primary: #181716;
+  --text-secondary: rgba(24, 23, 22, 0.62);
+  --text-muted: rgba(24, 23, 22, 0.36);
+
+  --accent: #2c2926;
+  --accent-contrast: #f8f4ee;
+  --accent-soft: rgba(44, 41, 38, 0.08);
+
+  --border: rgba(60, 52, 46, 0.10);
+  --border-strong: rgba(60, 52, 46, 0.16);
+  --divider: rgba(60, 52, 46, 0.12);
+
+  --shadow-soft: 0 10px 30px rgba(36, 30, 24, 0.10);
+  --shadow-medium: 0 18px 45px rgba(36, 30, 24, 0.14);
+
+  --blur: blur(18px);
+
+  --radius-sm: 10px;
+  --radius-md: 18px;
+  --radius-lg: 28px;
+  --radius-xl: 32px;
+  --radius-pill: 999px;
+
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+body.dark-theme {
+  --bg-base: #101010;
+
+  --glass-bg: rgba(24, 24, 24, 0.72);
+  --glass-bg-strong: rgba(30, 30, 30, 0.88);
+  --glass-elevated: rgba(255, 255, 255, 0.06);
+
+  --text-primary: #f3f3f1;
+  --text-secondary: rgba(243, 243, 241, 0.68);
+  --text-muted: rgba(243, 243, 241, 0.34);
+
+  --accent: #f3f3f1;
+  --accent-contrast: #111111;
+  --accent-soft: rgba(255, 255, 255, 0.10);
+
+  --border: rgba(255, 255, 255, 0.10);
+  --border-strong: rgba(255, 255, 255, 0.18);
+  --divider: rgba(255, 255, 255, 0.12);
+
+  --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.28);
+  --shadow-medium: 0 18px 45px rgba(0, 0, 0, 0.36);
 }
-a:hover {
-  color: #535bf2;
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
 }
 
 body {
-  margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+a {
+  color: inherit;
+  text-decoration: none;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+button,
+input,
+select,
+textarea {
+  font: inherit;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+/* Usuwa brzydki kwadrat (focus outline) po kliknięciu w dzielnicę na mapie */
+path.leaflet-interactive:focus {
+  outline: none !important;
 }

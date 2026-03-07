@@ -1,10 +1,229 @@
+/* --- ISTNIEJĄCE STYLE (CHIP I KAFELKI MIESZKAŃ) --- */
+
 .chip {
-  border: 1px solid rgba(15, 23, 42, 0.18);
-  background: aqua;
-  color: #213547;
-  padding: 12px 18px;
-  border-radius: 999px;
+  margin: 0 0 18px;
+  padding: 12px 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--glass-bg-strong);
+  color: var(--text-primary);
+  font-size: 1rem;
   font-weight: 600;
+  letter-spacing: -0.01em;
   cursor: pointer;
-  margin: 1rem;
+  transition: all 0.2s ease;
+  width: 100%;
+  text-align: center;
+}
+
+.chip:hover {
+  border-color: var(--border-strong);
+}
+
+.resultsContainer {
+  margin-top: 10px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.resultsCount {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+  padding-left: 4px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.listWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-bottom: 20px;
+}
+
+.card {
+  background: var(--glass-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  transition: transform 0.2s, border-color 0.2s, background-color 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-strong);
+  background: var(--glass-bg-strong);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.cardPrice {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a9850;
+}
+
+.cardDistrict {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: var(--text-secondary);
+  letter-spacing: 0.05em;
+}
+
+.cardTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.cardButton {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cardButton:hover {
+  color: var(--text-primary);
+  border-color: var(--text-primary);
+  background: rgba(255,255,255,0.05);
+}
+
+.loadMoreBtn {
+  margin-top: 10px;
+  padding: 14px;
+  background: var(--text-primary);
+  color: var(--bg-root);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: opacity 0.2s;
+}
+
+.loadMoreBtn:hover {
+  opacity: 0.9;
+}
+
+/* --- NOWE STYLE DLA PANELU FILTRÓW (ROZWIJANIE I SUWAK) --- */
+
+.filtersWrapper {
+  margin-bottom: 20px;
+  min-height: 60px; /* Zapobiega skakaniu layoutu */
+}
+
+/* Kontener rozwiniętego filtra */
+.expandedFilter {
+  background: var(--glass-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  /* Animacja wjazdu */
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.expandedHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+  gap: 12px;
+}
+
+.backButton {
+  background: none;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.backButton:hover {
+  background: rgba(255,255,255,0.1);
+  color: var(--text-primary);
+  border-color: var(--border);
+}
+
+.expandedTitle {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+/* --- SUWAK (Slider) --- */
+.sliderContainer {
+  padding: 0 4px;
+}
+
+/* Styl samego paska input range */
+.sliderInput {
+  width: 100%;
+  margin: 12px 0;
+  cursor: pointer;
+  accent-color: var(--primary); /* Używa głównego koloru motywu */
+  height: 6px;
+}
+
+.sliderLabels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.sliderValue {
+  text-align: center;
+  font-size: 0.9rem;
+  margin-top: 8px;
+  color: var(--text-primary);
+  background: rgba(255,255,255,0.05);
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+/* Przycisk resetowania filtrów */
+.resetButton {
+  margin-left: auto;
+  background: none;
+  border: 1px solid var(--border-strong);
+  color: #ff6b6b; /* Czerwonawy odcień */
+  font-size: 0.8rem;
+  padding: 6px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.resetButton:hover {
+  background: rgba(255, 107, 107, 0.15);
+  border-color: #ff6b6b;
 }

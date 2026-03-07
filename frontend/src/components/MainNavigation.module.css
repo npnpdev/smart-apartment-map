@@ -1,43 +1,104 @@
 .header {
-  max-width: 60rem;
-  margin: auto;
-  padding: 2rem;
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2000;
+  pointer-events: none;
+}
+
+.pill {
+  pointer-events: auto;
   display: flex;
-  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  background: var(--glass-bg);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-soft);
+  border-radius: var(--radius-lg);
 }
 
 .list {
-  position: relative;
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: flex;
-  gap: 1rem;
-  z-index:100;
+  align-items: center;
+  gap: 6px;
 }
 
-.list a,
-.list button {
-  text-decoration: none;
-  color: var(--color-primary-400);
-  background-color: unset;
+.list a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 18px;
+  border-radius: var(--radius-pill);
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  transition: all 0.2s ease;
+}
+
+.list a:hover {
+  background: var(--glass-elevated);
+  color: var(--text-primary);
+}
+
+.active {
+  background: var(--accent) !important;
+  color: var(--accent-contrast) !important;
+}
+
+.separator {
+  width: 1px;
+  height: 20px;
+  background: var(--divider);
+  margin: 0 4px;
+}
+
+.userItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.userEmail {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  padding-left: 6px;
+}
+
+.themeToggle {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
   border: none;
-  outline: none;
-  font: unset;
-  padding: unset;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
 }
 
-.list buttona {
-  text-decoration: none;
-  color: var(--color-primary-400);
-  background-color: unset;
+.themeToggle:hover {
+  background: var(--glass-elevated);
+  color: var(--text-primary);
 }
 
-.list a.active {
-  color: var(--color-primary-900);
-  background-color: var(--color-gray-700);
+.themeToggle svg {
+  transition: transform 0.3s ease;
 }
 
-.list a:hover,
-.list button:hover {
-  color: var(--color-primary-800);
-  background-color: var(--color-gray-500);
+.themeToggle:active svg {
+  transform: scale(0.9);
 }
-

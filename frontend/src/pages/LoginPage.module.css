@@ -1,72 +1,179 @@
-.chip {
-  border: 1px solid rgba(15, 23, 42, 0.18);
-  background: aquamarine;
-  color: #213547;
-  padding: 12px 18px;
-  border-radius: 999px;
-  font-weight: 600;
+.pageWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* Odejmujemy orientacyjną wysokość headera, żeby wyśrodkować na ekranie */
+  min-height: calc(100vh - 80px); 
+  padding: 2rem;
+  background: var(--bg-base);
+  animation: fadeIn 0.4s ease-out;
+}
+
+.authCard {
+  position: relative;
+  background: var(--glass-bg-strong);
+  backdrop-filter: var(--blur);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-xl);
+  padding: 3rem 2.5rem;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: var(--shadow-medium);
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.closeButton {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  background: var(--accent-soft);
+  border: 1px solid transparent;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-pill);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--text-secondary);
   cursor: pointer;
-  margin: 1rem;
+  transition: all 0.2s ease;
+}
+
+.closeButton:hover {
+  background: var(--accent);
+  color: var(--accent-contrast);
+  transform: scale(1.05);
+}
+
+.header {
+  text-align: center;
+}
+
+.header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.02em;
+}
+
+.header p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.errorMessage {
+  background: rgba(220, 38, 38, 0.1);
+  color: #ef4444;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border: 1px solid rgba(220, 38, 38, 0.2);
 }
 
 .loginContainer {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  padding: 8px 4px;
+  gap: 1.25rem;
 }
 
 .loginField {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 0.5rem;
 }
 
 .loginLabel {
-  font-size: 11px;
+  font-size: 0.75rem;
   font-weight: 600;
-  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #888;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+  margin-left: 0.25rem;
 }
 
 .loginInput {
-  padding: 10px 14px;
-  border: 1.5px solid #e0e0e0;
-  border-radius: 8px;
-  font-size: 14px;
-  outline: none;
-  transition: border-color 0.2s;
-  background: #fafafa;
-  color: #1a1a1a;
+  background: var(--glass-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  font-size: 1rem;
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+}
+
+.loginInput::placeholder {
+  color: var(--text-muted);
 }
 
 .loginInput:focus {
-  border-color: #2ecc71;
-  background: #fff;
+  outline: none;
+  border-color: var(--text-primary);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+  background: var(--glass-bg);
 }
 
 .loginButton {
-  margin-top: 4px;
-  padding: 12px;
+  margin-top: 1rem;
+  background: var(--accent);
+  color: var(--accent-contrast);
   border: none;
-  border-radius: 8px;
-  background: #2ecc71;
-  color: white;
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
+  border-radius: var(--radius-pill);
+  padding: 1.125rem;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
-  transition:
-    background 0.2s,
-    transform 0.1s;
+  transition: all 0.25s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: var(--shadow-soft);
 }
 
 .loginButton:hover {
-  background: #27ae60;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
+  opacity: 0.95;
 }
 
 .loginButton:active {
   transform: translateY(0);
+}
+
+.toggleContainer {
+  text-align: center;
+  font-size: 0.95rem;
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.toggleText {
+  color: var(--text-secondary);
+}
+
+.toggleBtn {
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s ease;
+}
+
+.toggleBtn:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }

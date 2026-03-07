@@ -4,3 +4,5 @@ django-cors-headers
 psycopg[binary]
 djangorestframework-simplejwt
 #dodac geodjango
+pandas
+openpyxl

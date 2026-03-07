@@ -1,10 +1,124 @@
-.chip {
-  border: 1px solid rgba(15, 23, 42, 0.18);
-  background: aquamarine;
-  color: #213547;
+/* --- GŁÓWNE KONTENERY MAPY --- */
+.mapWrapper {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+}
+
+.mapContainer {
+  height: 100%;
+  width: 100%;
+}
+
+/* --- PANEL FILTROWANIA (WARSTWY) --- */
+.filterPanel {
+  position: absolute;
+  top: 20px;
+  left: 60px;
+  z-index: 1000;
+  
+  /* UŻYWAMY TWOICH ZMIENNYCH Z INDEX.CSS */
+  background: var(--glass-bg-strong); /* Automatycznie jasne/ciemne tło */
+  color: var(--text-primary);         /* Automatycznie jasny/ciemny tekst */
+  border: 1px solid var(--border);    /* Subtelna ramka pasująca do motywu */
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: var(--blur);       /* Efekt rozmycia (frosted glass) */
+
   padding: 12px 18px;
-  border-radius: 999px;
-  font-weight: 600;
+  border-radius: var(--radius-md);    /* Twoje zaokrąglenia */
+  
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  
+  /* Płynne przejście przy zmianie motywu */
+  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+
+.filterHeader {
+  margin: 0 0 4px 0;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary); /* Szary tekst zdefiniowany w Twoim motywie */
+  font-weight: 700;
+}
+
+.filterLabel {
   cursor: pointer;
-  margin: 1rem;
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  font-size: 14px;
+  transition: opacity 0.2s;
+}
+
+.filterLabel:hover {
+  opacity: 0.8;
+}
+
+.filterCheckbox {
+  margin-right: 10px;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--accent); /* Główny kolor akcentu (czarny/biały zależnie od motywu) */
+}
+
+/* --- MARKERY BUDYNKÓW --- */
+.markerWrap {
+  width: 42px;
+  height: 42px;
+  position: relative;
+}
+
+.marker {
+  width: 42px;
+  height: 42px;
+  border-radius: 16px;
+  background: rgba(255, 251, 245, 0.96); /* Tutaj zostawiamy jasne, żeby marker był widoczny na mapie */
+  border: 1px solid rgba(44, 41, 38, 0.12);
+  box-shadow:
+    0 10px 24px rgba(36, 30, 24, 0.18),
+    0 2px 6px rgba(36, 30, 24, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.marker:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow:
+    0 14px 30px rgba(36, 30, 24, 0.22),
+    0 4px 10px rgba(36, 30, 24, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+.markerHouse {
+  width: 18px;
+  height: 18px;
+  color: #2c2926;
+  opacity: 0.92;
+}
+
+.markerDot {
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  transform: translateX(-50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #2c2926;
+  border: 2px solid rgba(255, 251, 245, 0.96);
+  box-shadow: 0 4px 10px rgba(36, 30, 24, 0.18);
+}
+
+/* FIX: FOCUS OUTLINE */
+:global(path.leaflet-interactive:focus) {
+  outline: none !important;
 }
