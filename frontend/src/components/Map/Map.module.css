@@ -77,32 +77,28 @@
   width: 42px;
   height: 42px;
   border-radius: 16px;
-  background: rgba(255, 251, 245, 0.96); /* Tutaj zostawiamy jasne, żeby marker był widoczny na mapie */
-  border: 1px solid rgba(44, 41, 38, 0.12);
-  box-shadow:
-    0 10px 24px rgba(36, 30, 24, 0.18),
-    0 2px 6px rgba(36, 30, 24, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(8px);
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-medium);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.25s ease, border-color 0.25s ease;
 }
 
 .marker:hover {
   transform: translateY(-2px) scale(1.03);
-  box-shadow:
-    0 14px 30px rgba(36, 30, 24, 0.22),
-    0 4px 10px rgba(36, 30, 24, 0.10),
-    inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  box-shadow: var(--shadow-strong);
 }
 
 .markerHouse {
   width: 18px;
   height: 18px;
-  color: #2c2926;
+  color: var(--text-primary);
   opacity: 0.92;
+  transition: color 0.25s ease;
 }
 
 .markerDot {
@@ -113,9 +109,35 @@
   width: 10px;
   height: 10px;
   border-radius: 999px;
-  background: #2c2926;
-  border: 2px solid rgba(255, 251, 245, 0.96);
-  box-shadow: 0 4px 10px rgba(36, 30, 24, 0.18);
+  background: var(--text-primary);
+  border: 2px solid var(--glass-bg-strong);
+  box-shadow: var(--shadow-soft);
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+/* --- STANY AKTYWNE (PODŚWIETLONE) --- */
+.markerHoveredContainer {
+  transform: scale(1.15);
+  transition: transform 0.2s;
+  z-index: 2000;
+}
+
+.markerHovered {
+  /* Wymuszamy mocny, ciemno-szary kolor zawsze - niezależnie od motywu */
+  background: #1a1a1a !important; 
+  border-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+/* Kolor samej ikonki domku w srodku */
+.markerHovered .markerHouse {
+  color: #ffffff !important; 
+}
+
+/* Kolor ogonka z kropką */
+.markerDotHovered {
+  background: #1a1a1a !important;
+  border-color: #1a1a1a !important;
 }
 
 /* FIX: FOCUS OUTLINE */

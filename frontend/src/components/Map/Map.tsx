@@ -8,6 +8,7 @@ import {
 } from 'react-leaflet';
 import L, { divIcon, type LatLngExpression } from 'leaflet';
 import { useEffect, useMemo, useState, useRef } from 'react';
+import { useAppContext } from '../../context/AppContext.tsx'; 
 import MapController from '../MapController.tsx';
 import RightSidePanel from '../RightSidePanel/RightSidePanel.tsx';
 import styles from './Map.module.css';
@@ -22,20 +23,28 @@ function FixMapSize() {
   return null;
 }
 
-const cities: { name: string; center: LatLngExpression }[] = [
-  { name: 'Gdańsk', center:[54.352, 18.6466] },
-  { name: 'Gdynia', center:[54.5189, 18.5305] },
-  { name: 'Sopot', center: [54.4418, 18.5601] },
-  { name: 'OlsztynKOCHAM', center:[53.7784, 20.4801] },
-];
-
 export default function Map() {
-  const[selectedCityIdx, setSelectedCityIdx] = useState(0);
+  const { currentCity } = useAppContext();
 
   // --- DANE ---
   const[safetyData, setSafetyData] = useState<Record<string, number>>({});
   const[geoJsonData, setGeoJsonData] = useState<any>(null);
   const [buildings, setBuildings] = useState<any[]>([]);
+
+  // --- STAN HOVERA MIESZKAŃ ---
+  const [hoveredBuildingId, setHoveredBuildingId] = useState<number | string | null>(null);
+
+  // --- OBSŁUGA MOTYWU ---
+  const [isDarkTheme, setIsDarkTheme] = useState(document.body.classList.contains('dark-theme'));
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDarkTheme(document.body.classList.contains('dark-theme'));
+    });
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
+
 
   // --- NOWA LOGIKA FILTRÓW (Suwak) ---
   // 1. Zakres danych (Min i Max przestępczości w mieście) - obliczane z API
@@ -43,6 +52,10 @@ export default function Map() {
   
   // 2. Aktualnie wybrany próg (domyślnie ustawiamy wysoko, żeby pokazać wszystko)
   const[safetyThreshold, setSafetyThreshold] = useState<number>(1000); 
+
+  // --- LOGIKA FILTRÓW: EDUKACJA ---
+  const[eduTypes, setEduTypes] = useState<string[]>([]);
+  const[eduRadius, setEduRadius] = useState<number>(5);
 
   // --- ZAPAMIĘTYWANIE WARSTW (localStorage) ---
   const [showSafetyLayer, setShowSafetyLayer] = useState<boolean>(() => {
@@ -55,6 +68,13 @@ export default function Map() {
   }, [showSafetyLayer]);
   
   const geoJsonRef = useRef<any>(null);
+
+    // --- HELPER DO FILTRÓW ---
+  const isDistrictVisible = (wskaznik?: number) => {
+    if (wskaznik === undefined) return true;
+    return wskaznik <= safetyThreshold;
+  };
+
 
   // --- NORMALIZACJA NAZW ---
   const normalizeName = (name: string) => {
@@ -156,6 +176,35 @@ export default function Map() {
       }),[]
   );
 
+    // --- IKONA PODŚWIETLONA (Większa) ---
+  const buildingMarkerIconHovered = useMemo(
+    () => {
+      // Sztywne hexy żeby oszukać Leafleta: tło i ikona/ogon
+      const fgColor = isDarkTheme ? '#111111' : '#f3f3f1'; 
+      const bgColor = isDarkTheme ? '#f3f3f1' : '#181716'; 
+      
+      return divIcon({
+        className: '',
+        html: `
+          <div style="width: 42px; height: 42px; position: relative; transform: scale(1.15); transition: transform 0.2s; z-index: 2000;">
+            <div style="width: 42px; height: 42px; border-radius: 16px; background-color: ${bgColor} !important; border: 1px solid ${bgColor} !important; box-shadow: 0 14px 30px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center;">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px; color: ${fgColor} !important;">
+                <path d="M4 10.5L12 4L20 10.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M6.5 9.5V19H17.5V9.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M10 19V14H14V19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div style="position: absolute; left: 50%; bottom: -6px; transform: translateX(-50%); width: 10px; height: 10px; border-radius: 999px; background-color: ${fgColor} !important; border: 2px solid ${bgColor} !important; box-shadow: 0 4px 10px rgba(0,0,0,0.3);"></div>
+          </div>
+        `,
+        iconSize:[42, 48],
+        iconAnchor: [21, 48],
+        popupAnchor:[0, -44],
+      });
+    }, [isDarkTheme] 
+  );
+
+
   const getSafetyLabel = (val: number) => {
     if (val < 15) return 'Bardzo Wysokie';
     if (val < 30) return 'Wysokie';
@@ -172,6 +221,17 @@ export default function Map() {
     if (wskaznik >= 15) return '#d9ef8b';
     if (wskaznik >= 10) return '#91cf60';
     return '#1a9850';
+  };
+
+  const getTextColor = (wskaznik?: number) => {
+  if (wskaznik === undefined || wskaznik === null) return '#333333';
+  if (wskaznik >= 60) return '#b2182b'; // Ciemny czerwony
+  if (wskaznik >= 45) return '#d6604d'; // Ciemniejszy pomarańczowy
+  if (wskaznik >= 30) return '#b8860b'; // Zgaszony, ciemny żółto-musztardowy
+  if (wskaznik >= 20) return '#8c7d00'; // Oliwkowy (zamiast bardzo jasnego żółtego)
+  if (wskaznik >= 15) return '#4d9221'; // Ciemny, soczysty zielony
+  if (wskaznik >= 10) return '#276419'; // Jeszcze ciemniejszy zielony
+  return '#00441b'; // Najciemniejszy zielony
   };
 
   // --- ZMODYFIKOWANY STYL (Reaguje na suwak) ---
@@ -203,13 +263,24 @@ export default function Map() {
     };
   };
 
-  const highlightFeature = (e: any) => { /* ... bez zmian ... */
+    const highlightFeature = (e: any) => {
     const layer = e.target;
+    const rawName = layer.feature?.properties?.name || layer.feature?.properties?.nazwa;
+    const cleanName = normalizeName(rawName);
+    const wskaznik = safetyData[cleanName];
+
+    // TUTAJ JEST MAGIA: Jeśli dzielnica jest ukryta filtrem, ignoruj hover
+    if (!isDistrictVisible(wskaznik)) {
+      return;
+    }
+
     layer.setStyle({ weight: 3, color: '#111111', fillOpacity: 0.75 });
+    
     if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
       layer.bringToFront();
     }
   };
+
 
   const resetHighlight = (e: any) => {
     if (geoJsonRef.current) {
@@ -224,12 +295,18 @@ export default function Map() {
 
     layer.on({ mouseover: highlightFeature, mouseout: resetHighlight });
 
+    // Jeśli ukryta, w ogóle nie doczepiaj dymka (tooltipa)
+    if (!isDistrictVisible(wskaznik)) {
+      return;
+    }
+
+
     if (wskaznik !== undefined) {
       layer.bindTooltip(
         `<div style="text-align: center; font-family: sans-serif;">
           <b style="font-size:14px;">${rawName}</b><br/>
           <span style="font-size:11px; color:#555; text-transform:uppercase;">Bezpieczeństwo</span><br/>
-          <b style="color: ${getColor(wskaznik)}">${getSafetyLabel(wskaznik)}</b><br/>
+          <b style="color: ${getTextColor(wskaznik)}">${getSafetyLabel(wskaznik)}</b><br/>
           <small>(${wskaznik.toFixed(1)} zgłoszeń/1k)</small>
         </div>`,
         { sticky: true }
@@ -238,10 +315,6 @@ export default function Map() {
       layer.bindTooltip(`<b>${rawName}</b><br/>Brak danych`, { sticky: true });
     }
   };
-
-  function onChangeCity(): void {
-    setSelectedCityIdx((prev) => (prev < cities.length - 1 ? prev + 1 : 0));
-  }
 
   return (
     <div className={styles.mapWrapper}>
@@ -259,12 +332,12 @@ export default function Map() {
       </div>
 
       <MapContainer
-        center={cities[0].center}
+        center={currentCity.center}
         zoom={12}
         className={styles.mapContainer}
       >
         <FixMapSize />
-        <MapController center={cities[selectedCityIdx].center} />
+        <MapController center={currentCity.center} />
 
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -273,7 +346,7 @@ export default function Map() {
 
         {showSafetyLayer && geoJsonData && Object.keys(safetyData).length > 0 && (
           <GeoJSON
-            key="gdansk-safety-layer"
+            key={`gdansk-safety-layer-${safetyThreshold}`}
             data={geoJsonData}
             style={geoJsonStyle}
             onEachFeature={onEachFeature}
@@ -285,10 +358,15 @@ export default function Map() {
           <Marker
             key={building.id}
             position={[building.lat, building.lng]}
-            icon={buildingMarkerIcon}
-            zIndexOffset={1000}
+            icon={hoveredBuildingId === building.id ? buildingMarkerIconHovered : buildingMarkerIcon}
+            zIndexOffset={hoveredBuildingId === building.id ? 2000 : 1000}
+            eventHandlers={{
+              mouseover: () => setHoveredBuildingId(building.id),
+              mouseout: () => setHoveredBuildingId(null),
+            }}
           >
             <Popup>
+
               <div>
                 <strong>{building.name}</strong><br />
                 {building.district}<br />
@@ -302,14 +380,19 @@ export default function Map() {
       {/* --- PRZEKAZUJEMY DANE DO SIDEBARA --- */}
       {/* Tu będzie błąd TypeScripta dopóki nie zrobimy Kroku 2 - to normalne! */}
       <RightSidePanel
-        cityName={cities[selectedCityIdx].name}
-        onChangeCity={onChangeCity}
+        cityName={currentCity.name}
         buildings={filteredBuildings}
         // Nowe propsy:
         safetyThreshold={safetyThreshold}
         setSafetyThreshold={setSafetyThreshold}
         safetyMin={safetyRange.min}
         safetyMax={safetyRange.max}
+        hoveredBuildingId={hoveredBuildingId}
+        setHoveredBuildingId={setHoveredBuildingId}
+        eduTypes={eduTypes}
+        setEduTypes={setEduTypes}
+        eduRadius={eduRadius}
+        setEduRadius={setEduRadius}
       />
     </div>
   );

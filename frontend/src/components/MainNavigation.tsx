@@ -4,7 +4,7 @@ import { useAppContext } from '../context/AppContext';
 import { useState, useEffect } from 'react';
 
 function MainNavigation() {
-  const { email } = useAppContext();
+  const { email, cities, currentCity, changeCity } = useAppContext();
   
   // Prosty state dla dark mode (domyślnie light, żeby pasował do nowego UI)
   const [isDark, setIsDark] = useState(false);
@@ -40,9 +40,32 @@ function MainNavigation() {
             
             <li><div className={classes.separator} /></li>
 
+            {/* Wybór miasta */}
+            {/* Wybór miasta */}
+            <li>
+              <div className={classes.citySelectWrapper}>
+                {/* Wyświetlamy tylko nazwę miasta, bez pinezki */}
+                <span>{currentCity.name}</span>
+                
+                <select 
+                  className={classes.citySelect}
+                  value={currentCity.name}
+                  onChange={(e) => changeCity(e.target.value)}
+                >
+                  {cities.map((city) => (
+                    <option key={city.name} value={city.name}>
+                      {city.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </li>
+
+            <li><div className={classes.separator} /></li>
+
             {/* Przycisk zmiany motywu */}
             <li>
-              <button 
+              <button
                 className={classes.themeToggle} 
                 onClick={() => setIsDark(!isDark)}
                 aria-label="Toggle dark mode"

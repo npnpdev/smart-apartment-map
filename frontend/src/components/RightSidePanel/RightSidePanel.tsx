@@ -1,7 +1,7 @@
 import SidePanel from "../SidePanel/SidePanel.tsx";
 import stylesSidePanel from "../SidePanel/SidePanel.module.css";
 import styles from "./RightSidePanel.module.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import type { Dispatch, SetStateAction } from "react";
 
 // Definicja typu danych o budynku
@@ -17,40 +17,50 @@ export interface Building {
 
 interface RightSidePanelProps {
   cityName: string;
-  onChangeCity: () => void;
   buildings: Building[];
 
-  // NOWOŚĆ: Propsy do sterowania suwakiem bezpieczeństwa
+  // Propsy do sterowania suwakiem bezpieczeństwa
   safetyThreshold: number;
   setSafetyThreshold: Dispatch<SetStateAction<number>>;
   safetyMin: number;
   safetyMax: number;
+
+  // Propsy do filtra edukacji
+  eduTypes: string[];
+  setEduTypes: Dispatch<SetStateAction<string[]>>;
+  eduRadius: number;
+  setEduRadius: Dispatch<SetStateAction<number>>;
+
+  hoveredBuildingId?: number | string | null;
+  setHoveredBuildingId?: (id: number | string | null) => void;
 }
 
 const ITEMS_PER_PAGE = 5;
 
-// Typ określający, który filtr jest aktualnie rozwinięty
-type FilterType = 'safety' | 'noise' | 'budget' | null;
+const AVAILABLE_EDU_TYPES =["Przedszkola", "Podstawowe", "Średnie", "Uczelnie"];
 
 export default function RightSidePanel({
-  cityName,
-  onChangeCity,
   buildings,
   safetyThreshold,
   setSafetyThreshold,
   safetyMin,
-  safetyMax
+  safetyMax,
+  eduTypes,
+  setEduTypes,
+  eduRadius,
+  setEduRadius,
+  hoveredBuildingId,      
+  setHoveredBuildingId,
 }: RightSidePanelProps) {
-  const [hovered, setHovered] = useState(false);
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
   
-  // Stan: który filtr jest rozwinięty? (null = widok ogólny)
-  const [activeFilter, setActiveFilter] = useState<FilterType>(null);
+  // Stan: kontroluje widok (lista wyników vs strona z filtrami)
+  const [view, setView] = useState<'list' | 'filters'>('list');
 
   // Resetujemy paginację przy zmianie filtrów
   useEffect(() => {
     setVisibleCount(ITEMS_PER_PAGE);
-  }, [buildings, safetyThreshold]);
+  },[buildings, safetyThreshold, eduTypes, eduRadius]);
 
   const handleLoadMore = () => {
     setVisibleCount((prev) => prev + ITEMS_PER_PAGE);
@@ -59,14 +69,31 @@ export default function RightSidePanel({
   const visibleBuildings = buildings.slice(0, visibleCount);
   const hasMore = visibleCount < buildings.length;
 
-  // Funkcja resetująca filtry
+  // Sprawdzamy czy filtry są aktywne
+  const isSafetyFiltered = safetyThreshold <= safetyMax;
+  const isEduFiltered = eduTypes.length > 0;
+
+  // Obliczanie liczby aktywnych filtrów dla odznaki
+  const activeFilterCount = useMemo(() => {
+    let count = 0;
+    if (isSafetyFiltered) count++;
+    if (isEduFiltered) count++;
+    return count;
+  }, [isSafetyFiltered, isEduFiltered]);
+
+  // Funkcja resetująca stany wszystkich filtrów (bez zmiany widoku)
   const resetFilters = () => {
-    setActiveFilter(null);
-    setSafetyThreshold(safetyMax + 1); // Ustawiamy próg powyżej max, żeby pokazać wszystko
+    setSafetyThreshold(safetyMax + 1);
+    setEduTypes([]); 
+    setEduRadius(5); 
   };
 
-  // Sprawdzamy czy filtr jest aktywny (czy suwak został ruszony)
-  const isSafetyFiltered = safetyThreshold <= safetyMax;
+  // Funkcja dodająca/usuwająca dany typ edukacji z listy
+  const toggleEduType = (type: string) => {
+    setEduTypes((prev) => 
+      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
+    );
+  };
 
   return (
     <SidePanel
@@ -75,135 +102,178 @@ export default function RightSidePanel({
       subtitle="PLATFORMA ANALITYCZNA"
       width={560}
     >
-      <button
-        className={styles.chip}
-        type="button"
-        onClick={onChangeCity}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-      >
-        {hovered ? "Zmień miasto" : cityName}
-      </button>
 
-      {/* --- SEKCJA FILTRÓW (DYNAMICZNA) --- */}
+      {/* --- SEKCJA GŁÓWNA (ZARZĄDZANIE WIDOKAMI) --- */}
       <div className={styles.filtersWrapper}>
         
-        {/* WIDOK 1: GŁÓWNA LISTA KAFELKÓW (Gdy nic nie jest rozwinięte) */}
-        {activeFilter === null && (
-          <div className={stylesSidePanel.chips}>
-            {/* Kafelek Bezpieczeństwo */}
+        {/* WIDOK 1: PRZYCISK FILTRÓW I RESET */}
+        {view === 'list' && (
+          <div className={styles.mainControls}>
             <button 
-              className={`${stylesSidePanel.chip} ${isSafetyFiltered ? stylesSidePanel.chipActive : ''}`}
-              onClick={() => setActiveFilter('safety')}
+              className={styles.mainFilterButton} 
+              onClick={() => setView('filters')}
             >
-              Bezpieczeństwo {isSafetyFiltered && '✓'}
+              Filtry
+              {activeFilterCount > 0 && (
+                <span className={styles.activeFilterBadge}>{activeFilterCount}</span>
+              )}
             </button>
 
-            {/* Inne kafelki (na razie atrapy) */}
-            <button className={stylesSidePanel.chip} onClick={() => setActiveFilter('noise')}>
-              Hałas
-            </button>
-            <button className={stylesSidePanel.chip} onClick={() => setActiveFilter('budget')}>
-              Budżet
-            </button>
-
-            {/* Przycisk Reset */}
-            {isSafetyFiltered && (
+            {activeFilterCount > 0 && (
                <button className={styles.resetButton} onClick={resetFilters}>
-                 Resetuj filtry ✕
+                 Resetuj ✕
                </button>
             )}
           </div>
         )}
 
-        {/* WIDOK 2: ROZWINIĘTY FILTR BEZPIECZEŃSTWA */}
-        {activeFilter === 'safety' && (
-          <div className={styles.expandedFilter}>
-            <div className={styles.expandedHeader}>
-              <button className={styles.backButton} onClick={() => setActiveFilter(null)}>
-                ← Wróć
-              </button>
-              <span className={styles.expandedTitle}>Poziom Bezpieczeństwa</span>
+        {/* WIDOK 2: PIONOWA LISTA FILTRÓW */}
+        {view === 'filters' && (
+          <div className={styles.filtersPage}>
+            <button className={styles.backButton} onClick={() => setView('list')}>
+              ← Wróć do wyników
+            </button>
+
+            {/* SEKCJA 1: BEZPIECZEŃSTWO */}
+            <div className={styles.filterSection}>
+              <h3 className={styles.filterSectionTitle}>Poziom Bezpieczeństwa</h3>
+              <div className={styles.sliderContainer}>
+                <div className={styles.sliderLabels}>
+                  <span>Najbezpieczniejsze</span>
+                  <span>Wszystkie</span>
+                </div>
+                
+                <input 
+                  type="range" 
+                  min={safetyMin} 
+                  max={safetyMax + 1} 
+                  value={safetyThreshold} 
+                  onChange={(e) => setSafetyThreshold(Number(e.target.value))}
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onTouchStart={(e) => e.stopPropagation()}
+                  className={styles.sliderInput}
+                />
+                
+                <div className={styles.sliderValue}>
+                  {safetyThreshold > safetyMax ? (
+                    <strong>Pokazuję wszystkie dzielnice</strong>
+                  ) : (
+                    <>
+                      Max: <strong>{safetyThreshold}</strong> zgłoszeń/1k
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* SEKCJA 2: EDUKACJA */}
+            <div className={styles.filterSection}>
+              <h3 className={styles.filterSectionTitle}>Placówki edukacyjne</h3>
+              <div className={styles.eduTypesWrapper}>
+                <span className={styles.sectionLabel}>Wybierz rodzaj:</span>
+                <div className={styles.eduTypesContainer}>
+                  {AVAILABLE_EDU_TYPES.map(type => {
+                    const isActive = eduTypes.includes(type);
+                    return (
+                      <button 
+                        key={type}
+                        onClick={() => toggleEduType(type)}
+                        className={`${styles.eduTypeChip} ${isActive ? styles.eduTypeChipActive : ''}`}
+                      >
+                        {type}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className={styles.sliderContainer} style={{ marginTop: '20px' }}>
+                <span className={styles.sectionLabel}>Maksymalna odległość:</span>
+                <div className={styles.sliderLabels} style={{ marginTop: '8px' }}>
+                  <span>0.5 km</span>
+                  <span>5 km</span>
+                </div>
+                
+                <input 
+                  type="range" 
+                  min="0.5" 
+                  max="5" 
+                  step="0.5"
+                  value={eduRadius} 
+                  onChange={(e) => setEduRadius(Number(e.target.value))}
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onTouchStart={(e) => e.stopPropagation()}
+                  className={styles.sliderInput}
+                />
+                
+                <div className={styles.sliderValue}>
+                  W promieniu: <strong>{eduRadius} km</strong>
+                </div>
+              </div>
             </div>
             
-            <div className={styles.sliderContainer}>
-              <div className={styles.sliderLabels}>
-                <span>Najbezpieczniejsze</span>
-                <span>Wszystkie</span>
-              </div>
-              
-              <input 
-                type="range" 
-                min={safetyMin} 
-                max={safetyMax + 1} // +1 pozwala wybrać opcję "Wszystkie"
-                value={safetyThreshold} 
-                onChange={(e) => setSafetyThreshold(Number(e.target.value))}
-                className={styles.sliderInput}
-              />
-              
-              <div className={styles.sliderValue}>
-                {safetyThreshold > safetyMax ? (
-                  <strong>Pokazuję wszystkie dzielnice</strong>
-                ) : (
-                  <>
-                    Max: <strong>{safetyThreshold}</strong> zgłoszeń/1k
-                  </>
-                )}
-              </div>
+            {/* SEKCJA 3: INFO O PRZYSZŁYCH FILTRACH */}
+            <div className={styles.filterSection}>
+              <h3 className={styles.filterSectionTitle}>Hałas i Budżet</h3>
+              <p className={styles.placeholderText}>Opcje filtrowania na podstawie hałasu i budżetu pojawią się w przyszłych wersjach platformy.</p>
             </div>
-          </div>
-        )}
-
-        {/* Placeholder dla innych filtrów */}
-        {(activeFilter === 'noise' || activeFilter === 'budget') && (
-           <div className={styles.expandedFilter}>
-             <button className={styles.backButton} onClick={() => setActiveFilter(null)}>← Wróć</button>
-             <p style={{padding: '20px', textAlign: 'center', color: '#888'}}>Tu będzie filtr {activeFilter}...</p>
-           </div>
-        )}
-
-      </div>
-
-      {/* --- LISTA WYNIKÓW --- */}
-      <div className={styles.resultsContainer}>
-        {buildings.length === 0 ? (
-          <div className={stylesSidePanel.empty}>
-            <div>
-              <div className={stylesSidePanel.emptyIcon}>🔍</div>
-              <div className={stylesSidePanel.emptyText}>
-                Brak ofert w wybranym zakresie bezpieczeństwa.
-                <br/>
-                Spróbuj przesunąć suwak w prawo.
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className={styles.listWrapper}>
-            <div className={styles.resultsCount}>
-               Znaleziono: {buildings.length} ofert
-            </div>
-
-            {visibleBuildings.map((building) => (
-              <div key={building.id} className={styles.card}>
-                <div className={styles.cardHeader}>
-                  <span className={styles.cardPrice}>{building.price} zł</span>
-                  <span className={styles.cardDistrict}>{building.district}</span>
-                </div>
-                <div className={styles.cardTitle}>{building.name}</div>
-                <div className={styles.cardFooter}>
-                    <button className={styles.cardButton}>Szczegóły</button>
-                </div>
-              </div>
-            ))}
-
-            {hasMore && (
-              <button onClick={handleLoadMore} className={styles.loadMoreBtn}>
-                Załaduj więcej (+{buildings.length - visibleCount})
-              </button>
-            )}
+            
           </div>
         )}
       </div>
+
+      {/* --- LISTA WYNIKÓW (POKAZYWANA TYLKO W WIDOKU 'LIST') --- */}
+      {view === 'list' && (
+        <div className={styles.resultsContainer}>
+          {buildings.length === 0 ? (
+            <div className={stylesSidePanel.empty}>
+              <div>
+                <div className={stylesSidePanel.emptyIcon}>🔍</div>
+                <div className={stylesSidePanel.emptyText}>
+                  Brak ofert w wybranym zakresie.
+                  <br/>
+                  Spróbuj zmienić parametry filtrów.
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className={styles.listWrapper}>
+              <div className={styles.resultsCount}>
+                 Znaleziono: {buildings.length} ofert
+              </div>
+
+                {visibleBuildings.map((building) => {
+                const isHovered = hoveredBuildingId === building.id;
+                
+                return (
+                  <div 
+                    key={building.id} 
+                    className={`${styles.card} ${isHovered ? styles.cardHovered : ""}`}
+                    onMouseEnter={() => setHoveredBuildingId && setHoveredBuildingId(building.id)}
+                    onMouseLeave={() => setHoveredBuildingId && setHoveredBuildingId(null)}
+                    style={isHovered ? { transform: 'translateY(-2px)', borderColor: 'var(--accent)', boxShadow: 'var(--shadow-medium)' } : { transition: 'all 0.2s' }}
+                  >
+                    <div className={styles.cardHeader}>
+                      <span className={styles.cardPrice}>{building.price} zł</span>
+                      <span className={styles.cardDistrict}>{building.district}</span>
+                    </div>
+                    <div className={styles.cardTitle}>{building.name}</div>
+                    <div className={styles.cardFooter}>
+                        <button className={styles.cardButton}>Szczegóły</button>
+                    </div>
+                  </div>
+                );
+              })}
+
+              {hasMore && (
+                <button onClick={handleLoadMore} className={styles.loadMoreBtn}>
+                  Załaduj więcej (+{buildings.length - visibleCount})
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      )}
     </SidePanel>
   );
 }
