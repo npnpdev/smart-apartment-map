@@ -10,6 +10,11 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U smart_user -d smart_apartment" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   docs:
     build:
@@ -31,6 +36,9 @@ services:
       - ./data:/app/data
     env_file:
       - .env
+    depends_on:
+      db:
+        condition: service_healthy
 
   frontend:
     build:
