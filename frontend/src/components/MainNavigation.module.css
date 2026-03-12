@@ -103,102 +103,98 @@
   transform: scale(0.9);
 }
 
-/* --- WYBÓR MIASTA --- */
-.citySelectWrapper {
+/* --- CUSTOM CITY DROPDOWN --- */
+.customDropdownContainer {
+  position: relative;
+}
+
+.dropdownTrigger {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 0 14px;
-  height: 42px; /* Wysokość dopasowana do reszty przycisków w pasku */
-  border-radius: var(--radius-pill);
-  background: var(--glass-bg);
-  border: 1px solid transparent;
-  transition: all 0.2s ease;
-}
-
-.citySelectWrapper:hover {
-  background: var(--glass-elevated);
-  border-color: var(--border);
-}
-
-.cityIcon {
-  font-size: 1rem;
-}
-
-.citySelect {
-  background: transparent;
-  border: none;
-  color: var(--text-primary);
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  outline: none;
-  appearance: none;
-  -webkit-appearance: none;
-  padding-right: 4px; /* brak strzałki, więc mniej paddingu */
-}
-
-/* Opcje w HTML select potrzebują twardego tła (inaczej tekst zleje się na szkle) */
-.citySelect option {
-  background: var(--glass-bg-strong, #222); 
-  color: var(--text-primary, #fff);
-}
-
-.citySelectWrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-  height: 42px;
-  padding: 0 18px;
-  background: var(--glass-bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-pill);
-  cursor: pointer;
-  transition: all 0.2s;
-  color: var(--text-secondary);
-  font-weight: 500;
-  font-size: 0.95rem;
-}
-
-.citySelectWrapper:hover {
-  background: var(--glass-elevated);
-  color: var(--text-primary);
-}
-
-.citySelect {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0; /* Ukrywamy systemowy select, ale zostawiamy go funkcjonalnym */
-  cursor: pointer;
-}
-
-.citySelectWrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
   padding: 0 16px;
   height: 42px;
-  background: var(--glass-bg);
-  border: 1px solid var(--border);
+  background: transparent;
+  border: 1px solid transparent;
   border-radius: var(--radius-pill);
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
   transition: all 0.2s ease;
-  cursor: pointer;
 }
 
-.citySelectWrapper:hover {
+.dropdownTrigger:hover, .dropdownTrigger[aria-expanded="true"] {
   background: var(--glass-elevated);
-  border-color: var(--border-strong);
+  color: var(--text-primary);
 }
 
-.citySelect {
+.dropdownIcon {
+  transition: transform 0.2s ease;
+}
+
+.dropdownIcon.open {
+  transform: rotate(180deg); /* Obraca strzałeczkę po kliknięciu */
+}
+
+.dropdownMenu {
   position: absolute;
-  top: 0;
-  left: 0;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 130px;
+  
+  background: var(--glass-bg-strong); 
+  
+  backdrop-filter: blur(50px);
+  -webkit-backdrop-filter: blur(50px);
+  
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15); /* Delikatny cień odkleja menu od tła */
+  
+  padding: 6px;
+  margin: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 3000;
+  animation: fadeInDown 0.2s ease-out forwards;
+}
+
+.dropdownItem {
   width: 100%;
-  height: 100%;
-  opacity: 0; /* Ukrywamy go, żeby nie było widać systemowej listy */
+  text-align: left;
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  font-weight: 500;
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dropdownItem:hover {
+  background: var(--glass-elevated);
+  color: var(--text-primary);
+}
+
+.activeItem {
+  background: var(--accent-soft);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
 }

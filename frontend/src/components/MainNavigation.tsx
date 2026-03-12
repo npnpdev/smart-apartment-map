@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import classes from './MainNavigation.module.css';
 import { useAppContext } from '../context/AppContext';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 function MainNavigation() {
   const { email, cities, currentCity, changeCity } = useAppContext();
@@ -9,6 +9,20 @@ function MainNavigation() {
   // Prosty state dla dark mode (domyślnie light, żeby pasował do nowego UI)
   const [isDark, setIsDark] = useState(false);
 
+  // --- NOWE STANY DO DROPDOWNU MIAST ---
+  const [isCityDropdownOpen, setIsCityDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLLIElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsCityDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  },[]);
+  
   useEffect(() => {
     if (isDark) {
       document.body.classList.add('dark-theme');
@@ -40,25 +54,39 @@ function MainNavigation() {
             
             <li><div className={classes.separator} /></li>
 
-            {/* Wybór miasta */}
-            {/* Wybór miasta */}
-            <li>
-              <div className={classes.citySelectWrapper}>
-                {/* Wyświetlamy tylko nazwę miasta, bez pinezki */}
+            {/* --- NOWY, SZKLANY WYBÓR MIASTA --- */}
+            <li ref={dropdownRef} className={classes.customDropdownContainer}>
+              <button 
+                className={classes.dropdownTrigger}
+                onClick={() => setIsCityDropdownOpen(!isCityDropdownOpen)}
+                aria-expanded={isCityDropdownOpen}
+              >
                 <span>{currentCity.name}</span>
-                
-                <select 
-                  className={classes.citySelect}
-                  value={currentCity.name}
-                  onChange={(e) => changeCity(e.target.value)}
+                <svg 
+                  className={`${classes.dropdownIcon} ${isCityDropdownOpen ? classes.open : ''}`} 
+                  width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
                 >
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </button>
+
+              {isCityDropdownOpen && (
+                <ul className={classes.dropdownMenu}>
                   {cities.map((city) => (
-                    <option key={city.name} value={city.name}>
-                      {city.name}
-                    </option>
+                    <li key={city.name}>
+                      <button
+                        className={`${classes.dropdownItem} ${city.name === currentCity.name ? classes.activeItem : ''}`}
+                        onClick={() => {
+                          changeCity(city.name);
+                          setIsCityDropdownOpen(false);
+                        }}
+                      >
+                        {city.name}
+                      </button>
+                    </li>
                   ))}
-                </select>
-              </div>
+                </ul>
+              )}
             </li>
 
             <li><div className={classes.separator} /></li>

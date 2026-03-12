@@ -1,98 +1,370 @@
-@lat,@lon,name,amenity
-54.4209492,18.4790736,Szkoła Podstawowa nr 33 im. Stefana Banacha w Gdańsku,school
-54.3425302,18.5655726,,kindergarten
-54.3427741,18.5506999,Bajeczne Przedszkola,kindergarten
-54.3607062,18.6448988,"Akademickie Liceum Ogólnokształcące ""Lingwista""",school
-54.4208604,18.4791667,XXIV Liceum Ogólnokształcące im. Stefana Banacha,school
-54.3518258,18.5331573,Wiszący Ogródek,kindergarten
-54.3501497,18.5628412,,kindergarten
-54.3504225,18.5308403,Słoneczny Ogród,kindergarten
-54.4023481,18.6045206,Szkoła Podstawowa nr 5 im. Jana Pawła II,school
-54.4020343,18.6042732,XIV Liceum Ogólnokształcące im. Jana Pawła II,school
-54.3449666,18.8296102,Szkoła Podstawowa Nr 87,school
-54.3517583,18.5732062,Przedszkole Niepubliczne Bajkoland,kindergarten
-54.3326083,18.5972842,Morskie Przedszkole Niepubliczne,kindergarten
-54.4221276,18.4782263,Szkoła języków europejskich Universus,school
-54.3790900,18.6060501,Szkoła Muzyczna 1 stopnia imienia Grażyny Bacewicz,school
-54.3324116,18.5971177,Morska  Szkoła Podstawowa im.Aleksandra Doby w Gdańsku,school
-54.3313254,18.5574191,Kotek Mamrotek,kindergarten
-54.3664617,18.6301927,Iskierka,kindergarten
-54.3188757,18.5847376,Bajkowy Domek,kindergarten
-54.3962371,18.5902802,Przedszkole,kindergarten
-54.4029158,18.5701650,Biały Kotek,kindergarten
-54.3257583,18.6007855,Chrześcijańskie Przedszkole Montessori nr 2,kindergarten
-54.3256758,18.6006044,Chrześcijańska Szkoła Montessori nr 2,school
-54.3488274,18.5586746,Przedszkole Tygryskowa Kraina,kindergarten
-54.4048997,18.5759790,"Przedszkole niepubliczne ""Little Harvard""",kindergarten
-54.3768597,18.6053030,Przedszkole Niepubliczne Językowo – Muzyczne Calineczka,kindergarten
-54.3971132,18.5950255,MegaMocni,kindergarten
-54.3555720,18.6148147,MegaMocni,kindergarten
-54.3565722,18.5913228,I Gdańskie Liceum Katolickie im. św. Wojciecha,school
-54.3565313,18.5915156,Katolicka Szkoła Podstawowa im. Św. Wojciecha,school
-54.3836911,18.5912426,Żyrafa,kindergarten
-54.3451267,18.8298842,Przedszkole ne 61,kindergarten
-54.3525221,18.6738275,Szkoła Podstawowa Mistrzostwa Sportowego nr 94,school
-54.3522575,18.6738679,VI Liceum Ogólnokształcące im. Obrońców Helu,school
-54.3760001,18.6205450,Niepubliczne Przedszkole Lew Leon,kindergarten
-54.4116454,18.5933336,Przedszkole Specjalne Nr 72 o Profilu Terapeutycznym,kindergarten
-54.3338377,18.5423695,Publiczne Pozytywne Przedszkole nr 7,kindergarten
-54.3535085,18.6028627,Szkoła Podstawowa nr 42 w Gdańsku,school
-54.3534451,18.6028627,Przedszkole nr 73 w Gdańsku,kindergarten
-54.3403776,18.6222678,Szkoła Podstawowa nr 3,school
-54.3608130,18.6104576,Technikum nr 1 w Gdańsku,school
-54.3607517,18.6104909,Szkoła Branżowa I Stopnia nr 1 w Gdańsku,school
-54.3578366,18.5883182,Mali Zwyciezcy,kindergarten
-54.3930634,18.6098754,Wesoła kraina,kindergarten
-54.3503952,18.5339230,Elf Kids,kindergarten
-54.4106215,18.6007285,Punkt Przedszkolny Słowiańska Wieża,kindergarten
-54.3512182,18.5506996,Przedszkole Niepubliczne Marchewka,kindergarten
-54.3879163,18.5743712,Szkoła Podstawowa nr 70 z Oddziałami Sportowymi,school
-54.4098118,18.5973682,Przedszkole MoreLove,kindergarten
-54.3943141,18.6438143,Smart Kids 2 - Nowa Letnica,kindergarten
-54.3932070,18.6198333,No Stress,kindergarten
-54.4309174,18.4783906,Przedszkole publiczne Octopus,kindergarten
-54.3491467,18.5821252,Przedszkole Martolandia,kindergarten
-54.3871865,18.5900125,Klub Dziecięcy Esy Floresy,kindergarten
-54.3919074,18.6004232,9 Miesięcy,school
-54.3509511,18.5865927,Smart Kids,kindergarten
-54.3686898,18.6382413,Mental Arts,school
-54.3637033,18.5823821,Teddy,kindergarten
-54.3638556,18.5824706,Leśny Żłobek i Przedszkole,kindergarten
-54.3590583,18.5823363,Fantazja,kindergarten
-54.3824285,18.5861305,A-KuKu,kindergarten
-54.3503047,18.6253598,"Przedszkole Niepubliczne ""Sokrates""",school
-54.3503372,18.6256426,"Niepubliczna Szkoła Podstawowa ""Sokrates""",school
-54.3846955,18.5814269,MegaMocni,kindergarten
-54.3816765,18.5863731,Smykowo,kindergarten
-54.4222240,18.5898510,Nadmorskie Przedszkole Montessori,kindergarten
-54.3899408,18.6422418,Bursztynowy Kompas,kindergarten
-54.3675322,18.6921050,MegaMocni,kindergarten
-54.3234811,18.5518117,MegaMocni,kindergarten
-54.3689375,18.6106721,MegaMocni,kindergarten
-54.4052405,18.6447963,Szkoła Podstawowa nr 18,school
-54.4049877,18.6445661,XXIII Liceum Ogólnokształcące,school
-54.4197647,18.5732553,XII Sportowe Liceum Ogólnokształcące z Oddziałami Mistrzostwa Sportowego im. Janusza Kusocińskiego,school
-54.4195351,18.5732251,Sportowa Szkoła Podstawowa nr 75 z Oddziałami Mistrzostwa Sportowego im. Janusza Kusocińskiego,school
-54.3398368,18.6222562,VII Liceum Ogólnokształcące im. Józefa Wybickiego,school
-54.3489969,18.5669586,Przedszkole Fahrenheita,kindergarten
-54.3274068,18.5912030,MegaMocni Ujeścisko,kindergarten
-54.3841204,18.6146271,Ogólnokształcąca Szkoła Baletowa im. Janiny Jarzynówny-Sobczak,school
-54.4015502,18.6478183,Wesoła Kraina,kindergarten
-54.4004969,18.6468311,Wymarzone Przedszkole,kindergarten
-54.3575218,18.4914934,Publiczne Pozytywne Przedszkole nr 9,kindergarten
-54.4138899,18.5953061,Zespół Niepublicznych Placówek Oświatowych PSONI Koło w Gdańsku,school
-54.3950840,18.5957712,Szkoła Podstawowa nr 92,school
-54.3946819,18.5962835,Przedszkole nr 13,kindergarten
-54.4188319,18.4812209,Kolorowe Gniazdko,kindergarten
-54.4187321,18.4812579,Kolorowe Gniazdko,kindergarten
-54.3599806,18.5905319,Przedszkole Misia Wojtka,kindergarten
-54.3336749,18.5429945,A-Kuku,kindergarten
-54.3670367,18.5958459,Przedszkole Niepubliczne Królestwo Fantazji,kindergarten
-54.3330518,18.5868166,Przedszkole Mali Przyjaciele,kindergarten
-54.3656720,18.5828795,Przedszkole I Żłobek Koliber,kindergarten
-54.4292223,18.4723793,Słoneczna Kraina,kindergarten
-54.3828786,18.6091702,Publiczne Pozytywne Przedszkole nr 1,kindergarten
-54.3859854,18.6088416,XIX Liceum Ogólnokształcące im.Mariana Mokwy,school
-54.3854449,18.6092761,II Liceum Ogólnokształcące im. dr. Władysława Pniewskiego,school
-54.3237340,18.5935770,Mały Skarb,kindergarten
-54.3485114,18.6144339,Chatka Puchatka,kindergarten
+@lat,@lon,name,amenity,school,isced:level
+54.4209492,18.4790736,Szkoła Podstawowa nr 33 im. Stefana Banacha w Gdańsku,school,,
+54.3425302,18.5655726,,kindergarten,,
+54.3427741,18.5506999,Bajeczne Przedszkola,kindergarten,,
+54.3607062,18.6448988,"Akademickie Liceum Ogólnokształcące ""Lingwista""",school,,
+54.4208604,18.4791667,XXIV Liceum Ogólnokształcące im. Stefana Banacha,school,,3
+54.3518258,18.5331573,Wiszący Ogródek,kindergarten,,
+54.3501497,18.5628412,,kindergarten,,
+54.3504225,18.5308403,Słoneczny Ogród,kindergarten,,
+54.4023481,18.6045206,Szkoła Podstawowa nr 5 im. Jana Pawła II,school,,
+54.4020343,18.6042732,XIV Liceum Ogólnokształcące im. Jana Pawła II,school,,3
+54.3449666,18.8296102,Szkoła Podstawowa Nr 87,school,,
+54.3517583,18.5732062,Przedszkole Niepubliczne Bajkoland,kindergarten,,
+54.3326083,18.5972842,Morskie Przedszkole Niepubliczne,kindergarten,,
+54.4221276,18.4782263,Szkoła języków europejskich Universus,school,,
+54.3790900,18.6060501,Szkoła Muzyczna 1 stopnia imienia Grażyny Bacewicz,school,,1
+54.3324116,18.5971177,Morska  Szkoła Podstawowa im.Aleksandra Doby w Gdańsku,school,,
+54.3313254,18.5574191,Kotek Mamrotek,kindergarten,,
+54.3664617,18.6301927,Iskierka,kindergarten,,
+54.3981580,18.6671862,"Wyższa Szkoła Bezpieczeństwa, Wydział Studiów Społecznych w Gdańsku",university,,
+54.3188757,18.5847376,Bajkowy Domek,kindergarten,,
+54.3962371,18.5902802,Przedszkole,kindergarten,,
+54.4029158,18.5701650,Biały Kotek,kindergarten,,
+54.3774686,18.6151501,Wyższa Szkoła Turystyki i Hotelarstwa w Gdańsku,university,,
+54.3257583,18.6007855,Chrześcijańskie Przedszkole Montessori nr 2,kindergarten,,
+54.3256758,18.6006044,Chrześcijańska Szkoła Montessori nr 2,school,,
+54.3488274,18.5586746,Przedszkole Tygryskowa Kraina,kindergarten,,
+54.4048997,18.5759790,"Przedszkole niepubliczne ""Little Harvard""",kindergarten,,
+54.3768597,18.6053030,Przedszkole Niepubliczne Językowo – Muzyczne Calineczka,kindergarten,,
+54.3971132,18.5950255,MegaMocni,kindergarten,,
+54.3555720,18.6148147,MegaMocni,kindergarten,,
+54.3565722,18.5913228,I Gdańskie Liceum Katolickie im. św. Wojciecha,school,,
+54.3565313,18.5915156,Katolicka Szkoła Podstawowa im. Św. Wojciecha,school,,
+54.3836911,18.5912426,Żyrafa,kindergarten,,
+54.3451267,18.8298842,Przedszkole ne 61,kindergarten,,
+54.3525221,18.6738275,Szkoła Podstawowa Mistrzostwa Sportowego nr 94,school,,
+54.3522575,18.6738679,VI Liceum Ogólnokształcące im. Obrońców Helu,school,,3
+54.3760001,18.6205450,Niepubliczne Przedszkole Lew Leon,kindergarten,,
+54.4116454,18.5933336,Przedszkole Specjalne Nr 72 o Profilu Terapeutycznym,kindergarten,,
+54.3338377,18.5423695,Publiczne Pozytywne Przedszkole nr 7,kindergarten,,
+54.3535085,18.6028627,Szkoła Podstawowa nr 42 w Gdańsku,school,,
+54.3534451,18.6028627,Przedszkole nr 73 w Gdańsku,kindergarten,,
+54.3403776,18.6222678,Szkoła Podstawowa nr 3,school,,
+54.3608130,18.6104576,Technikum nr 1 w Gdańsku,school,,
+54.3607517,18.6104909,Szkoła Branżowa I Stopnia nr 1 w Gdańsku,school,,
+54.3578366,18.5883182,Mali Zwyciezcy,kindergarten,,
+54.3930634,18.6098754,Wesoła kraina,kindergarten,,
+54.3503952,18.5339230,Elf Kids,kindergarten,,
+54.4106215,18.6007285,Punkt Przedszkolny Słowiańska Wieża,kindergarten,,
+54.3512182,18.5506996,Przedszkole Niepubliczne Marchewka,kindergarten,,
+54.3879163,18.5743712,Szkoła Podstawowa nr 70 z Oddziałami Sportowymi,school,,
+54.4098118,18.5973682,Przedszkole MoreLove,kindergarten,,
+54.3943141,18.6438143,Smart Kids 2 - Nowa Letnica,kindergarten,,
+54.3932070,18.6198333,No Stress,kindergarten,,
+54.4309174,18.4783906,Przedszkole publiczne Octopus,kindergarten,,
+54.3491467,18.5821252,Przedszkole Martolandia,kindergarten,,
+54.3871865,18.5900125,Klub Dziecięcy Esy Floresy,kindergarten,,
+54.3919074,18.6004232,9 Miesięcy,school,,
+54.3509511,18.5865927,Smart Kids,kindergarten,,
+54.3686898,18.6382413,Mental Arts,school,,4
+54.3637033,18.5823821,Teddy,kindergarten,,
+54.3638556,18.5824706,Leśny Żłobek i Przedszkole,kindergarten,,
+54.3590583,18.5823363,Fantazja,kindergarten,,
+54.3563690,18.6502125,Cosinus,college,,
+54.3824285,18.5861305,A-KuKu,kindergarten,,
+54.3503047,18.6253598,"Przedszkole Niepubliczne ""Sokrates""",school,,0
+54.3503372,18.6256426,"Niepubliczna Szkoła Podstawowa ""Sokrates""",school,,1;2
+54.3565926,18.6471824,Pascal,college,,
+54.3846955,18.5814269,MegaMocni,kindergarten,,
+54.3816765,18.5863731,Smykowo,kindergarten,,
+54.3554081,18.6505460,Wyższa Szkoła Społeczno-Ekonomiczna w Gdańsku,university,,
+54.3554511,18.6507257,Bałtyckie Liceum Ogólnokształcące dla Dorosłych,college,,
+54.4222240,18.5898510,Nadmorskie Przedszkole Montessori,kindergarten,,
+54.3899408,18.6422418,Bursztynowy Kompas,kindergarten,,
+54.3675322,18.6921050,MegaMocni,kindergarten,,
+54.3234811,18.5518117,MegaMocni,kindergarten,,
+54.3689375,18.6106721,MegaMocni,kindergarten,,
+54.3641731,18.6167655,Powiślańska Szkoła Wyższa,college,,
+54.3565447,18.6498417,Powiślańska Szkoła Wyższa,university,,
+54.4052405,18.6447963,Szkoła Podstawowa nr 18,school,,
+54.4049877,18.6445661,XXIII Liceum Ogólnokształcące,school,,3
+54.4197647,18.5732553,XII Sportowe Liceum Ogólnokształcące z Oddziałami Mistrzostwa Sportowego im. Janusza Kusocińskiego,school,,3
+54.4195351,18.5732251,Sportowa Szkoła Podstawowa nr 75 z Oddziałami Mistrzostwa Sportowego im. Janusza Kusocińskiego,school,,
+54.3398368,18.6222562,VII Liceum Ogólnokształcące im. Józefa Wybickiego,school,,3
+54.3489969,18.5669586,Przedszkole Fahrenheita,kindergarten,,
+54.3274068,18.5912030,MegaMocni Ujeścisko,kindergarten,,
+54.3841204,18.6146271,Ogólnokształcąca Szkoła Baletowa im. Janiny Jarzynówny-Sobczak,school,,
+54.4015502,18.6478183,Wesoła Kraina,kindergarten,,
+54.4004969,18.6468311,Wymarzone Przedszkole,kindergarten,,
+54.3575218,18.4914934,Publiczne Pozytywne Przedszkole nr 9,kindergarten,,
+54.4138899,18.5953061,Zespół Niepublicznych Placówek Oświatowych PSONI Koło w Gdańsku,school,,
+54.4016449,18.5787276,Pascal,college,,
+54.3950840,18.5957712,Szkoła Podstawowa nr 92,school,,
+54.3946819,18.5962835,Przedszkole nr 13,kindergarten,,
+54.4188319,18.4812209,Kolorowe Gniazdko,kindergarten,,
+54.4187321,18.4812579,Kolorowe Gniazdko,kindergarten,,
+54.3599806,18.5905319,Przedszkole Misia Wojtka,kindergarten,,
+54.3336749,18.5429945,A-Kuku,kindergarten,,
+54.3670367,18.5958459,Przedszkole Niepubliczne Królestwo Fantazji,kindergarten,,
+54.3330518,18.5868166,Przedszkole Mali Przyjaciele,kindergarten,,
+54.3656720,18.5828795,Przedszkole I Żłobek Koliber,kindergarten,,0
+54.4292223,18.4723793,Słoneczna Kraina,kindergarten,,
+54.3828786,18.6091702,Publiczne Pozytywne Przedszkole nr 1,kindergarten,,
+54.3859854,18.6088416,XIX Liceum Ogólnokształcące im.Mariana Mokwy,school,,3
+54.3854449,18.6092761,II Liceum Ogólnokształcące im. dr. Władysława Pniewskiego,school,,3
+54.3237340,18.5935770,Mały Skarb,kindergarten,,
+54.3485114,18.6144339,Chatka Puchatka,kindergarten,,
+54.3932976,18.5767758,Katedra biotechnologii,university,,
+54.3446320,18.6503691,Szkoła Podstawowa nr 67 im. kapitana żeglugi wielkiej Tadeusza Ziółkowskiego,school,,
+54.3392606,18.6074349,Szkoła Podstawowa nr 8,school,,
+54.3992646,18.6713575,Szkoła Podstawowa nr 55,school,,
+54.4023289,18.6618778,Zespół Szkół Ogólnokształcących Nr 5 IV Liceum Ogólnokształcące z Oddziałami Mistrzostwa Sportowego im. Marynarzy Wojsk Ochrony Pogranicza,school,,3
+54.4018698,18.6563705,Zespół Szkół Morskich im. Bohaterskich Obrońców Westerplatte,school,,
+54.3577366,18.6527926,Szkoła Podstawowa nr 57 im. gen. Władysława Andersa,school,,
+54.3482656,18.6173458,VIII Liceum Ogólnokształcące im. Komisji Edukacji Narodowej,school,,3
+54.3481718,18.6188463,Szkoła Podstawowa nr 14 im. ks. Grzegorza Piramowicza,school,,
+54.3418442,18.6206179,Żłobek nr 19,kindergarten,,
+54.3419223,18.6212802,Przedszkole nr 76 Radosny Zakątek,kindergarten,,
+54.3407276,18.6229100,Przedszkole nr 85 Wesoły Ul,kindergarten,,
+54.4101056,18.5587969,Gdańskie Seminarium Duchowne,university,,
+54.3772818,18.6148670,Zakład Doskonalenia Zawodowego,college,,
+54.3817430,18.6237290,Wydział Farmaceutyczny (GUM),university,,
+54.3906523,18.5950535,"Podstawowa Szkoła Społeczna ""Niedźwiednik""",school,,
+54.3983169,18.6750906,Przedszkole Nr 1,kindergarten,,
+54.4088621,18.6012244,Specjalny Ośrodek Rewalidacyjno-Wychowawczy dla Dzieci i Młodzieży z Autyzmem w Gdańsku,school,,
+54.4187903,18.5611463,,university,,
+54.4024752,18.5608017,Ogólnokształcące Liceum Programów Indywidualnych,school,,
+54.4102673,18.5567386,,kindergarten,,
+54.4120403,18.5626174,,kindergarten,,
+54.3981910,18.6751328,"Przedszkole nr 1 ""Tęczowa Jedyneczka""",kindergarten,,
+54.3415737,18.6247835,Podwodna Kraina,kindergarten,,
+54.3417915,18.6253379,Szkrabolandia,kindergarten,,
+54.4237508,18.4746175,Krasnoludek,kindergarten,,
+54.4219912,18.4547227,Puchatek,kindergarten,,
+54.3552923,18.6590961,Szkoła Podstawowa Specjalna nr 26,school,,
+54.3563913,18.6550895,Gdańskie Szkoły Autonomiczne,school,,
+54.3584887,18.6485888,I Liceum Ogólnokształcące im. Mikołaja Kopernika,school,,3
+54.4090526,18.6295135,Przedszkole Niepubliczne Sióstr Benedyktynek Misjonarek,kindergarten,,
+54.3545212,18.6571060,Zespół Szkół Łączności im. Obrońców Poczty Polskiej,school,,
+54.3527976,18.6555186,Szkoła Podstawowa nr 50 im. Emilii Plater,school,,
+54.3513816,18.6560061,Przedszkole Nr 32,kindergarten,,
+54.3529162,18.6536353,Pod Wesołą Chmurką,kindergarten,,
+54.3163550,18.5891317,Szkoła Podstawowa nr 86 im. prof. Jerzego Sampa,school,,
+54.3247944,18.5843991,Szkoła Podstawowa nr 12,school,,
+54.3619238,18.5909282,Przedszkole nr 75,kindergarten,,
+54.3567416,18.6147256,Szkoła Podstawowa nr 43,school,,
+54.3521377,18.6273985,Szkoła Podstawowa nr 58 im. Kazimierza Sołtysika w Gdańsku,school,,
+54.3265314,18.6257578,Szkoła Podstawowa nr 19 im. Zasłużonych Ludzi Morza,school,,
+54.3522007,18.6739451,Zespół Szkół Ogólnokształcących nr 6,school,,
+54.3533093,18.6030358,Zespół Szkolno - Przedszkolny nr 2 w Gdańsku,school,,
+54.3622892,18.7127986,Przedszkole nr 58,kindergarten,,
+54.3617141,18.7122006,Szkoła Podstawowa nr 11 im. Na Bursztynowym Szlaku,school,,
+54.3784925,18.6299167,Szkoła Podstawowa Nr 69 im. generała Stanisława Sosabowskiego,school,,
+54.3249190,18.5814872,Przedszkole przy Człuchowskiej,kindergarten,,
+54.4037276,18.5792411,Szkoła Podstawowa nr 46,school,,
+54.3955660,18.6092943,Szkoła Podstawowa nr 48 w Gdańsku,school,,
+54.3901973,18.5839323,Państwowe Szkoły Budownictwa im. Mariana Osińskiego,school,,
+54.3847171,18.6172914,Szkoła Podstawowa Nr 24,school,,
+54.3435387,18.5611246,Szkoła Podstawowa nr 85 im. Zrzeszenia Kaszubsko-Pomorskiego,school,,
+54.4306320,18.4673709,Szkoła Podstawowa Nr 81,school,,
+54.3410662,18.6696490,Szkoła Podstawowa nr 59,school,,
+54.4108430,18.5980118,Szkoła Podstawowa Nr 44 im. Adama Mickiewicza,school,,
+54.4114467,18.5936666,Zespół Szkolno-Przedszkolny nr 1 w Gdańsku,school,,
+54.3448673,18.8298540,Zespół Kształcenia Podstawowego i Przedszkolnego nr 1,school,,
+54.4043588,18.5679559,Szkoła Podstawowa nr 35 z Oddziałami Sportowymi im. Jana Parandowskiego,school,,
+54.4159141,18.5555717,"Przedszkole ""Leśny Domek""",kindergarten,,
+54.4102094,18.5565787,Przedszkole Niepubliczne w Oliwie,kindergarten,,
+54.3868436,18.6254188,Szkoła Podstawowa nr 52 im. Tadeusza Kościuszki,school,,
+54.4119758,18.5553046,Szkoła Podstawowa nr 23,school,,
+54.3878390,18.5786565,IX Liceum Ogólnokształcące im. Krzysztofa Kolbergera,school,,3
+54.3796855,18.6207964,Centrum Kształcenia Zawodowego i Ustawicznego Nr 1,school,,
+54.4023913,18.6007318,Szkoła Podstawowa nr 80 im. Budowniczych Portu Północnego,school,,
+54.4131232,18.5893762,Chrześcijańskie Autorskie Liceum Ogólnokształcące Chalo,school,,
+54.4064481,18.5934400,Szkoła Podstawowa nr 79,school,,
+54.3951675,18.5635442,Szkoła Podstawowa nr 10 w Gdańsku,school,,
+54.3834272,18.6263438,Przedszkole nr 33,kindergarten,,
+54.3587450,18.5760800,,kindergarten,,
+54.4019882,18.5952692,Przedszkole nr 62,kindergarten,,
+54.3606963,18.7202241,Szkoła Podstawowa nr 72 im. Obrońców Westerplatte,school,,
+54.3585616,18.6910709,Szkoła Podstawowa nr 61 im. Józefa Wybickiego,school,,
+54.3587446,18.5933513,Szkoła Podstawowa nr 1 im. Mariusza Zaruskiego w Gdańsku,school,,
+54.3500764,18.6645226,"Przedszkole nr 31 ""Słoneczko""",kindergarten,,
+54.3882786,18.4838996,Szkoła Podstawowa nr 82,school,,
+54.3865816,18.6040207,X Liceum Ogólnokształcące Dwujęzyczne im. Lecha Bądkowskiego,school,,3
+54.4198633,18.5789733,Wesoły Delfinek,kindergarten,,
+54.4118428,18.5623719,Przedszkole nr 39,kindergarten,,
+54.3535044,18.4803135,Szkoła Podstawowa nr 83,school,,
+54.3518733,18.5117341,,school,,1
+54.3397715,18.5091922,Szkoła Podstawowa nr 84,school,,
+54.3420081,18.6315903,Szkoła Podstawowa nr 47,school,,
+54.3608832,18.5553862,Kolorowe Przedszkole,kindergarten,,
+54.3422943,18.6578731,Szkoła Podstawowa nr 65 imienia Alfa Liczmańskiego,school,,
+54.3420071,18.6463261,Akademia Sztuk Pięknych - Wydział Rzeźby i Intermediów,university,,
+54.2838402,18.6369176,Szkoła Podstawowa nr 40,school,,
+54.3218019,18.5762424,,kindergarten,,
+54.3481307,18.6957912,Szkoła Podstawowa nr 29,school,,
+54.3937444,18.6451727,Publiczna Szkoła Podstawowa Hevelius,school,,
+54.3813768,18.6311057,Zespół Szkół Energetycznych,school,,
+54.3196598,18.5837275,"Szkoła Podstawowa i Przedszkole ""Olimpijczyk""",school,,
+54.4120475,18.5934750,Przedszkole nr 34 im. Marii Konopnickiej,kindergarten,,
+54.4163804,18.5932726,"Przedszkole nr 51 ""Jacek i Agatka""",kindergarten,,
+54.4153985,18.5901337,Żłobek nr 2,kindergarten,,
+54.4145451,18.5904076,"Przedszkole nr 54 ""Fantazja""",kindergarten,,
+54.3805225,18.5944281,Szkoła Podstawowa nr 39,school,,
+54.3738352,18.5657392,Szkoły im. św. Jana de La Salle,school,,
+54.3574330,18.6493250,Ogólnokształcąca Szkoła Muzyczna I i II st.,school,,1; 2; 3
+54.3711921,18.6091989,Uniwersyteckie Liceum Ogólnokształcące im. Pawła Adamowicza,school,,3
+54.3074464,18.5710093,Szkoła Podstawowa w Kowalach,school,,
+54.4134035,18.5743278,Szkoła Podstawowa Specjalna nr 37 w Gdańsku,school,,
+54.3456953,18.6625809,Akademia Muzyczna im. Stanisława Moniuszki w Gdańsku,university,,
+54.4220461,18.5760210,Szkoła Podstawowa nr 89 w Gdańsku im. Tadeusza Mazowieckiego,school,,
+54.3601371,18.6105867,Pomorskie Szkoły Rzemiosł,school,,
+54.3604943,18.6113521,Centrum Kształcenia Zawodowego i Ustawicznego nr 1,school,,
+54.3282363,18.5685114,Przedszkole nr 68,kindergarten,,
+54.3264690,18.5677979,Szkoła Podstawowa nr 6,school,,
+54.3730922,18.6007481,Polska Akademia Nauk,university,,
+54.3677007,18.6263208,Szkoła Podstawowa nr 15,school,,
+54.4029984,18.6057638,Żłobek nr 12 Żagielek,kindergarten,,
+54.3310084,18.6285321,Szkoła Podstawowa nr 56 imienia Andrzeja Struga,school,,
+54.3317858,18.6328448,Polsko-Japońska Akademia Technik Komputerowych,college,,
+54.3263149,18.6288745,,kindergarten,,
+54.3239495,18.6324775,Publiczne Pozytywne Przedszkole nr 3,kindergarten,,
+54.3762939,18.5612649,Szkoła Podstawowa nr 38 im. gen. Stanisława Maczka,school,,
+54.3537099,18.6471473,Uniwersytet Gdański Instytut Historii Sztuki Instytut Archeologii i Etnologii,university,,
+54.3522643,18.5855812,TE Vizja,school,,
+54.4073960,18.5934575,Przedszkole nr 59,kindergarten,,
+54.3200066,18.5887738,Przedszkole nr 83,kindergarten,,
+54.3624079,18.6350403,Gdańska Wyższa Szkoła Humanistyczna,university,,
+54.3493929,18.7995376,Stacja Ornitologiczna Muzeum i Instytutu Zoologii PAN,university,,
+54.3320242,18.5985010,,kindergarten,,
+54.4182973,18.5890327,Przedszkole nr 48 z oddziałami integracyjnymi w Gdańsku,kindergarten,,
+54.3448437,18.5598921,,kindergarten,,
+54.3486098,18.7961167,Stacja Biologiczna Uniwersytetu Gdańskiego,university,,
+54.4063583,18.6285890,,university,,
+54.3675607,18.6102778,Przedszkole nr 4 „Gwarny Dworek”,kindergarten,,
+54.3714059,18.5241739,Szkoła Podstawowa nr 7 im. mjra Mieczysława Słabego,school,,
+54.4189665,18.5606533,Hala Gimnastyczna im. Leszka Blanika,university,,
+54.4190910,18.5928032,British International School Gdańsk,school,,
+54.4182362,18.5874656,Szkoła Podstawowa nr 60,school,,
+54.3960798,18.5222881,Leśna Baza Wilczek,kindergarten,,
+54.3117642,18.6016872,Przedszkole nr 80,kindergarten,,
+54.3302515,18.5629974,Przedszkole Fantazja,kindergarten,,
+54.3366296,18.9092780,Szkoła Podstawowa nr 88,school,,
+54.4067820,18.5586430,V Liceum Ogólnokształcące w Gdańsku im. Stefana Żeromskiego,school,,3
+54.4078178,18.5552766,,school,,
+54.4097065,18.5577190,"Niepubliczna Szkoła Podstawowa ""Fregata""",school,,
+54.3475687,18.6756690,Zespół Szkół Samochodowych,college,,
+54.3505667,18.6490454,Akademia Sztuk Pięknych,university,,
+54.3835401,18.6129435,Akademia Malucha,kindergarten,,
+54.4241847,18.5847409,Szkoła Podstawowa nr 77,school,,
+54.4080621,18.5845288,Zespół Szkół Specjalnych nr 2,school,,
+54.4080015,18.5860828,Przedszkole nr 49 Miś,kindergarten,,
+54.3774453,18.5811302,Szkoła Podstawowa nr 27 im. Dzieci Zjednoczonej Europy,school,,
+54.3767086,18.5955570,III Liceum Ogólnokształcące z Oddziałami Dwujęzycznymi im. Bohaterów Westerplatte,school,,3
+54.4174103,18.4538396,Happy Kids Osowa,kindergarten,,
+54.3322843,18.5974072,,school,,
+54.3748391,18.6225717,Szkoły Okrętowe i Techniczne Conradinum,school,,
+54.3469626,18.8209012,Szkoła Podstawowa Specjalna nr 28,school,,
+54.4098173,18.6305237,Szkoła Podstawowa nr 20 im. Jana Grudzińskiego,school,,
+54.4029856,18.5799336,Przedszkole niepubliczne Stokrotka,kindergarten,,
+54.3863292,18.6122428,Szkoła Podstawowa nr 49 im. ks. Bronisława Komorowskiego,school,,1;2
+54.3787225,18.6109632,Przedszkole nr 7,kindergarten,,
+54.3779153,18.6136336,Szkoła Podstawowa nr 17,school,,
+54.3998638,18.6660519,Przedszkole nr 23,kindergarten,,
+54.3961111,18.6075727,"Przedszkole nr 5 ""Róża Wiatrów""",kindergarten,,1;2
+54.3850027,18.6140503,Zespół Szkół Gastronomiczno-Hotelarskich,school,,
+54.3785802,18.6027176,Szkoła Muzyczna II stopnia imienia Fryderyka Chopina,school,,3
+54.3902679,18.5940031,Publiczne Pozytywne Przedszkole nr 12 w Gdańsku,kindergarten,,
+54.3581124,18.6516534,Przedszkole nr 35,kindergarten,,
+54.4025852,18.6269744,Podstawowa Szkoła Gedanensis,school,,
+54.4133504,18.5906396,Chrześcijańska Szkoła Podstawowa i Przedszkole Montessori,kindergarten,,
+54.4045875,18.5661517,,kindergarten,,
+54.4043230,18.5664122,,kindergarten,,
+54.4060918,18.5603045,I Społeczna Szkoła Podstawowa,school,primary,
+54.4167061,18.5716178,Gdańska Akademia Medyczna Nauk Stosowanych,college,,
+54.4199571,18.5624582,Akademia Wychowania Fizycznego i Sportu im. Jędrzeja Śniadeckiego,university,,
+54.3933299,18.5973042,Żłobek nr 4 Nutka,kindergarten,,
+54.4219274,18.5601410,Zespół Szkół Architektury Krajobrazu i Handlowo-Usługowych im. Władysława Szafera,school,,
+54.3584035,18.5739866,Szkoła Podstawowa Nr 2,school,,
+54.3880771,18.5744317,Gdańska Szkoła Szermierki,school,,
+54.3767229,18.6003415,Zespół Szkół Specjalnych nr 1,school,,
+54.3773010,18.6024711,Szkoła Podstawowa nr 45 im. Bohaterów Westerplatte,school,,
+54.3328183,18.5534011,,kindergarten,,
+54.3482723,18.6519506,,kindergarten,,
+54.3487844,18.6496445,,kindergarten,,
+54.4231493,18.5832425,Przedszkole nr 60 im. Jana Brzechwy,kindergarten,,
+54.3902613,18.6034356,,kindergarten,,
+54.3438223,18.6609528,"Przedszkole nr 46 ""Muszelka""",kindergarten,,
+54.3955361,18.6453434,Norlandia Gdańsk Letnica,kindergarten,,
+54.3929846,18.5936613,XV Liceum Ogólnokształcące im. Zjednoczonej Europy z Oddziałami Dwujęzycznymi,school,,3
+54.3458948,18.6422727,Szkoła Podstawowa nr 21 im. kpt. ż. w. Karola Olgierda Borchardta,school,,
+54.3911229,18.6127259,"Niepubliczna Szkoła Podstawowa ""Nasza Szkoła""",school,,
+54.3616933,18.5879362,XX Liceum Ogólnokształcące z Oddziałami Dwujęzycznymi im. Zbigniewa Herberta,school,,3
+54.4238966,18.5767676,"Przedszkole nr 64 ""Kubuś Puchatek""",kindergarten,,
+54.3922003,18.6741928,Centrum Offshore Uniwersytetu Morskiego w Gdyni,university,,
+54.3944324,18.5910744,Przedszkole nr 63,kindergarten,,
+54.3950676,18.5956806,,school,,
+54.3966749,18.5915635,Przedszkole nr 66,kindergarten,,
+54.4032914,18.6284799,Przedszkole nr 67,kindergarten,,
+54.4117385,18.5998586,British International School Gdańsk,kindergarten,,
+54.3807031,18.6118868,Przedszkole nr 15 Niezapominajka,kindergarten,,
+54.3789217,18.6070338,TEB Edukacja,college,,
+54.3893082,18.5847915,Uniwersytet WSB Merito,university,,
+54.3465212,18.5987646,,school,,
+54.3506338,18.6725119,,kindergarten,,
+54.3608064,18.7372845,Szkoła Podstawowa nr 62,school,,
+54.4005218,18.6063856,Przedszkole nr 88,kindergarten,,
+54.4280420,18.4802989,Pozytywny Żłobek nr 4,kindergarten,,
+54.3299206,18.6297775,,school,,
+54.3276756,18.6245265,Publiczne Pozytywne Przedszkole nr 15,kindergarten,,
+54.3290829,18.6319501,Przedszkole nr 11,kindergarten,,
+54.3551226,18.5159200,,kindergarten,,
+54.3321284,18.5791803,"Przedszkole Niepubliczne ""Radosny Zakątek""",kindergarten,,
+54.3769172,18.6244271,Pomorska Medyczna Szkoła Policealna,college,,
+54.3970363,18.6234156,Niepubliczne Przedszkole Gedania 1922,kindergarten,,
+54.3501744,18.6255602,Szkoła Podstawowa i Przedszkole Sokrates,school,,
+54.3456056,18.5542103,"Niepubliczne Przedszkole ""Zielona Dolina""",kindergarten,,
+54.3366353,18.6149395,"Niepubliczne Przedszkole ""Dobry Port""",kindergarten,,
+54.4344651,18.4684826,Przedszkole nr 87,kindergarten,,
+54.4237736,18.4745112,,kindergarten,,
+54.3907504,18.5938380,Pozytywny Żłobek nr 5,kindergarten,,
+54.3226979,18.6189817,"Przedszkole Niepubliczne ""Parkowe Wzgórze""",kindergarten,,
+54.3413470,18.6449776,Pozytywne Przedszkole nr 8,kindergarten,,
+54.3281197,18.6387801,Szkoła Podstawowa nr 16,school,,
+54.3804220,18.6124308,III Społeczna Szkoła Podstawowa STO,school,,
+54.4079852,18.6007169,Przedszkole nr 57,kindergarten,,
+54.3491985,18.5078948,Przedszkole Tik Tak,kindergarten,,
+54.3324449,18.5529643,Publiczne Pozytywne Przedszkole nr 13,kindergarten,,
+54.3639846,18.5883421,Publiczne Pozytywne Przedszkole nr 5,kindergarten,,
+54.3143630,18.5937994,Przedszkole Preludium,kindergarten,,
+54.3295985,18.6026210,Przedszkole nr 14,kindergarten,,
+54.3219410,18.6023643,Publiczne Pozytywne Przedszkole nr 4,kindergarten,,
+54.4228190,18.5731362,Collegium Gedanense,school,,
+54.3220141,18.6316253,Państwowa Szkoła Muzyczna I stopnia im. Henryka Wieniawskiego,school,,
+54.3238583,18.6372489,"Niepubliczne Przedszkole ""Krasnal""",kindergarten,,
+54.3548709,18.6520506,"Przedszkole Zgromadzenia Sióstr Najświętszej Duszy Chrystusa Pana ""Solaris""",kindergarten,,
+54.3673289,18.6093085,"Niepubliczna Szkoła Podstawowa dla Chłopców ""Fregata""",school,,
+54.3021673,18.6300505,Przedszkole nr 24,kindergarten,,
+54.3930172,18.6058837,Chatka Puchatka,kindergarten,,
+54.3255584,18.6007555,Chrześcijańska Szkoła i Przedszkole Montessori nr 2,school,,
+54.3136421,18.6015836,Morska Szkoła Podstawowa Gdańsk-Południe,school,,
+54.4263280,18.4809349,Stacja Edukacja,kindergarten,,
+54.4067879,18.6034719,XXI Liceum Ogólnokształcące z Oddziałami Sportowymi,school,,3
+54.4087693,18.6063965,Zespół Szkół Kreowania Wizerunku,school,,
+54.3484876,18.6641680,"Gdańska Szkoła Podstawowa ""Lingwista"" im. Zjednoczonej Europy",school,,
+54.3557574,18.4940248,Przedszkole nr 8,kindergarten,,
+54.3798748,18.5930575,Przedszkole św. Jana de La Salle,kindergarten,,
+54.3466909,18.6641485,Szkoła Podstawowa nr 4 im. Króla Kazimierza Jagiellończyka,school,,
+54.3571308,18.6098142,Przedszkole nr 21,kindergarten,,
+54.3094447,18.6018161,Publiczne Pozytywne Przedszkole nr 14,kindergarten,,
+54.4184171,18.4776625,"Twórcze Przedszkole ""Rośnij Radośnie""",kindergarten,,
+54.3548611,18.5820817,Przedszkole nr 84,kindergarten,,
+54.3610134,18.5794221,"Niepubliczny Punkt Przedszkolny ""Morenowy Porcik""",kindergarten,,
+54.3609667,18.5801243,Przedszkole nr 74,kindergarten,,
+54.3636709,18.7151088,Przedszkole nr 16,kindergarten,,
+54.3500637,18.5392027,Marchewka,kindergarten,,
+54.4088220,18.6365934,Przedszkole im św. Antoniego z Padwy,kindergarten,,
+54.3473522,18.5644876,Szkoła Podstawowa nr 30,school,,
+54.4289782,18.4678248,"Przedszkole Niepubliczne ""Mój Kotek""",kindergarten,,
+54.3914494,18.5751574,Przedszkole nr 77 Specjalne dla Dzieci z Porażeniem Mózgowym,kindergarten,,
+54.3868102,18.5728348,Przedszkole nr 42,kindergarten,,
+54.3859084,18.6069999,Przedszkole nr 28,kindergarten,,
+54.4173937,18.5664055,Przedszkole Niepubliczne Zgromadzenia Sióstr Opieki Społecznej pw. św. Antoniego,kindergarten,,
+54.4116296,18.5551459,Przedszkole Sióstr Elżbietanek,kindergarten,,
+54.3966565,18.5734261,Uniwersytet Gdański,university,,
+54.4185925,18.5619502,Akademia Wychowania Fizycznego i Sportu im. Jędrzeja Śniadeckiego,university,,
+54.3630943,18.6274451,Gdański Uniwersytet Medyczny,university,,
+54.4210958,18.4804590,Zespół Szkół Ogólnokształcących nr 2,school,,
+54.3200883,18.6370662,Centrum Kształcenia Zawodowego i Ustawicznego Nr 2 w Gdańsku,school,,
+54.3853801,18.6200721,Politechnika Gdańska,university,,

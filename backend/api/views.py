@@ -6,7 +6,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 import math
-
+import numpy as np
 
 # --- KONFIGURACJA ---
 DATA_DIR_NAME = 'data'
@@ -20,44 +20,6 @@ def _get_data_file_path(filename):
     Prywatna funkcja pomocnicza budująca absolutną ścieżkę do pliku danych.
     """
     return os.path.join(settings.BASE_DIR, DATA_DIR_NAME, filename)
-
-# --- NOWE FUNKCJE POMOCNICZE ---
-
-def get_distance_in_km(lat1, lon1, lat2, lon2):
-    """
-    Funkcja licząca odległość w km między dwoma punktami GPS (wzór Haversine'a).
-    To jest pythonowa wersja tego, co mieliśmy w utils.ts.
-    """
-    R = 6371  # Promień Ziemi w km
-    lat1_rad = math.radians(lat1)
-    lon1_rad = math.radians(lon1)
-    lat2_rad = math.radians(lat2)
-    lon2_rad = math.radians(lon2)
-    
-    dlon = lon2_rad - lon1_rad
-    dlat = lat2_rad - lat1_rad
-    
-    a = math.sin(dlat / 2)**2 + math.cos(lat1_rad) * math.cos(lat2_rad) * math.sin(dlon / 2)**2
-    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-    
-    return R * c
-
-def count_nearby_locations(apartment_row, education_df, radius_km=1.0):
-    """
-    Funkcja, która dla danego mieszkania liczy, ile placówek edukacyjnych
-    znajduje się w zadanym promieniu.
-    """
-    nearby_count = 0
-    for _, edu_row in education_df.iterrows():
-        distance = get_distance_in_km(
-            apartment_row['lat'], 
-            apartment_row['lng'], 
-            edu_row['@lat'], 
-            edu_row['@lon']
-        )
-        if distance <= radius_km:
-            nearby_count += 1
-    return nearby_count
 
 # --- ENDPOINTY ---
 
@@ -100,36 +62,80 @@ def get_safety_data(request):
 @permission_classes([AllowAny])
 def get_apartments_data(request):
     """
-    Endpoint udostępniający dane o mieszkaniach.
-    Odczytuje mockowe dane z pliku CSV za pomocą pandas.
+    Endpoint udostępniający czyste dane o mieszkaniach.
     """
     apartments_path = _get_data_file_path(APARTMENTS_FILENAME)
-    education_path = _get_data_file_path(EDUCATION_FILENAME)
     
-    if not os.path.exists(apartments_path) or not os.path.exists(education_path):
-        return Response(
-            {"error": "Brak jednego ze źródeł danych (mieszkania lub edukacja)."}, 
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
+    if not os.path.exists(apartments_path):
+        return Response({"error": "Brak pliku mieszkania.csv."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     try:
-        # Wczytujemy oba pliki CSV
-        apartments_df = pd.read_csv(apartments_path)
-        education_df = pd.read_csv(education_path)
-        
-        # Tworzymy nową kolumnę z liczbą placówek w okolicy
-        apartments_df['education_nearby_count'] = apartments_df.apply(
-            lambda row: count_nearby_locations(row, education_df, radius_km=1.0),
-            axis=1
-        )
-        
-        # Konwersja DataFrame na format JSON (lista słowników)
-        data = apartments_df.to_dict(orient='records')
-        
+        df = pd.read_csv(apartments_path)
+        data = df.to_dict(orient='records')
         return Response(data, status=status.HTTP_200_OK)
-        
     except Exception as e:
-        return Response(
-            {"error": "Wystąpił błąd podczas przetwarzania danych mieszkań.", "details": str(e)}, 
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
+        return Response({"error": "Wystąpił błąd", "details": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+def classify_education_type(row):
+    amenity = str(row.get("amenity") or "").strip().lower()
+    name = str(row.get("name") or "").strip().lower()
+    school_type = str(row.get("school") or "").strip().lower()
+    isced = str(row.get("isced:level") or "").strip()
+
+    # Przedszkola
+    if amenity == "kindergarten":
+        return "Przedszkola"
+
+    # Uczelnie
+    if amenity in ["university", "college"] or any(x in name for x in ["uniwersytet", "akademia", "politechnika", "wyższa szkoła"]):
+        return "Uczelnie"
+
+    # Szkoły
+    if amenity == "school":
+        # Sprawdzamy tag isced (1 i 2 to podstawówka, 3 to szkoła średnia)
+        if "1" in isced or "2" in isced:
+            return "Podstawowe"
+        if "3" in isced:
+            return "Średnie"
+            
+        # Sprawdzamy bezpośredni tag school
+        if school_type in ["primary"]:
+            return "Podstawowe"
+        if school_type in ["secondary", "technical_college"]:
+            return "Średnie"
+
+        # Jeżeli tagów nie ma, szukamy po nazwie placówki
+        if any(x in name for x in ["podstawow", "podstawów"]):
+            return "Podstawowe"
+            
+        if any(x in name for x in ["liceum", "technikum", "branżowa", "branzowa", "zawodowa"]):
+            return "Średnie"
+
+    # Jeśli nic nie pasuje (np. szkoły muzyczne bez innych tagów), zwracamy "Inne" (frontend prawdopodobnie to zignoruje)
+    return "Inne"
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def get_education_data(request):
+    education_path = _get_data_file_path(EDUCATION_FILENAME)
+    
+    if not os.path.exists(education_path):
+        return Response({"error": "Brak pliku."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    try:
+        df = pd.read_csv(education_path)
+        
+        # 1. Zmieniamy nazwy
+        df.rename(columns={'@lat': 'lat', '@lon': 'lng'}, inplace=True)
+        
+        # 2. DODANO: Tworzymy nową kolumnę z typem pod frontend
+        df["education_type"] = df.apply(classify_education_type, axis=1)
+        
+        # 3. Zamieniamy wszystkie wartości NaN na None (JSON obsługuje None jako null)
+        df = df.replace({np.nan: None})
+        
+        data = df.to_dict(orient='records')
+        return Response(data, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -5,8 +5,11 @@ import {
   Marker,
   Popup,
   GeoJSON,
+  Circle,      
+  Tooltip      
 } from 'react-leaflet';
 import L, { divIcon, type LatLngExpression } from 'leaflet';
+
 import { useEffect, useMemo, useState, useRef } from 'react';
 import { useAppContext } from '../../context/AppContext.tsx'; 
 import MapController from '../MapController.tsx';
@@ -23,6 +26,19 @@ function FixMapSize() {
   return null;
 }
 
+// --- FUNKCJA POMOCNICZA ---
+function getDistanceInKm(lat1: number, lon1: number, lat2: number, lon2: number) {
+  const R = 6371; // Promień Ziemi w km
+  const dLat = (lat2 - lat1) * (Math.PI / 180);
+  const dLon = (lon2 - lon1) * (Math.PI / 180);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
 export default function Map() {
   const { currentCity } = useAppContext();
 
@@ -30,6 +46,8 @@ export default function Map() {
   const[safetyData, setSafetyData] = useState<Record<string, number>>({});
   const[geoJsonData, setGeoJsonData] = useState<any>(null);
   const [buildings, setBuildings] = useState<any[]>([]);
+
+  const [educationData, setEducationData] = useState<any[]>([]);
 
   // --- STAN HOVERA MIESZKAŃ ---
   const [hoveredBuildingId, setHoveredBuildingId] = useState<number | string | null>(null);
@@ -139,19 +157,107 @@ export default function Map() {
         setBuildings(data);
       })
       .catch((err) => console.error('Błąd API Mieszkań:', err));
+
+    // 4. Edukacja
+    fetch('http://localhost:8000/api/education/')
+      .then((res) => res.json())
+      .then((data) => {
+        setEducationData(data);
+      })
+      .catch((err) => console.error('Błąd API Edukacji:', err));
   },[]);
 
-  // --- LOGIKA FILTROWANIA ---
+  // --- LOGIKA FILTROWANIA (ROZBUDOWANA) ---
   const filteredBuildings = buildings.filter((building) => {
+    // 1. Filtr Bezpieczeństwa
     const districtName = normalizeName(building.district);
     const crimeRate = safetyData[districtName];
+    if (crimeRate !== undefined && crimeRate > safetyThreshold) return false;
 
-    // Jeśli nie mamy danych o dzielnicy, na razie przepuszczamy
-    if (crimeRate === undefined) return true;
+    // 2. Filtr Edukacji (Zaktualizowany)
+    if (eduTypes.length > 0) {
+      // Dla TEGO konkretnego budynku, sprawdzamy czy w pobliżu są zaznaczone typy placówek
+      // Musimy spełnić warunek dla KAŻDEGO z zaznaczonych typów (np. chcesz i Przedszkole i Podstawową)
+      // lub tylko dla jednego? Założenie: jeśli ktoś zaznaczy Przedszkola i Podstawowe, 
+      // szuka mieszkania, które ma OBA w promieniu.
+      
+      const hasAllSelectedTypes = eduTypes.every(selectedType => {
+        // Szukamy czy jest JAKAKOLWIEK placówka danego typu blisko tego budynku
+        return educationData.some(facility => {
+          // Używamy nowego pola z API
+          if (facility.education_type !== selectedType) return false;
+          
+          const distance = getDistanceInKm(building.lat, building.lng, facility.lat, facility.lng);
+          return distance <= eduRadius;
+        });
+      });
+      
+      if (!hasAllSelectedTypes) return false;
+    }
 
-    // NOWOŚĆ: Porównujemy z wartością suwaka
-    return crimeRate <= safetyThreshold;
+    return true;
   });
+
+    // --- OBLICZANIE LICZBY PLACÓWEK DLA FILTRÓW ---
+  // Oblicza, ile dostępnych placówek każdego typu znajduje się w zasięgu "eduRadius" 
+  const educationDetails = useMemo(() => {
+    // Przygotowujemy strukturę przechowującą i liczbę, i nazwy
+    const details: Record<string, { count: number; names: string[] }> = {
+      "Przedszkola": { count: 0, names: [] },
+      "Podstawowe": { count: 0, names: [] },
+      "Średnie": { count: 0, names: [] },
+      "Uczelnie": { count: 0, names: [] },
+      "Inne": { count: 0, names: [] }
+    };
+
+    if (buildings.length === 0 || educationData.length === 0) return details;
+
+    const countedFacilities = new Set<number>();
+
+    educationData.forEach((facility, index) => {
+      if (!details.hasOwnProperty(facility.education_type)) return;
+
+      const isNearAnyBuilding = filteredBuildings.some(building => {
+        const dist = getDistanceInKm(building.lat, building.lng, facility.lat, facility.lng);
+        return dist <= eduRadius;
+      });
+
+      if (isNearAnyBuilding && !countedFacilities.has(index)) {
+        countedFacilities.add(index);
+        details[facility.education_type].count += 1;
+        
+        // Czasami w OSM placówka nie ma wprowadzonej nazwy, zabezpieczamy to:
+        const facilityName = facility.name || `Placówka bez nazwy`;
+        details[facility.education_type].names.push(facilityName);
+      }
+    });
+
+    return details;
+  }, [filteredBuildings, educationData, eduRadius]);
+
+    // --- PLACÓWKI EDUKACYJNE DO WYŚWIETLENIA (Tylko dla aktywnego budynku) ---
+  const visibleEducationFacilities = useMemo(() => {
+    // Jeśli nie najeżdżamy na żaden dom, lub nie ma włączonych filtrów edukacji - nie pokazuj nic
+    if (!hoveredBuildingId || eduTypes.length === 0) return [];
+
+    const activeBuilding = filteredBuildings.find(b => b.id === hoveredBuildingId);
+    if (!activeBuilding) return [];
+
+    // Szukamy wszystkich placówek, które pasują do wybranych filtrów ORAZ są w zasięgu promienia
+    return educationData.filter(facility => {
+      if (!eduTypes.includes(facility.education_type)) return false;
+      
+      const dist = getDistanceInKm(activeBuilding.lat, activeBuilding.lng, facility.lat, facility.lng);
+      // Przekazujemy dystans do obiektu, żeby ew. wyświetlić go w tooltipie
+      if (dist <= eduRadius) {
+        facility.currentDistance = dist;
+        return true;
+      }
+      return false;
+    });
+  }, [hoveredBuildingId, filteredBuildings, educationData, eduTypes, eduRadius]);
+
+  const activeBuilding = filteredBuildings.find(b => b.id === hoveredBuildingId);
 
   // --- MARKERY I STYLE (Bez zmian) ---
   const buildingMarkerIcon = useMemo(
@@ -204,6 +310,23 @@ export default function Map() {
     }, [isDarkTheme] 
   );
 
+    // --- IKONA DLA PLACÓWEK EDUKACYJNYCH (Mała kropeczka) ---
+  const educationMarkerIcon = useMemo(
+    () => {
+      // Jasno-niebieski kolor odróżniający się od domów i mapy bezpieczeństwa
+      const bgColor = '#3b82f6'; 
+      const borderColor = '#ffffff';
+
+      return divIcon({
+        className: '',
+        html: `
+          <div style="width: 14px; height: 14px; border-radius: 50%; background-color: ${bgColor}; border: 2px solid ${borderColor}; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>
+        `,
+        iconSize: [14, 14],
+        iconAnchor: [7, 7], // Środek kropeczki
+      });
+    }, []
+  );
 
   const getSafetyLabel = (val: number) => {
     if (val < 15) return 'Bardzo Wysokie';
@@ -344,7 +467,7 @@ export default function Map() {
           attribution="&copy; OpenStreetMap contributors"
         />
 
-        {showSafetyLayer && geoJsonData && Object.keys(safetyData).length > 0 && (
+                {showSafetyLayer && geoJsonData && Object.keys(safetyData).length > 0 && (
           <GeoJSON
             key={`gdansk-safety-layer-${safetyThreshold}`}
             data={geoJsonData}
@@ -354,12 +477,49 @@ export default function Map() {
           />
         )}
 
+        {/* --- NOWE: OKRĄG PROMIENIA DLA EDUKACJI --- */}
+        {activeBuilding && eduTypes.length > 0 && (
+          <Circle
+            center={[activeBuilding.lat, activeBuilding.lng]}
+            radius={eduRadius * 1000} // radius w Leaflet jest w metrach, dlatego * 1000
+            pathOptions={{ 
+              color: '#3b82f6', 
+              fillColor: '#3b82f6', 
+              fillOpacity: 0.05, 
+              weight: 1.5, 
+              dashArray: '5, 5' 
+            }}
+          />
+        )}
+
+        {/* --- NOWE: MAŁE KROPECZKI PLACÓWEK EDUKACYJNYCH --- */}
+        {visibleEducationFacilities.map((facility, idx) => (
+          <Marker
+            key={`edu-${idx}-${facility.lat}-${facility.lng}`}
+            position={[facility.lat, facility.lng]}
+            icon={educationMarkerIcon}
+            zIndexOffset={1500} 
+          >
+            <Tooltip direction="top" offset={[0, -10]} opacity={0.95}>
+              <div style={{ textAlign: 'center', fontFamily: 'sans-serif' }}>
+                <strong style={{ fontSize: '13px', display: 'block', marginBottom: '2px' }}>
+                  {facility.name ? facility.name : `${facility.education_type} (niezidentyfikowana)`}
+                </strong>
+                <span style={{ fontSize: '11px', color: '#666', textTransform: 'uppercase' }}>
+                  {facility.education_type} • {(facility.currentDistance * 1000).toFixed(0)}m
+                </span>
+              </div>
+            </Tooltip>
+          </Marker>
+        ))}
+
+        {/* --- ZMIENIONE Z-INDEX DLA MIESZKAŃ --- */}
         {filteredBuildings.map((building) => (
           <Marker
             key={building.id}
             position={[building.lat, building.lng]}
             icon={hoveredBuildingId === building.id ? buildingMarkerIconHovered : buildingMarkerIcon}
-            zIndexOffset={hoveredBuildingId === building.id ? 2000 : 1000}
+            zIndexOffset={hoveredBuildingId === building.id ? 2500 : 500} // Z-index zmieniony na 2500/500 żeby mieszkania nad którymi NIE najeżdżamy nie zasłaniały pinezek edukacji
             eventHandlers={{
               mouseover: () => setHoveredBuildingId(building.id),
               mouseout: () => setHoveredBuildingId(null),
@@ -378,11 +538,9 @@ export default function Map() {
       </MapContainer>
 
       {/* --- PRZEKAZUJEMY DANE DO SIDEBARA --- */}
-      {/* Tu będzie błąd TypeScripta dopóki nie zrobimy Kroku 2 - to normalne! */}
-      <RightSidePanel
+        <RightSidePanel
         cityName={currentCity.name}
         buildings={filteredBuildings}
-        // Nowe propsy:
         safetyThreshold={safetyThreshold}
         setSafetyThreshold={setSafetyThreshold}
         safetyMin={safetyRange.min}
@@ -393,6 +551,9 @@ export default function Map() {
         setEduTypes={setEduTypes}
         eduRadius={eduRadius}
         setEduRadius={setEduRadius}
+        educationDetails={educationDetails}
+        educationData={educationData}
+        getDistanceInKm={getDistanceInKm}
       />
     </div>
   );
