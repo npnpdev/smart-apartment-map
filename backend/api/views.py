@@ -7,16 +7,18 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 import math
 
+
 # --- KONFIGURACJA ---
 DATA_DIR_NAME = 'data'
 SAFETY_FILENAME = 'bezpieczenstwo_gdansk.csv'
 APARTMENTS_FILENAME = 'mieszkania.csv' 
 EDUCATION_FILENAME = 'edukacja.csv'
 
-"""
-Prywatna funkcja pomocnicza budująca absolutną ścieżkę do pliku danych.
-"""
+
 def _get_data_file_path(filename):
+    """
+    Prywatna funkcja pomocnicza budująca absolutną ścieżkę do pliku danych.
+    """
     return os.path.join(settings.BASE_DIR, DATA_DIR_NAME, filename)
 
 # --- NOWE FUNKCJE POMOCNICZE ---
@@ -58,21 +60,23 @@ def count_nearby_locations(apartment_row, education_df, radius_km=1.0):
     return nearby_count
 
 # --- ENDPOINTY ---
-"""
-Prosty health-check dla monitoringu statusu usługi.
-"""
+
 @api_view(["GET"])
 @permission_classes([AllowAny])
-def health(request):    
+def health(request):
+    """
+    Prosty health-check dla monitoringu statusu usługi.
+    """
     return Response({"status": "ok"})
 
-"""
-Endpoint udostępniający dane o bezpieczeństwie w podziale na dzielnice.
-Dane są odczytywane z przygotowanego wcześniej pliku CSV.
-"""
+
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def get_safety_data(request):
+    """
+    Endpoint udostępniający dane o bezpieczeństwie w podziale na dzielnice.
+    Dane są odczytywane z przygotowanego wcześniej pliku CSV.
+    """
     file_path = _get_data_file_path(SAFETY_FILENAME)
     
     if not os.path.exists(file_path):
@@ -91,13 +95,14 @@ def get_safety_data(request):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
-"""
-Endpoint udostępniający dane o mieszkaniach.
-Odczytuje mockowe dane z pliku CSV za pomocą pandas.
-"""
+
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def get_apartments_data(request):
+    """
+    Endpoint udostępniający dane o mieszkaniach.
+    Odczytuje mockowe dane z pliku CSV za pomocą pandas.
+    """
     apartments_path = _get_data_file_path(APARTMENTS_FILENAME)
     education_path = _get_data_file_path(EDUCATION_FILENAME)
     
