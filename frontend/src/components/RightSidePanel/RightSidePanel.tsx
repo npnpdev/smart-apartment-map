@@ -4,6 +4,11 @@ import styles from "./RightSidePanel.module.css";
 import { useState, useEffect, useMemo } from "react";
 import type { Dispatch, SetStateAction } from "react";
 
+import { RightSidePanelResults } from "./RightSidePanelResults";
+
+// Konfiguracja
+import { APP_CONFIG } from "../../constants";
+
 // Definicja typu danych o budynku
 export interface Building {
   id: number;
@@ -25,7 +30,7 @@ interface RightSidePanelProps {
   safetyMin: number;
   safetyMax: number;
 
-  // NOWE: Propsy do sterowania hałasem
+  // Propsy do sterowania hałasem
   noiseThreshold: number;
   setNoiseThreshold: Dispatch<SetStateAction<number>>;
 
@@ -42,12 +47,7 @@ interface RightSidePanelProps {
   
   educationData?: any[];
   getDistanceInKm?: (lat1: number, lon1: number, lat2: number, lon2: number) => number;
-
 }
-
-const ITEMS_PER_PAGE = 3;
-
-const AVAILABLE_EDU_TYPES =["Przedszkola", "Podstawowe", "Średnie", "Uczelnie"];
 
 export default function RightSidePanel({
   buildings,
@@ -70,7 +70,7 @@ export default function RightSidePanel({
   const [currentPage, setCurrentPage] = useState(1);
   const [view, setView] = useState<'list' | 'filters'>('list');
   
-  // NOWY STAN: do obsługi komunikatu błędu dla zablokowanego suwaka
+  // Stan do obsługi błędu suwaka edukacji, gdy nie wybrano żadnego typu placówki
   const [sliderError, setSliderError] = useState<string | null>(null);
 
   const [expandedBuildingId, setExpandedBuildingId] = useState<number | string | null>(null);
@@ -80,9 +80,9 @@ export default function RightSidePanel({
     setExpandedBuildingId(null);
   }, [safetyThreshold, eduTypes, eduRadius]);
 
-  const totalPages = Math.ceil(buildings.length / ITEMS_PER_PAGE);
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const visibleBuildings = buildings.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(buildings.length / APP_CONFIG.ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * APP_CONFIG.ITEMS_PER_PAGE;
+  const visibleBuildings = buildings.slice(startIndex, startIndex + APP_CONFIG.ITEMS_PER_PAGE);
 
   const handlePageChange = (e: React.MouseEvent, direction: 'prev' | 'next') => {
     e.stopPropagation();
@@ -93,8 +93,7 @@ export default function RightSidePanel({
 
   const isSafetyFiltered = safetyThreshold <= safetyMax;
   const isEduFiltered = eduTypes.length > 0;
-  // NOWE: Sprawdzamy czy użytkownik zmniejszył limit hałasu (domyślnie jest 80+)
-  const isNoiseFiltered = noiseThreshold < 80;
+  const isNoiseFiltered = noiseThreshold < APP_CONFIG.DEFAULT_NOISE_LIMIT;
 
   const activeFilterCount = useMemo(() => {
     let count = 0;
@@ -106,12 +105,11 @@ export default function RightSidePanel({
 
   const resetFilters = () => {
     setSafetyThreshold(safetyMax + 1);
-    setEduTypes([]); 
-    setEduRadius(5); 
-    setNoiseThreshold(80); // Reset hałasu
-    setSliderError(null); 
+    setEduTypes([]);
+    setEduRadius(APP_CONFIG.DEFAULT_EDU_RADIUS);
+    setNoiseThreshold(APP_CONFIG.DEFAULT_NOISE_LIMIT);
+    setSliderError(null);
   };
-
 
   const toggleEduType = (type: string) => {
     setEduTypes((prev) => {
@@ -125,31 +123,12 @@ export default function RightSidePanel({
     });
   };
 
-  // NOWA FUNKCJA: Obsługa kliknięcia zablokowanego suwaka
+  // Obsługa kliknięcia nieaktywnego suwaka edukacji
   const handleSliderContainerClick = () => {
     if (eduTypes.length === 0) {
       setSliderError("Najpierw wybierz rodzaj placówki (np. Przedszkola) by użyć promienia.");
     }
   };
-
-  // NOWA FUNKCJA OBLICZAJĄCA ZNALEZIONĄ INFRASTRUKTURĘ DLA JEDNEGO DOMU
-  const getFacilitiesForBuilding = (building: Building) => {
-    if (eduTypes.length === 0 || educationData.length === 0) return [];
-    
-    const nearby = educationData.filter((facility: any) => {
-      if (!eduTypes.includes(facility.education_type)) return false;
-      const dist = getDistanceInKm(building.lat, building.lng, facility.lat, facility.lng);
-      if (dist <= eduRadius) {
-        facility.currentDistance = dist;
-        return true;
-      }
-      return false;
-    });
-
-    return nearby.sort((a: any, b: any) => a.currentDistance - b.currentDistance);
-  };
-
-
 
   return (
     <SidePanel
@@ -222,13 +201,13 @@ export default function RightSidePanel({
               </div>
             </div>
 
-                        {/* SEKCJA 2: EDUKACJA */}
+            {/* SEKCJA 2: EDUKACJA */}
             <div className={styles.filterSection}>
               <h3 className={styles.filterSectionTitle}>Placówki edukacyjne</h3>
               <div className={styles.eduTypesWrapper}>
                 <span className={styles.sectionLabel}>Wybierz rodzaj:</span>
                 <div className={styles.eduTypesContainer}>
-                  {AVAILABLE_EDU_TYPES.map(type => {
+                  {APP_CONFIG.AVAILABLE_EDU_TYPES.map(type => {
                     const isActive = eduTypes.includes(type);
                     const count = educationDetails[type]?.count || 0; 
 
@@ -283,7 +262,7 @@ export default function RightSidePanel({
               </div>           
             </div>
             
-                        {/* SEKCJA 3: HAŁAS */}
+            {/* SEKCJA 3: HAŁAS */}
             <div className={styles.filterSection}>
               <h3 className={styles.filterSectionTitle}>Maksymalny Poziom Hałasu</h3>
               
@@ -314,140 +293,23 @@ export default function RightSidePanel({
         )}
       </div>
 
-      {/* --- LISTA WYNIKÓW (POKAZYWANA TYLKO W WIDOKU 'LIST') --- */}
-      {view === 'list' && (
-        <div className={styles.resultsContainer}>
-          {buildings.length === 0 ? (
-            <div className={stylesSidePanel.empty}>
-              <div>
-                <div className={stylesSidePanel.emptyIcon}>🔍</div>
-                <div className={stylesSidePanel.emptyText}>
-                  Brak ofert w wybranym zakresie.
-                  <br/>
-                  Spróbuj zmienić parametry filtrów.
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className={styles.listWrapper}>
-              <div className={styles.resultsCount}>
-                 Znaleziono: {buildings.length} ofert
-              </div>
-
-                {visibleBuildings.map((building) => {
-                const isHovered = hoveredBuildingId === building.id;
-                const isExpanded = expandedBuildingId === building.id;
-                const facilities = isExpanded ? getFacilitiesForBuilding(building) : [];
-                
-                return (
-                  <div 
-                    key={building.id} 
-                    className={`${styles.card} ${isHovered ? styles.cardHovered : ""}`}
-                    onMouseEnter={() => setHoveredBuildingId && setHoveredBuildingId(building.id)}
-                    onMouseLeave={() => setHoveredBuildingId && setHoveredBuildingId(null)}
-                    style={isHovered ? { transform: 'translateY(-2px)', borderColor: 'var(--accent)', boxShadow: 'var(--shadow-medium)' } : { transition: 'all 0.2s' }}
-                  >
-                    <div className={styles.cardHeader}>
-                      <span className={styles.cardPrice}>{building.price} zł</span>
-                      <span className={styles.cardDistrict}>{building.district}</span>
-                    </div>
-                    <div className={styles.cardTitle}>{building.name}</div>
-                    
-                    <div className={styles.cardFooter}>
-                        <button 
-                          className={styles.cardButton}
-                          onClick={() => setExpandedBuildingId(isExpanded ? null : building.id)}
-                          style={isExpanded ? { background: 'var(--text-primary)', color: 'var(--bg-base)' } : {}}
-                        >
-                          {isExpanded ? 'Zwiń szczegóły' : 'Szczegóły'}
-                        </button>
-                    </div>
-
-                    {isExpanded && (
-                      <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid var(--border)', animation: 'fadeIn 0.2s ease' }}>
-                        
-                        {/* NOWA SEKCJA: HAŁAS */}
-                        <h4 style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '8px' }}>
-                          Otoczenie Akustyczne
-                        </h4>
-                        <div style={{ 
-                          display: 'flex', 
-                          alignItems: 'center', 
-                          gap: '12px', 
-                          background: 'rgba(255,255,255,0.03)', 
-                          padding: '10px 14px', 
-                          borderRadius: '8px', 
-                          marginBottom: '20px'
-                        }}>
-                          <div style={{ fontSize: '1.5rem' }}>🔊</div>
-                          <div>
-                            <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block' }}>Szacowany poziom hałasu:</span>
-                            {building.noise_db ? (
-                              <strong style={{ fontSize: '1.1rem', color: 'var(--text-primary)' }}>{building.noise_db}</strong>
-                            ) : (
-                              <span style={{ color: '#888', fontStyle: 'italic', fontSize: '0.9rem' }}>Brak danych</span>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* STARA SEKCJA: EDUKACJA */}
-                        <h4 style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '8px' }}>
-                          Infrastruktura Edukacyjna
-                        </h4>
-
-                        
-                        {eduTypes.length === 0 ? (
-                          <p style={{ fontSize: '0.8rem', color: '#888', fontStyle: 'italic' }}>Włącz filtr edukacji, aby zobaczyć placówki w okolicy.</p>
-                        ) : facilities.length === 0 ? (
-                          <p style={{ fontSize: '0.8rem', color: '#888', fontStyle: 'italic' }}>Brak wybranych placówek w zadanym promieniu.</p>
-                        ) : (
-                          <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '0.85rem' }}>
-                            {facilities.map((fac: any, idx: number) => (
-                              <li key={idx} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', background: 'rgba(255,255,255,0.03)', padding: '6px 10px', borderRadius: '6px' }}>
-                                <span style={{ color: 'var(--text-primary)' }}> {fac.name ? fac.name : `${fac.education_type} (niezidentyfikowana)`} </span>
-
-                                <span style={{ color: '#3b82f6', fontWeight: 600 }}>{(fac.currentDistance * 1000).toFixed(0)} m</span>
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                        
-                        <div style={{ marginTop: '16px', padding: '12px', background: 'rgba(59, 130, 246, 0.1)', borderRadius: '8px', borderLeft: '3px solid #3b82f6' }}>
-                          <p style={{ fontSize: '0.8rem', margin: 0, color: 'var(--text-primary)', lineHeight: 1.4 }}>
-                            <strong>Podsumowanie AI:</strong> Okolica korzystna dla rodzin. Znaleziono {facilities.length} placówek edukacyjnych.
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-
-              {totalPages > 1 && (
-                <div className={styles.pagination}>
-                  <button 
-                    className={styles.pageButton} 
-                    onClick={(e) => handlePageChange(e, 'prev')}
-                    disabled={currentPage === 1}
-                  >
-                    ←
-                  </button>
-                  <span className={styles.pageInfo}>
-                    Strona {currentPage} z {totalPages}
-                  </span>
-                  <button 
-                    className={styles.pageButton} 
-                    onClick={(e) => handlePageChange(e, 'next')}
-                    disabled={currentPage === totalPages}
-                  >
-                    →
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      )}
+      {/* --- SEKCJA WYNIKÓW --- */}
+      <RightSidePanelResults
+        view={view}
+        buildings={buildings}
+        visibleBuildings={visibleBuildings}
+        totalPages={totalPages}
+        currentPage={currentPage}
+        onPageChange={handlePageChange}
+        hoveredBuildingId={hoveredBuildingId}
+        setHoveredBuildingId={setHoveredBuildingId}
+        eduTypes={eduTypes}
+        educationData={educationData}
+        getDistanceInKm={getDistanceInKm}     
+        eduRadius={eduRadius}               
+        expandedBuildingId={expandedBuildingId}
+        setExpandedBuildingId={setExpandedBuildingId}
+      />
     </SidePanel>
   );
 }

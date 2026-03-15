@@ -1,4 +1,5 @@
 site_name: "🍺 Smart Apartment Map"
+docs_dir: "."    
 repo_url: https://github.com/npnpdev/smart-apartment-map.git
 theme:
   name: material

@@ -18,21 +18,19 @@
   left: 60px;
   z-index: 1000;
   
-  /* UŻYWAMY TWOICH ZMIENNYCH Z INDEX.CSS */
-  background: var(--glass-bg-strong); /* Automatycznie jasne/ciemne tło */
-  color: var(--text-primary);         /* Automatycznie jasny/ciemny tekst */
-  border: 1px solid var(--border);    /* Subtelna ramka pasująca do motywu */
+  background: var(--glass-bg-strong);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
   box-shadow: var(--shadow-soft);
-  backdrop-filter: var(--blur);       /* Efekt rozmycia (frosted glass) */
+  backdrop-filter: var(--blur);
 
   padding: 12px 18px;
-  border-radius: var(--radius-md);    /* Twoje zaokrąglenia */
+  border-radius: var(--radius-md);
   
   display: flex;
   flex-direction: column;
   gap: 8px;
   
-  /* Płynne przejście przy zmianie motywu */
   transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
 }
 
@@ -41,7 +39,7 @@
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: var(--text-secondary); /* Szary tekst zdefiniowany w Twoim motywie */
+  color: var(--text-secondary);
   font-weight: 700;
 }
 
@@ -63,7 +61,7 @@
   width: 18px;
   height: 18px;
   cursor: pointer;
-  accent-color: var(--accent); /* Główny kolor akcentu (czarny/biały zależnie od motywu) */
+  accent-color: var(--accent);
 }
 
 /* --- MARKERY BUDYNKÓW --- */
@@ -81,7 +79,6 @@
   border: 1px solid var(--border);
   box-shadow: var(--shadow-medium);
   backdrop-filter: var(--blur);
-  -webkit-backdrop-filter: var(--blur);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -115,32 +112,7 @@
   transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 
-/* --- STANY AKTYWNE (PODŚWIETLONE) --- */
-.markerHoveredContainer {
-  transform: scale(1.15);
-  transition: transform 0.2s;
-  z-index: 2000;
-}
-
-.markerHovered {
-  /* Wymuszamy mocny, ciemno-szary kolor zawsze - niezależnie od motywu */
-  background: #1a1a1a !important; 
-  border-color: #000000 !important;
-  color: #ffffff !important;
-}
-
-/* Kolor samej ikonki domku w srodku */
-.markerHovered .markerHouse {
-  color: #ffffff !important; 
-}
-
-/* Kolor ogonka z kropką */
-.markerDotHovered {
-  background: #1a1a1a !important;
-  border-color: #1a1a1a !important;
-}
-
-/* FIX: FOCUS OUTLINE */
+/* --- FIX: FOCUS OUTLINE DLA LEAFLET --- */
 :global(path.leaflet-interactive:focus) {
   outline: none !important;
 }

@@ -6,7 +6,7 @@ import {
   createHashRouter,
   RouterProvider,
 } from 'react-router-dom';
-import MainNavigation from './components/MainNavigation.tsx';
+import MainNavigation from './components/MainNavigation/MainNavigation.tsx';
 import ErrorPage from './pages/ErrorPage.tsx';
 import HomePage from './pages/HomePage.tsx';
 import Map from './components/Map/Map.tsx';

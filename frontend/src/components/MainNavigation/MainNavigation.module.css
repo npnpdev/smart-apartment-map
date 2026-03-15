@@ -14,7 +14,6 @@
   padding: 8px;
   background: var(--glass-bg);
   backdrop-filter: var(--blur);
-  -webkit-backdrop-filter: var(--blur);
   border: 1px solid var(--border);
   box-shadow: var(--shadow-soft);
   border-radius: var(--radius-lg);
@@ -48,9 +47,10 @@
   color: var(--text-primary);
 }
 
-.active {
-  background: var(--accent) !important;
-  color: var(--accent-contrast) !important;
+/* Zamiast !important, po prostu łączymy selektory, by miały wyższy priorytet */
+.list a.active {
+  background: var(--accent);
+  color: var(--accent-contrast);
 }
 
 .separator {
@@ -124,7 +124,8 @@
   transition: all 0.2s ease;
 }
 
-.dropdownTrigger:hover, .dropdownTrigger[aria-expanded="true"] {
+.dropdownTrigger:hover, 
+.dropdownTrigger[aria-expanded="true"] {
   background: var(--glass-elevated);
   color: var(--text-primary);
 }
@@ -134,7 +135,7 @@
 }
 
 .dropdownIcon.open {
-  transform: rotate(180deg); /* Obraca strzałeczkę po kliknięciu */
+  transform: rotate(180deg);
 }
 
 .dropdownMenu {
@@ -143,16 +144,11 @@
   left: 50%;
   transform: translateX(-50%);
   min-width: 130px;
-  
   background: var(--glass-bg-strong); 
-  
   backdrop-filter: blur(50px);
-  -webkit-backdrop-filter: blur(50px);
-  
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-md);
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15); /* Delikatny cień odkleja menu od tła */
-  
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
   padding: 6px;
   margin: 0;
   list-style: none;

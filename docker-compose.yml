@@ -24,8 +24,7 @@ services:
       - ./:/work
     ports:
       - "8001:8000"
-    command: ["mkdocs","serve","--dev-addr=0.0.0.0:8000"]
-
+    command: ["mkdocs","serve","-f","docs/mkdocs.yml","--dev-addr=0.0.0.0:8000"]
   backend:
     build:
       context: ./backend
@@ -33,7 +32,6 @@ services:
       - "8000:8000"
     volumes:
       - ./backend:/app
-      - ./data:/app/data
     env_file:
       - .env
     depends_on:
