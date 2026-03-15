@@ -6,9 +6,10 @@ import {
   Popup,
   GeoJSON,
   Circle,      
-  Tooltip      
+  Tooltip,
 } from 'react-leaflet';
 import L, { divIcon, type LatLngExpression } from 'leaflet';
+import 'leaflet.vectorgrid';
 
 import { useEffect, useMemo, useState, useRef } from 'react';
 import { useAppContext } from '../../context/AppContext.tsx'; 
@@ -23,6 +24,68 @@ function FixMapSize() {
       map.invalidateSize();
     }, 0);
   }, [map]);
+  return null;
+}
+
+function VectorNoiseLayer({ showLayer }: { showLayer: boolean }) {
+  const map = useMap();
+  const layerRef = useRef<any>(null);
+
+  const getNoiseColor = (minval: number) => {
+    // Oficjalna paleta barw z map akustycznych (Dyrektywa UE / GeoGdańsk)
+    if (minval >= 75) return '#000080'; // Granatowy
+    if (minval >= 70) return '#0000FF'; // Jasnoniebieski
+    if (minval >= 65) return '#800080'; // Fioletowy
+    if (minval >= 60) return '#FF0000'; // Czerwony
+    return '#FF8000'; // Miękki pomarańczowy (55-60 dB)
+  };
+
+
+
+  useEffect(() => {
+    // Jeśli wyłączyliśmy warstwę, usuwamy ją z mapy
+    if (!showLayer) {
+      if (layerRef.current) {
+        map.removeLayer(layerRef.current);
+        layerRef.current = null;
+      }
+      return;
+    }
+
+    // Jeśli włączyliśmy warstwę i jeszcze jej nie ma, pobieramy plik
+    if (showLayer && !layerRef.current) {
+      fetch('/data/gdansk_noise.geojson')
+        .then((res) => res.json())
+        .then((data) => {
+          // @ts-ignore - TS nie widzi rozszerzenia wtyczki
+          layerRef.current = L.vectorGrid.slicer(data, {
+            rendererFactory: L.canvas.tile,
+            vectorTileLayerStyles: {
+              sliced: function (properties: any) {
+                return {
+                  fillColor: getNoiseColor(properties.MINVAL ?? 55),
+                  fillOpacity: 0.55, // Lekkie, oryginalne krycie 55%
+                  stroke: false,     // WYŁĄCZAMY ostre krawędzie (brak obrysu)
+                  fill: true
+                };
+              }
+            },
+            interactive: false,
+            maxZoom: 22,
+            zIndex: 200
+          }).addTo(map);
+        })
+        .catch(err => console.error("Błąd lokalnego pliku hałasu:", err));
+    }
+
+    return () => {
+      if (layerRef.current) {
+        map.removeLayer(layerRef.current);
+        layerRef.current = null;
+      }
+    };
+  }, [showLayer, map]);
+
   return null;
 }
 
@@ -71,8 +134,13 @@ export default function Map() {
   // 2. Aktualnie wybrany próg (domyślnie ustawiamy wysoko, żeby pokazać wszystko)
   const[safetyThreshold, setSafetyThreshold] = useState<number>(1000); 
 
+  // --- LOGIKA FILTRÓW: HAŁAS ---
+  // Domyślnie 80 dB (brak limitu). Użytkownik zjedzie do np. 55.
+  const [noiseThreshold, setNoiseThreshold] = useState<number>(80);
+
   // --- LOGIKA FILTRÓW: EDUKACJA ---
   const[eduTypes, setEduTypes] = useState<string[]>([]);
+
   const[eduRadius, setEduRadius] = useState<number>(5);
 
   // --- ZAPAMIĘTYWANIE WARSTW (localStorage) ---
@@ -85,6 +153,8 @@ export default function Map() {
     localStorage.setItem('map_show_safety_layer', JSON.stringify(showSafetyLayer));
   }, [showSafetyLayer]);
   
+  const [showNoiseLayer, setShowNoiseLayer] = useState<boolean>(false);
+
   const geoJsonRef = useRef<any>(null);
 
     // --- HELPER DO FILTRÓW ---
@@ -173,6 +243,20 @@ export default function Map() {
     const districtName = normalizeName(building.district);
     const crimeRate = safetyData[districtName];
     if (crimeRate !== undefined && crimeRate > safetyThreshold) return false;
+
+    // 2. Filtr Hałasu
+    if (noiseThreshold < 80 && building.noise_db !== undefined && building.noise_db !== null) {
+      // Zamieniamy wartość na string, żeby match na pewno zadziałał (nawet jeśli to zwykły int)
+      const noiseStr = String(building.noise_db);
+      const match = noiseStr.match(/\d+/); 
+      
+      if (match) {
+        const buildingNoise = parseInt(match[0], 10);
+        if (buildingNoise > noiseThreshold) return false; 
+      }
+    }
+
+    // 3. Filtr Edukacji (Zaktualizowany)
 
     // 2. Filtr Edukacji (Zaktualizowany)
     if (eduTypes.length > 0) {
@@ -347,14 +431,14 @@ export default function Map() {
   };
 
   const getTextColor = (wskaznik?: number) => {
-  if (wskaznik === undefined || wskaznik === null) return '#333333';
-  if (wskaznik >= 60) return '#b2182b'; // Ciemny czerwony
-  if (wskaznik >= 45) return '#d6604d'; // Ciemniejszy pomarańczowy
-  if (wskaznik >= 30) return '#b8860b'; // Zgaszony, ciemny żółto-musztardowy
-  if (wskaznik >= 20) return '#8c7d00'; // Oliwkowy (zamiast bardzo jasnego żółtego)
-  if (wskaznik >= 15) return '#4d9221'; // Ciemny, soczysty zielony
-  if (wskaznik >= 10) return '#276419'; // Jeszcze ciemniejszy zielony
-  return '#00441b'; // Najciemniejszy zielony
+    if (wskaznik === undefined || wskaznik === null) return '#333333';
+    if (wskaznik >= 60) return '#b2182b'; // Ciemny czerwony
+    if (wskaznik >= 45) return '#d6604d'; // Ciemniejszy pomarańczowy
+    if (wskaznik >= 30) return '#b8860b'; // Zgaszony, ciemny żółto-musztardowy
+    if (wskaznik >= 20) return '#8c7d00'; // Oliwkowy (zamiast bardzo jasnego żółtego)
+    if (wskaznik >= 15) return '#4d9221'; // Ciemny, soczysty zielony
+    if (wskaznik >= 10) return '#276419'; // Jeszcze ciemniejszy zielony
+    return '#00441b'; // Najciemniejszy zielony
   };
 
   // --- ZMODYFIKOWANY STYL (Reaguje na suwak) ---
@@ -452,6 +536,15 @@ export default function Map() {
           />
           Mapa Bezpieczeństwa
         </label>
+        <label className={styles.filterLabel}>
+          <input
+            type="checkbox"
+            checked={showNoiseLayer}
+            onChange={(e) => setShowNoiseLayer(e.target.checked)}
+            className={styles.filterCheckbox}
+          />
+          Mapa Hałasu
+        </label>
       </div>
 
       <MapContainer
@@ -467,7 +560,7 @@ export default function Map() {
           attribution="&copy; OpenStreetMap contributors"
         />
 
-                {showSafetyLayer && geoJsonData && Object.keys(safetyData).length > 0 && (
+        {showSafetyLayer && geoJsonData && Object.keys(safetyData).length > 0 && (
           <GeoJSON
             key={`gdansk-safety-layer-${safetyThreshold}`}
             data={geoJsonData}
@@ -477,7 +570,11 @@ export default function Map() {
           />
         )}
 
+        {/* --- MAPA HAŁASU (LOKALNY VECTOR GRID) --- */}
+        <VectorNoiseLayer showLayer={showNoiseLayer} />
+
         {/* --- NOWE: OKRĄG PROMIENIA DLA EDUKACJI --- */}
+
         {activeBuilding && eduTypes.length > 0 && (
           <Circle
             center={[activeBuilding.lat, activeBuilding.lng]}
@@ -545,6 +642,8 @@ export default function Map() {
         setSafetyThreshold={setSafetyThreshold}
         safetyMin={safetyRange.min}
         safetyMax={safetyRange.max}
+        noiseThreshold={noiseThreshold}
+        setNoiseThreshold={setNoiseThreshold}
         hoveredBuildingId={hoveredBuildingId}
         setHoveredBuildingId={setHoveredBuildingId}
         eduTypes={eduTypes}

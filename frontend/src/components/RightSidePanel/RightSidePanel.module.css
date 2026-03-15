@@ -110,22 +110,6 @@
   background: rgba(255,255,255,0.05);
 }
 
-.loadMoreBtn {
-  margin-top: 10px;
-  padding: 14px;
-  background: var(--text-primary);
-  color: var(--bg-root);
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 700;
-  transition: opacity 0.2s;
-}
-
-.loadMoreBtn:hover {
-  opacity: 0.9;
-}
-
 /* --- NOWE STYLE DLA PANELU FILTRÓW (ROZWIJANIE I SUWAK) --- */
 
 .filtersWrapper {
@@ -341,4 +325,47 @@
   color: var(--bg-base, #111) !important;
   border-color: var(--text-primary) !important;
   font-weight: 600;
+}
+
+/* --- PAGINACJA --- */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.pageButton {
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--border-strong);
+  color: var(--text-primary);
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pageButton:hover:not(:disabled) {
+  background: var(--text-primary);
+  color: var(--bg-base, #111);
+  border-color: var(--text-primary);
+}
+
+.pageButton:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.pageInfo {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
 }

@@ -6,3 +6,7 @@ djangorestframework-simplejwt
 #dodac geodjango
 pandas
 openpyxl
+requests
+shapely
+geopandas
+arcgis

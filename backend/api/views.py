@@ -1,4 +1,5 @@
 import os
+from django.http import HttpResponse
 import pandas as pd
 from django.conf import settings
 from rest_framework import status
@@ -7,12 +8,16 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 import math
 import numpy as np
+import requests
 
 # --- KONFIGURACJA ---
 DATA_DIR_NAME = 'data'
 SAFETY_FILENAME = 'bezpieczenstwo_gdansk.csv'
 APARTMENTS_FILENAME = 'mieszkania.csv' 
 EDUCATION_FILENAME = 'edukacja.csv'
+NOISE_FILENAME = 'halas.csv'
+GEOGDANSK_NOISE_URL = "https://geogdansk.pl/server/services/Srodowisko/Mapa_halasu/MapServer/WMSServer"
+NOISE_GEOJSON_FILENAME = 'halas.geojson'
 
 
 def _get_data_file_path(filename):
@@ -139,3 +144,50 @@ def get_education_data(request):
         return Response(data, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+def _fetch_noise_from_geogdansk():
+    """
+    Pobiera strefy hałasu drogowego LDWN z GeoGdańsk ArcGIS REST API.
+    Zwraca listę słowników lub None jeśli błąd.
+    """
+
+    params = {
+        "where": "1=1",
+        "outFields": "*",
+        "f": "geojson",
+        "outSR": "4326",
+        "resultRecordCount": 2000,
+    }
+    try:
+        resp = requests.get(GEOGDANSK_NOISE_URL, params=params, timeout=10)
+        resp.raise_for_status()
+        return resp.json()
+    except Exception:
+        return None
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def get_noise_data(request):
+    """
+    Endpoint proxy dla mapy hałasu.
+    Front pyta nasze API, nasze API pobiera lekki obrazek z GeoGdańska i zwraca do frontu.
+    """
+    # 1. Pobieramy wszystkie parametry od Leafleta (BBOX, width, height, layers itp.)
+    query_params = request.GET.urlencode()
+    
+    try:
+        # 2. Django pyta GeoGdańsk o kafelki
+        resp = requests.get(f"{GEOGDANSK_NOISE_URL}?{query_params}", timeout=10)
+        resp.raise_for_status()
+        
+        # 3. Django zwraca gotowy OBRAZEK prosto na front! (zamiast wielkiego JSONa)
+        content_type = resp.headers.get('content-type', 'image/png')
+        return HttpResponse(resp.content, content_type=content_type)
+        
+    except Exception as e:
+        return Response(
+            {"error": "Błąd pobierania warstwy hałasu", "details": str(e)}, 
+            status=status.HTTP_503_SERVICE_UNAVAILABLE
+        )
