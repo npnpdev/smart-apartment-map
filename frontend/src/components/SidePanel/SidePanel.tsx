@@ -1,9 +1,9 @@
-import { type ReactNode, useState, useEffect } from "react";
-import styles from "./SidePanel.module.css";
+import { type ReactNode, useState, useEffect } from 'react';
+import styles from './SidePanel.module.css';
 
-type Side = "left" | "right";
+type Side = 'left' | 'right';
 
-function ChevronIcon({ direction }: { direction: "up" | "down" }) {
+function ChevronIcon({ direction }: { direction: 'left' | 'right' }) {
   return (
     <svg
       className={styles.chevronIcon}
@@ -11,9 +11,9 @@ function ChevronIcon({ direction }: { direction: "up" | "down" }) {
       fill="none"
       aria-hidden="true"
     >
-      {direction === "up" ? (
+      {direction === 'left' ? (
         <path
-          d="M6 14L12 8L18 14"
+          d="M15 18L9 12L15 6"
           stroke="currentColor"
           strokeWidth="1.9"
           strokeLinecap="round"
@@ -21,7 +21,7 @@ function ChevronIcon({ direction }: { direction: "up" | "down" }) {
         />
       ) : (
         <path
-          d="M6 10L12 16L18 10"
+          d="M9 18L15 12L9 6"
           stroke="currentColor"
           strokeWidth="1.9"
           strokeLinecap="round"
@@ -33,7 +33,7 @@ function ChevronIcon({ direction }: { direction: "up" | "down" }) {
 }
 
 export default function SidePanel({
-  side = "right",
+  side = 'right',
   width = 520,
   title,
   subtitle,
@@ -45,54 +45,41 @@ export default function SidePanel({
   subtitle?: string;
   children: ReactNode;
 }) {
-  // 1. Tworzymy unikalny klucz dla localStorage
-  const storageKey = `sidepanel_collapsed_${side}_${title || "default"}`;
+  const storageKey = `sidepanel_collapsed_${side}_${title || 'default'}`;
 
-  // 2. Inicjalizujemy stan czytając z localStorage
-  const[collapsed, setCollapsed] = useState(() => {
+  const [collapsed, setCollapsed] = useState(() => {
     const savedState = localStorage.getItem(storageKey);
-    // Jeśli jest coś w pamięci to używamy tego, w przeciwnym razie domyślnie false
     return savedState !== null ? JSON.parse(savedState) : false;
   });
 
-  // 3. Nasłuchujemy zmian - jak tylko `collapsed` się zmieni, zapisujemy do pamięci
   useEffect(() => {
     localStorage.setItem(storageKey, JSON.stringify(collapsed));
   }, [collapsed, storageKey]);
 
-  const panelClassName =[
+  const panelClassName = [
     styles.panel,
-    side === "left" ? styles.left : styles.right,
-    collapsed ? styles.panelHidden : "",
-  ].join(" ");
+    side === 'left' ? styles.left : styles.right,
+    collapsed ? styles.panelHidden : '',
+  ].join(' ');
 
-  const floatingButtonClassName =[
-    styles.floatingToggle,
-    side === "left" ? styles.floatingToggleLeft : styles.floatingToggleRight,
-    collapsed ? styles.floatingToggleVisible : "",
-  ].join(" ");
+  // Ikona: panel prawy — gdy otwarty pokaż >, gdy zwinięty pokaż
+  // Panel lewy — odwrotnie
+  const iconDirection =
+    side === 'right'
+      ? collapsed
+        ? 'left'
+        : 'right'
+      : collapsed
+        ? 'right'
+        : 'left';
 
   return (
     <>
       <aside
         className={panelClassName}
-        style={
-          {
-            ["--panel-width" as any]: `${width}px`,
-          } as any
-        }
+        style={{ ['--panel-width' as any]: `${width}px` } as any}
         aria-expanded={!collapsed}
       >
-        <button
-          type="button"
-          className={styles.toggle}
-          onClick={() => setCollapsed(true)}
-          aria-label="Zwiń panel"
-          title="Zwiń"
-        >
-          <ChevronIcon direction="up" />
-        </button>
-
         <div className={styles.inner}>
           {(subtitle || title) && (
             <header className={styles.header}>
@@ -101,19 +88,21 @@ export default function SidePanel({
               <div className={styles.divider} />
             </header>
           )}
-
           <div className={styles.content}>{children}</div>
         </div>
       </aside>
 
+      {/* Przycisk zawsze widoczny, przyklejony do krawędzi */}
       <button
         type="button"
-        className={floatingButtonClassName}
-        onClick={() => setCollapsed(false)}
-        aria-label="Rozwiń panel"
-        title="Rozwiń"
+        className={[
+          styles.edgeToggle,
+          side === 'right' ? styles.edgeToggleRight : styles.edgeToggleLeft,
+        ].join(' ')}
+        onClick={() => setCollapsed((prev: boolean) => !prev)}
+        aria-label={collapsed ? 'Rozwiń panel' : 'Zwiń panel'}
       >
-        <ChevronIcon direction="down" />
+        <ChevronIcon direction={iconDirection} />
       </button>
     </>
   );
