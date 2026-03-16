@@ -3,6 +3,7 @@ import stylesSidePanel from "../SidePanel/SidePanel.module.css";
 import styles from "./RightSidePanel.module.css";
 import { useState, useEffect, useMemo } from "react";
 import type { Dispatch, SetStateAction } from "react";
+import { useAppContext } from '../../context/AppContext.tsx';
 
 import { RightSidePanelResults } from "./RightSidePanelResults";
 
@@ -69,6 +70,8 @@ export default function RightSidePanel({
 }: RightSidePanelProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [view, setView] = useState<'list' | 'filters'>('list');
+
+  const { cities, currentCity, changeCity } = useAppContext();
   
   // Stan do obsługi błędu suwaka edukacji, gdy nie wybrano żadnego typu placówki
   const [sliderError, setSliderError] = useState<string | null>(null);
@@ -137,27 +140,27 @@ export default function RightSidePanel({
       subtitle="PLATFORMA ANALITYCZNA"
       width={560}
     >
-
       {/* --- SEKCJA GŁÓWNA (ZARZĄDZANIE WIDOKAMI) --- */}
       <div className={styles.filtersWrapper}>
-        
         {/* WIDOK 1: PRZYCISK FILTRÓW I RESET */}
         {view === 'list' && (
           <div className={styles.mainControls}>
-            <button 
-              className={styles.mainFilterButton} 
+            <button
+              className={styles.mainFilterButton}
               onClick={() => setView('filters')}
             >
               Filtry
               {activeFilterCount > 0 && (
-                <span className={styles.activeFilterBadge}>{activeFilterCount}</span>
+                <span className={styles.activeFilterBadge}>
+                  {activeFilterCount}
+                </span>
               )}
             </button>
 
             {activeFilterCount > 0 && (
-               <button className={styles.resetButton} onClick={resetFilters}>
-                 Resetuj ✕
-               </button>
+              <button className={styles.resetButton} onClick={resetFilters}>
+                Resetuj ✕
+              </button>
             )}
           </div>
         )}
@@ -165,30 +168,51 @@ export default function RightSidePanel({
         {/* WIDOK 2: PIONOWA LISTA FILTRÓW */}
         {view === 'filters' && (
           <div className={styles.filtersPage}>
-            <button className={styles.backButton} onClick={() => setView('list')}>
+            <button
+              className={styles.backButton}
+              onClick={() => setView('list')}
+            >
               ← Wróć do wyników
             </button>
 
-            {/* SEKCJA 1: BEZPIECZEŃSTWO */}
+            {/* SEKCJA 1: WYBÓR MIASTA */}
             <div className={styles.filterSection}>
-              <h3 className={styles.filterSectionTitle}>Poziom Bezpieczeństwa</h3>
+              <h3 className={styles.filterSectionTitle}>Miasto</h3>
+              <div className={styles.cityButtonsRow}>
+                {cities.map((city) => (
+                  <button
+                    key={city.name}
+                    className={`${styles.cityButton} ${city.name === currentCity.name ? styles.cityButtonActive : ''}`}
+                    onClick={() => changeCity(city.name)}
+                  >
+                    {city.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* SEKCJA 2: BEZPIECZEŃSTWO */}
+            <div className={styles.filterSection}>
+              <h3 className={styles.filterSectionTitle}>
+                Poziom Bezpieczeństwa
+              </h3>
               <div className={styles.sliderContainer}>
                 <div className={styles.sliderLabels}>
                   <span>Najbezpieczniejsze</span>
                   <span>Wszystkie</span>
                 </div>
-                
-                <input 
-                  type="range" 
-                  min={safetyMin} 
-                  max={safetyMax + 1} 
-                  value={safetyThreshold} 
+
+                <input
+                  type="range"
+                  min={safetyMin}
+                  max={safetyMax + 1}
+                  value={safetyThreshold}
                   onChange={(e) => setSafetyThreshold(Number(e.target.value))}
                   onMouseDown={(e) => e.stopPropagation()}
                   onTouchStart={(e) => e.stopPropagation()}
                   className={styles.sliderInput}
                 />
-                
+
                 <div className={styles.sliderValue}>
                   {safetyThreshold > safetyMax ? (
                     <strong>Pokazuję wszystkie dzielnice</strong>
@@ -201,18 +225,18 @@ export default function RightSidePanel({
               </div>
             </div>
 
-            {/* SEKCJA 2: EDUKACJA */}
+            {/* SEKCJA 3: EDUKACJA */}
             <div className={styles.filterSection}>
               <h3 className={styles.filterSectionTitle}>Placówki edukacyjne</h3>
               <div className={styles.eduTypesWrapper}>
                 <span className={styles.sectionLabel}>Wybierz rodzaj:</span>
                 <div className={styles.eduTypesContainer}>
-                  {APP_CONFIG.AVAILABLE_EDU_TYPES.map(type => {
+                  {APP_CONFIG.AVAILABLE_EDU_TYPES.map((type) => {
                     const isActive = eduTypes.includes(type);
-                    const count = educationDetails[type]?.count || 0; 
+                    const count = educationDetails[type]?.count || 0;
 
                     return (
-                      <button 
+                      <button
                         key={type}
                         onClick={() => toggleEduType(type)}
                         className={`${styles.eduTypeChip} ${isActive ? styles.eduTypeChipActive : ''}`}
@@ -224,68 +248,92 @@ export default function RightSidePanel({
                 </div>
               </div>
 
-              <div 
-                className={styles.sliderContainer} 
-                style={{ marginTop: '20px', opacity: eduTypes.length === 0 ? 0.5 : 1 }}
+              <div
+                className={styles.sliderContainer}
+                style={{
+                  marginTop: '20px',
+                  opacity: eduTypes.length === 0 ? 0.5 : 1,
+                }}
                 onClick={handleSliderContainerClick}
               >
-                <span className={styles.sectionLabel}>Maksymalna odległość:</span>
-                
+                <span className={styles.sectionLabel}>
+                  Maksymalna odległość:
+                </span>
+
                 {sliderError && (
-                  <div style={{ color: '#ff6b6b', fontSize: '0.8rem', marginBottom: '8px', fontWeight: 'bold' }}>
+                  <div
+                    style={{
+                      color: '#ff6b6b',
+                      fontSize: '0.8rem',
+                      marginBottom: '8px',
+                      fontWeight: 'bold',
+                    }}
+                  >
                     {sliderError}
                   </div>
                 )}
 
-                <div className={styles.sliderLabels} style={{ marginTop: '8px' }}>
+                <div
+                  className={styles.sliderLabels}
+                  style={{ marginTop: '8px' }}
+                >
                   <span>0.5 km</span>
                   <span>5 km</span>
                 </div>
-                
-                <input 
-                  type="range" 
-                  min="0.5" 
-                  max="5" 
+
+                <input
+                  type="range"
+                  min="0.5"
+                  max="5"
                   step="0.5"
-                  value={eduRadius} 
+                  value={eduRadius}
                   onChange={(e) => setEduRadius(Number(e.target.value))}
                   onMouseDown={(e) => e.stopPropagation()}
                   onTouchStart={(e) => e.stopPropagation()}
                   className={styles.sliderInput}
-                  disabled={eduTypes.length === 0} 
-                  style={{ cursor: eduTypes.length === 0 ? 'not-allowed' : 'pointer' }}
+                  disabled={eduTypes.length === 0}
+                  style={{
+                    cursor: eduTypes.length === 0 ? 'not-allowed' : 'pointer',
+                  }}
                 />
-                
+
                 <div className={styles.sliderValue}>
                   W promieniu: <strong>{eduRadius} km</strong>
                 </div>
-              </div>           
+              </div>
             </div>
-            
-            {/* SEKCJA 3: HAŁAS */}
+
+            {/* SEKCJA 4: HAŁAS */}
             <div className={styles.filterSection}>
-              <h3 className={styles.filterSectionTitle}>Maksymalny Poziom Hałasu</h3>
-              
+              <h3 className={styles.filterSectionTitle}>
+                Maksymalny Poziom Hałasu
+              </h3>
+
               <div className={styles.sliderContainer}>
                 <div className={styles.sliderLabels}>
                   <span>Cicho (55 dB)</span>
                   <span>Głośno (75+ dB)</span>
                 </div>
-                
-                <input 
-                  type="range" 
-                  min="50" 
-                  max="80" 
+
+                <input
+                  type="range"
+                  min="50"
+                  max="80"
                   step="5"
-                  value={noiseThreshold} 
+                  value={noiseThreshold}
                   onChange={(e) => setNoiseThreshold(Number(e.target.value))}
                   onMouseDown={(e) => e.stopPropagation()}
                   onTouchStart={(e) => e.stopPropagation()}
                   className={styles.sliderInput}
                 />
-                
+
                 <div className={styles.sliderValue}>
-                  Max: <strong>{noiseThreshold >= 80 ? 'Brak limitu' : `${noiseThreshold} dB`}</strong>
+                  Max:{' '}
+                  <strong>
+                    {noiseThreshold >= 80
+                      ? 'Brak limitu'
+                      : `${noiseThreshold} dB`}
+                  </strong>
                 </div>
               </div>
             </div>
@@ -305,8 +353,8 @@ export default function RightSidePanel({
         setHoveredBuildingId={setHoveredBuildingId}
         eduTypes={eduTypes}
         educationData={educationData}
-        getDistanceInKm={getDistanceInKm}     
-        eduRadius={eduRadius}               
+        getDistanceInKm={getDistanceInKm}
+        eduRadius={eduRadius}
         expandedBuildingId={expandedBuildingId}
         setExpandedBuildingId={setExpandedBuildingId}
       />

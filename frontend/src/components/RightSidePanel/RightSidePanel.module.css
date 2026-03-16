@@ -369,3 +369,36 @@
   font-weight: 600;
   color: var(--text-secondary);
 }
+
+/* --- WYBÓR MIASTA --- */
+.cityButtonsRow {
+  display: flex;
+  flex-direction: row-reverse; /* prawa do lewej */
+  gap: 8px;
+}
+
+.cityButton {
+  flex: 1;
+  padding: 10px 8px;
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.cityButton:hover:not(.cityButtonActive) {
+  border-color: var(--text-primary);
+  color: var(--text-primary);
+}
+
+.cityButtonActive {
+  background: var(--text-primary);
+  color: var(--bg-base, #111);
+  border-color: var(--text-primary);
+  font-weight: 600;
+}
