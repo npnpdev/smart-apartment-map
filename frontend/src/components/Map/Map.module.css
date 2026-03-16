@@ -14,8 +14,8 @@
 /* --- PANEL FILTROWANIA (WARSTWY) --- */
 .filterPanel {
   position: absolute;
-  top: 20px;
-  left: 60px;
+  bottom: 30px;
+  left: 20px;
   z-index: 1000;
   
   background: var(--glass-bg-strong);
