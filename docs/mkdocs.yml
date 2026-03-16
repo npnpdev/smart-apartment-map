@@ -33,7 +33,7 @@ plugins:
   - mkdocstrings:
       handlers:
         python:
-          paths: [src]
+          paths: [/work/backend]
           options:
             docstring_style: google
             separate_signature: true
