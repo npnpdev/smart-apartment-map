@@ -116,3 +116,10 @@
 :global(path.leaflet-interactive:focus) {
   outline: none !important;
 }
+
+/* --- LEAFLET ZOOM CONTROLS --- */
+:global(.leaflet-top.leaflet-left) {
+  bottom: 150px;
+  top: auto;
+  left: 30px;
+}
