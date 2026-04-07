@@ -15,37 +15,44 @@
   flex-direction: column;
   opacity: 1;
   pointer-events: auto;
-  will-change: transform, opacity;
+  will-change: transform;
   transform: translate3d(0, 0, 0) scale(1);
   transition:
     transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 240ms ease,
     background-color 0.25s ease,
     border-color 0.25s ease,
     box-shadow 0.25s ease;
 }
 
 .right {
-  right: 18px;
-  transform-origin: top right;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  border-radius: var(--radius-xl) 0 0 var(--radius-xl);
+  transform-origin: right center;
+  transform: translateX(0);
 }
 
+
 .left {
-  left: 18px;
-  transform-origin: top left;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  border-radius: 0 var(--radius-xl) var(--radius-xl) 0;
+  transform-origin: left center;
+  transform: translateX(0);
 }
 
 .panelHidden {
-  opacity: 0;
   pointer-events: none;
 }
 
 .right.panelHidden {
-  transform: translate3d(0, -18px, 0) scale(0.09);
+  transform: translateX(100%);
 }
 
 .left.panelHidden {
-  transform: translate3d(0, -18px, 0) scale(0.09);
+  transform: translateX(-100%);
 }
 
 .toggle,
@@ -72,13 +79,6 @@
 .floatingToggle:hover {
   transform: scale(1.04);
   border-color: var(--border-strong);
-}
-
-.toggle {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  z-index: 3100;
 }
 
 .left .toggle {
@@ -208,25 +208,53 @@
   letter-spacing: -0.03em;
 }
 
-.floatingToggle {
-  position: absolute;
-  top: 34px;
+
+/* --- EDGE TOGGLE (zawsze widoczny przycisk przy krawędzi) --- */
+.edgeToggle {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
   z-index: 3200;
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(-10px) scale(0.82);
+  width: 28px;
+  height: 56px;
+  border: 1px solid var(--border);
+  background: var(--glass-bg-strong);
+  backdrop-filter: var(--blur);
+  box-shadow: var(--shadow-soft);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  padding: 0;
 }
 
-.floatingToggleVisible {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0) scale(1);
+.edgeToggleRight {
+  right: 0;
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
 }
 
-.floatingToggleRight {
-  right: 34px;
+.edgeToggleLeft {
+  left: 0;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 }
 
-.floatingToggleLeft {
-  left: 34px;
+.edgeToggle:hover {
+  background: var(--glass-elevated);
+  border-color: var(--border-strong);
+}
+
+@media (max-width: 768px) {
+  .right {
+    width: 100vw !important;
+    top: 0;
+    bottom: 0;
+    border-radius: 0;
+  }
+
+  .left {
+    width: 100vw !important;
+    top: 0;
+    bottom: 0;
+    border-radius: 0;
+  }
 }

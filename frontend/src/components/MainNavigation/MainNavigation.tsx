@@ -76,43 +76,6 @@ export default function MainNavigation() {
             
             <li><div className={classes.separator} /></li>
 
-            {/* 2. Wybór miasta */}
-            <li ref={dropdownRef} className={classes.customDropdownContainer}>
-              <button 
-                className={classes.dropdownTrigger}
-                onClick={() => setIsCityDropdownOpen((prev) => !prev)}
-                aria-expanded={isCityDropdownOpen}
-              >
-                <span>{currentCity.name}</span>
-                <svg 
-                  className={`${classes.dropdownIcon} ${isCityDropdownOpen ? classes.open : ''}`} 
-                  width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                >
-                  <polyline points="6 9 12 15 18 9" />
-                </svg>
-              </button>
-
-              {isCityDropdownOpen && (
-                <ul className={classes.dropdownMenu}>
-                  {cities.map((city) => (
-                    <li key={city.name}>
-                      <button
-                        className={`${classes.dropdownItem} ${city.name === currentCity.name ? classes.activeItem : ''}`}
-                        onClick={() => {
-                          changeCity(city.name);
-                          setIsCityDropdownOpen(false);
-                        }}
-                      >
-                        {city.name}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </li>
-
-            <li><div className={classes.separator} /></li>
-
             {/* 3. Przełącznik Motywu */}
             <li>
               <button
