@@ -1,5 +1,0 @@
-mkdocs
-mkdocs-material
-mkdocstrings[python]
-griffe-pydantic
-pymdown-extensions

@@ -1,0 +1,31 @@
+id,name,district,lat,lng,price,noise_db
+1,Apartament Grunwaldzka,Wrzeszcz Górny,54.3785,18.6045,3200,45
+2,Kawalerka przy Galerii,Wrzeszcz Górny,54.3761,18.6082,2500,60
+3,Studio Partyzantów,Wrzeszcz Górny,54.3768,18.6012,2400,65
+4,Cisza Jaśkowa Dolina,Wrzeszcz Górny,54.3732,18.5901,4000,45
+5,Zielony Batorego,Wrzeszcz Górny,54.3755,18.5945,3500,45
+6,Loft Wita Stwosza,Oliwa,54.3981,18.5752,3100,65
+7,Mieszkanie Spacerowa,Oliwa,54.4095,18.5521,2600,60
+8,Rezydencja Polanki,Oliwa,54.3955,18.5681,4500,45
+9,Oliwa Park Residence,Oliwa,54.4109,18.5562,2800,60
+10,Zaspa Tower Rzeczpospolitej,Zaspa-Młyniec,54.395,18.591,2900,45
+11,Blok Hynka,Zaspa-Młyniec,54.3912,18.5905,2700,60
+12,Spokojna Zaspa Pilotów,Zaspa-Młyniec,54.3935,18.6002,2850,70
+13,Przymorze Chłopska,Przymorze Małe,54.4065,18.5881,2500,60
+14,Falowiec Jagiellońska,Przymorze Wielkie,54.409,18.5915,2400,60
+15,Wieża Obrońców Wybrzeża,Przymorze Wielkie,54.405,18.595,3300,60
+16,Głośne Centrum Podwale,Śródmieście,54.356,18.645,3000,70
+17,Starówka Szeroka,Śródmieście,54.3515,18.653,3800,65
+18,Apartament Rajska,Śródmieście,54.3535,18.6495,4200,45
+19,Długie Ogrody Nowe,Śródmieście,54.3505,18.6605,3400,70
+20,Siennicka Widok,Śródmieście,54.3525,18.675,2200,60
+21,Kamienica Kartuska,Siedlce,54.348,18.625,2300,45
+22,Zakopiańska Spokój,Siedlce,54.3495,18.62,2400,65
+23,Łostowicka Węzeł,Chełm,54.335,18.61,2100,60
+24,Nowa Warszawska,Ujeścisko - Łostowice,54.325,18.595,2600,45
+25,Świętokrzyska Droga,Orunia Górna - Gdańsk Południe,54.322,18.62,2000,45
+26,Dworcowa Kamienica,Orunia - Święty Wojciech - Lipce,54.325,18.635,2150,60
+27,Słowackiego Trasa,Wrzeszcz Górny,54.3805,18.575,2400,45
+28,Leśna Góra,VII Dwór,54.382,18.568,2700,45
+29,Wodnika Osowa,Osowa,54.425,18.46,2800,45
+30,Kielnieńska Osowa,Osowa,54.43,18.475,2500,65

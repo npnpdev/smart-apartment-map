@@ -1,5 +1,5 @@
 import { Outlet, redirect } from "react-router-dom";
-import MainNavigation from "../components/MainNavigation.tsx";
+import MainNavigation from "../components/MainNavigation/MainNavigation.tsx";
 
 export default function RootLayout() {
   return (

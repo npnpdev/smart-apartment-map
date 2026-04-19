@@ -2,3 +2,11 @@ Django>=5.0
 djangorestframework
 django-cors-headers
 psycopg[binary]
+djangorestframework-simplejwt
+#dodac geodjango
+pandas
+openpyxl
+requests
+shapely
+geopandas
+arcgis
