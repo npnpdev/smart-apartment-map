@@ -1,4 +1,4 @@
-mkdocs<2
+mkdocs
 mkdocs-material
 mkdocstrings[python]
 griffe-pydantic
