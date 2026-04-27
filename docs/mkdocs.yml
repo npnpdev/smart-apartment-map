@@ -56,8 +56,11 @@ markdown_extensions:
 
 # --- TUTAJ ZMIANA: NOWA NAWIGACJA ---
 nav:
-  - Poradnik tworzenia dokumentacji: how-to-use.md
+  - Zalozenia projektu: index.md
   - Frontend:
       - Stylizacja i Motywy: frontend/styling.md
   - Backend & API:
       - Architektura Danych: backend/api.md
+  - Scraper:
+      - Baza danych projektu: scraper/data.md
+  - Poradnik tworzenia dokumentacji: how-to-use.md
