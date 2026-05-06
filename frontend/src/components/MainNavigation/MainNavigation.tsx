@@ -6,11 +6,11 @@ import { useState, useEffect, useRef } from 'react';
 const NAV_LINKS = [
   { path: "/", label: "Home", exact: true },
   { path: "/map", label: "Mapa" },
-  { path: "/results", label: "Wyniki" },
+  { path: "/most-liked", label: "Ulubione" },
 ];
 
 export default function MainNavigation() {
-  const { email, cities, currentCity, changeCity } = useAppContext();
+  const { email, /*cities, currentCity, changeCity*/ } = useAppContext();
   
   // Dark mode z pamięcią w localStorage
   const [isDark, setIsDark] = useState(() => {
