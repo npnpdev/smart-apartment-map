@@ -1,10 +1,18 @@
-from django.urls import path
-from .views import health, get_safety_data, get_apartments_data, get_education_data, get_noise_data
+from django.urls import path, include
+from . import views
+from rest_framework.routers import DefaultRouter
+
+router = DefaultRouter()
+#router.register(r"favorites", views.FavoriteViewSet, basename="favorite")
+
 
 urlpatterns = [
-    path("health/", health, name="health"),
-    path("safety/", get_safety_data, name="safety_data"),
-    path("apartments/", get_apartments_data, name="apartments_data"),
-    path("education/", get_education_data, name="education_data"),
-    path("noise/", get_noise_data, name="noise_data"), 
+    path("health/", views.health, name="health"),
+    path("apartments/", views.ApartmentListView.as_view(), name="apartments"),
+    path("education/", views.EducationListView.as_view(), name="education"),
+    path("safety/", views.SafetyListView.as_view(), name="safety"),
+    path("districts/", views.DistrictGeoView.as_view(), name="districts"),
+    path("noise/", views.get_noise_data, name="noise"),
+    #path("", include(router.urls)),
+
 ]

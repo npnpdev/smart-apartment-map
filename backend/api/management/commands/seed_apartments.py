@@ -1,21 +1,3 @@
-"""
-Wgrywa MOCKOWE oferty mieszkan z mieszkania.csv do tabeli Apartment.
-
-UWAGA: To sa dane TESTOWE (seed) na potrzeby developmentu Fazy 3.
-Prawdziwe oferty wjada scraperem w Fazie 4 ze swoja logika
-DataVersion / ApartmentHistory / walidacji.
-
-CSV ma kolumny: id, name, district, lat, lng, price, noise_db
-Modele wymagaja wiecej pol; brakujace lecimy z domyslnymi:
-- area : 45 m2 (placeholder; CSV nie ma tej kolumny)
-- rooms : None (nullable)
-- offer_type : "rent"
-
-source_portal="seed" pozwala odfiltrowac mocki od realnych ofert
-i czysto je skasowac jak przyjdzie czas:
-    Apartment.objects.filter(source_portal="seed").delete()
-"""
-
 import csv
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
@@ -33,7 +15,6 @@ DEFAULT_AREA = Decimal("45.00")
 
 
 def find_containing(point, candidates):
-    """Zwraca pierwszy obiekt z `candidates`, ktorego geometry zawiera punkt."""
     for c in candidates:
         if c.geometry.contains(point):
             return c
@@ -63,7 +44,6 @@ class Command(BaseCommand):
             qs.delete()
             self.stdout.write(f"Skasowano {count} seedowych mieszkan.")
 
-        # DataVersion dla seedu; reuzywamy ten sam przy ponownych odpaleniach
         version, created = DataVersion.objects.get_or_create(
             version_number=SEED_VERSION_NUMBER,
             defaults={
@@ -74,7 +54,6 @@ class Command(BaseCommand):
         if created:
             self.stdout.write(f"Utworzono DataVersion v{version.version_number}.")
 
-        # Cache geo ; spatial join in-memory zeby uniknac N+1 zapytan
         districts = list(District.objects.all())
         if not districts:
             self.stderr.write(self.style.WARNING(

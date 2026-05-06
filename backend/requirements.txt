@@ -10,3 +10,5 @@ requests
 shapely
 geopandas
 arcgis
+django-filter
+
