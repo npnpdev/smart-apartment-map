@@ -1,6 +1,6 @@
 :root {
+  --font-size-base: 16px;
   --bg-base: #ebe7df;
-
   --glass-bg: rgba(255, 251, 245, 0.72);
   --glass-bg-strong: rgba(255, 251, 245, 0.88);
   --glass-elevated: rgba(255, 255, 255, 0.52);
@@ -65,6 +65,7 @@ body,
 #root {
   height: 100%;
   margin: 0;
+  font-size: var(--font-size-base, 16px);
 }
 
 body {
