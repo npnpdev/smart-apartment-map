@@ -2,16 +2,16 @@ services:
   db:
     image: postgis/postgis:16-3.4
     restart: unless-stopped
-    environment:
-      POSTGRES_DB: smart_apartment
-      POSTGRES_USER: smart_user
-      POSTGRES_PASSWORD: smart_pass
-    ports:
-      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: ${DB_NAME?set DB_NAME in .env}
+      POSTGRES_USER: ${DB_USER?set POSTGRES_USER in .env}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?set POSTGRES_PASSWORD in .env}
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U smart_user -d smart_apartment" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -29,11 +29,11 @@ services:
   backend:
     build:
       context: ./backend
-    ports:
-      - "8000:8000"
     volumes:
       - ./backend:/app
       - ./data:/app/scraped_data
+    ports:
+      - "8000:8000"
     env_file:
       - .env
     depends_on:
@@ -43,14 +43,14 @@ services:
   frontend:
     build:
       context: ./frontend
-    ports:
-      - "5173:5173"
     volumes:
       - ./frontend:/app
       - /app/node_modules
+    ports:
+      - "5173:5173"
     command: [ "npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5173" ]
     environment:
-      - CHOKIDAR_USEPOLLING=true
+      CHOKIDAR_USEPOLLING: true
 
 volumes:
   postgres_data:
