@@ -10,7 +10,8 @@ const NAV_LINKS = [
 ];
 
 export default function MainNavigation() {
-  const { email, /*cities, currentCity, changeCity*/ } = useAppContext();
+  const { email, fontSize, setFontSize /*cities, currentCity, changeCity*/ } =
+    useAppContext();
   
   // Dark mode z pamięcią w localStorage
   const [isDark, setIsDark] = useState(() => {
@@ -60,65 +61,171 @@ export default function MainNavigation() {
       <div className={classes.pill}>
         <nav>
           <ul className={classes.list}>
-            
             {/* 1. Dynamicznie wygenerowane linki Główne */}
             {NAV_LINKS.map((link) => (
               <li key={link.path}>
-                <NavLink 
-                  to={link.path} 
+                <NavLink
+                  to={link.path}
                   end={link.exact}
-                  className={({ isActive }) => isActive ? classes.active : undefined}
+                  className={({ isActive }) =>
+                    isActive ? classes.active : undefined
+                  }
                 >
                   {link.label}
                 </NavLink>
               </li>
             ))}
-            
-            <li><div className={classes.separator} /></li>
 
-            {/* 3. Przełącznik Motywu */}
             <li>
+              <div className={classes.separator} />
+            </li>
+
+            <li ref={dropdownRef} className={classes.customDropdownContainer}>
               <button
-                className={classes.themeToggle} 
-                onClick={() => setIsDark((prev) => !prev)}
-                aria-label={isDark ? "Przełącz na tryb jasny" : "Przełącz na tryb ciemny"}
+                className={classes.dropdownTrigger}
+                onClick={() => setIsCityDropdownOpen((p) => !p)}
+                aria-expanded={isCityDropdownOpen}
+                aria-label="Ustawienia"
               >
-                {isDark ? (
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
-                  </svg>
-                ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="4" />
-                    <path d="M12 2v2" />
-                    <path d="M12 20v2" />
-                    <path d="m4.93 4.93 1.41 1.41" />
-                    <path d="m17.66 17.66 1.41 1.41" />
-                    <path d="M2 12h2" />
-                    <path d="M20 12h2" />
-                    <path d="m6.34 17.66-1.41 1.41" />
-                    <path d="m19.07 4.93-1.41 1.41" />
-                  </svg>
-                )}
+                Ustawienia
               </button>
+
+              {isCityDropdownOpen && (
+                <ul className={classes.dropdownMenu} style={{ minWidth: 180 }}>
+                  {/* Ciemny motyw */}
+                  <li>
+                    <button
+                      className={`${classes.dropdownItem} ${isDark ? classes.activeItem : ''}`}
+                      onClick={() => setIsDark((p) => !p)}
+                    >
+                      <span
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 10,
+                        }}
+                      >
+                        {isDark ? (
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="15"
+                            height="15"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+                          </svg>
+                        ) : (
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="15"
+                            height="15"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <circle cx="12" cy="12" r="4" />
+                            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+                          </svg>
+                        )}
+                        {isDark ? 'Tryb ciemny' : 'Tryb jasny'}
+                      </span>
+                    </button>
+                  </li>
+
+                  <li>
+                    <div
+                      style={{
+                        height: 1,
+                        background: 'var(--divider)',
+                        margin: '4px 0',
+                      }}
+                    />
+                  </li>
+
+                  <li style={{ padding: '6px 14px' }}>
+                    <span
+                      style={{
+                        fontSize: '0.75rem',
+                        color: 'var(--text-muted)',
+                        letterSpacing: '0.05em',
+                        textTransform: 'uppercase',
+                      }}
+                    >
+                      Rozmiar tekstu
+                    </span>
+                    <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
+                      {(['normal', 'large', 'xlarge'] as const).map(
+                        (size, i) => (
+                          <button
+                            key={size}
+                            onClick={() => setFontSize(size)}
+                            style={{
+                              flex: 1,
+                              padding: '6px 0',
+                              background:
+                                fontSize === size
+                                  ? 'var(--accent)'
+                                  : 'var(--glass-elevated)',
+                              color:
+                                fontSize === size
+                                  ? 'var(--accent-contrast)'
+                                  : 'var(--text-secondary)',
+                              border: 'none',
+                              borderRadius: 'var(--radius-sm)',
+                              fontSize: `${13 + i * 4}px`,
+                              fontWeight: fontSize === size ? 700 : 400,
+                              cursor: 'pointer',
+                              transition: 'all 0.2s',
+                            }}
+                            aria-pressed={fontSize === size}
+                          >
+                            A
+                          </button>
+                        )
+                      )}
+                    </div>
+                  </li>
+                </ul>
+              )}
+            </li>
+
+            <li>
+              <div className={classes.separator} />
             </li>
 
             {/* 4. Sekcja Logowania */}
             {!email ? (
               <li>
-                <NavLink to="/login" className={({ isActive }) => isActive ? classes.active : undefined}>
+                <NavLink
+                  to="/login"
+                  className={({ isActive }) =>
+                    isActive ? classes.active : undefined
+                  }
+                >
                   Zaloguj
                 </NavLink>
               </li>
             ) : (
               <li className={classes.userItem}>
                 <span className={classes.userEmail}>{email}</span>
-                <NavLink to="/logout" className={({ isActive }) => isActive ? classes.active : undefined}>
+                <NavLink
+                  to="/logout"
+                  className={({ isActive }) =>
+                    isActive ? classes.active : undefined
+                  }
+                >
                   Wyloguj
                 </NavLink>
               </li>
             )}
-            
           </ul>
         </nav>
       </div>
