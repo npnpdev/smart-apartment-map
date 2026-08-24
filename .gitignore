@@ -247,3 +247,10 @@ logs/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
+
+# Zrzuty bazy danych (duze, zawieraja dane uzytkownikow)
+*.dump
+backup.dump
+
+# Lokalne notatki robocze
+CLAUDE.md
