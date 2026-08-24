@@ -7,11 +7,10 @@ class RollbackError(Exception):
     pass
 
 
-def _has_newer_activity(version):
-    n = version.version_number
-    newer_updated = Apartment.objects.filter(last_updated_in__version_number__gt=n).exists()
-    newer_created = Apartment.objects.filter(first_seen_in__version_number__gt=n).exists()
-    return newer_updated or newer_created
+def _has_newer_version(version):
+    return DataVersion.objects.filter(
+        version_number__gt=version.version_number
+    ).exists()
 
 
 @transaction.atomic
@@ -21,7 +20,7 @@ def rollback_version(version_number):
     except DataVersion.DoesNotExist:
         raise RollbackError(f"Wersja {version_number} nie istnieje")
 
-    if _has_newer_activity(version):
+    if _has_newer_version(version):
         raise RollbackError(f"Wersja {version_number} nie jest najnowsza")
 
     summary = {"deleted": 0, "restored": 0, "skipped": 0}
@@ -33,9 +32,14 @@ def rollback_version(version_number):
     updated = (Apartment.objects.filter(last_updated_in=version).exclude(first_seen_in=version))
 
     for apt in updated:
-        prev = (ApartmentHistory.objects.filter(apartment=apt).order_by("-created_at").first()
+        prev = (
+            ApartmentHistory.objects.filter(apartment=apt)
+            .order_by("-id")
+            .first()
         )
         if prev is None:
+            apt.last_updated_in = apt.first_seen_in
+            apt.save(update_fields=["last_updated_in"])
             summary["skipped"] += 1
             continue
 
