@@ -1,14 +1,8 @@
-Django>=5.0
-djangorestframework
-django-cors-headers
-psycopg[binary]
-djangorestframework-simplejwt
-#dodac geodjango
-pandas
-openpyxl
-requests
-shapely
-geopandas
-arcgis
-django-filter
-
+Django==6.0.5
+djangorestframework==3.17.1
+djangorestframework-simplejwt==5.5.1
+django-cors-headers==4.9.0
+django-filter==25.2
+psycopg[binary]==3.3.4
+openpyxl==3.1.5
+requests==2.33.1

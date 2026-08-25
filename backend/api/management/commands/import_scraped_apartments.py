@@ -278,9 +278,6 @@ class Command(BaseCommand):
                             existing_apt.save()
                         stats["updated"] += 1
                     else:
-                        if not opts["dry_run"]:
-                            existing_apt.last_updated_in = version
-                            existing_apt.save(update_fields=["last_updated_in"])
                         stats["unchanged"] += 1
 
         portal = opts["source"]
