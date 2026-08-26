@@ -131,3 +131,112 @@ class ImportRollbackTests(TestCase):
         self.assertEqual(DataVersion.objects.count(), 3)
         with self.assertRaises(RollbackError):
             rollback_version(2)
+
+
+KM_NA_STOPIEN = 111.32
+
+
+def na_polnoc(lat, lng, km):
+    return lat + km / KM_NA_STOPIEN, lng
+
+
+class FiltryPrzestrzenneTests(TestCase):
+
+    def setUp(self):
+        from django.contrib.gis.geos import Point
+
+        from api.models import EducationFacility
+
+        self.wersja = DataVersion.objects.create(version_number=1, source="test")
+        self.lat, self.lng = 54.3520, 18.6466
+
+        self.apt = Apartment.objects.create(
+            external_id="a1",
+            source_portal="test",
+            title="Mieszkanie testowe",
+            price=3000,
+            area=45,
+            location=Point(self.lng, self.lat, srid=4326),
+            first_seen_in=self.wersja,
+            last_updated_in=self.wersja,
+        )
+
+        lat_p, lng_p = na_polnoc(self.lat, self.lng, 0.5)
+        EducationFacility.objects.create(
+            name="Przedszkole blisko",
+            facility_type="kindergarten",
+            location=Point(lng_p, lat_p, srid=4326),
+        )
+
+        lat_s, lng_s = na_polnoc(self.lat, self.lng, 3)
+        EducationFacility.objects.create(
+            name="Podstawowka daleko",
+            facility_type="primary",
+            location=Point(lng_s, lat_s, srid=4326),
+        )
+
+    def pobierz(self, query=""):
+        odp = self.client.get(f"/api/apartments/{query}")
+        self.assertEqual(odp.status_code, 200)
+        return odp.json()
+
+    def test_bez_filtrow_zwraca_mieszkanie(self):
+        self.assertEqual(len(self.pobierz()), 1)
+
+    def test_edu_typ_w_zasiegu(self):
+        self.assertEqual(len(self.pobierz("?edu_types=Przedszkola&edu_radius=1")), 1)
+
+    def test_edu_typ_poza_zasiegiem(self):
+        self.assertEqual(len(self.pobierz("?edu_types=Podstawowe&edu_radius=1")), 0)
+
+    def test_edu_wymaga_wszystkich_typow(self):
+        self.assertEqual(
+            len(self.pobierz("?edu_types=Przedszkola,Podstawowe&edu_radius=1")), 0
+        )
+        self.assertEqual(
+            len(self.pobierz("?edu_types=Przedszkola,Podstawowe&edu_radius=5")), 1
+        )
+
+    def test_edu_przyjmuje_klucze_modelu(self):
+        self.assertEqual(len(self.pobierz("?edu_types=kindergarten&edu_radius=1")), 1)
+
+    def test_promien_jest_w_metrach(self):
+        self.assertEqual(len(self.pobierz("?edu_types=Podstawowe&edu_radius=2.9")), 0)
+        self.assertEqual(len(self.pobierz("?edu_types=Podstawowe&edu_radius=3.1")), 1)
+
+    def test_near_filtruje_po_odleglosci(self):
+        lat_d, lng_d = na_polnoc(self.lat, self.lng, 10)
+        self.assertEqual(len(self.pobierz(f"?near={self.lat},{self.lng}&radius_km=1")), 1)
+        self.assertEqual(len(self.pobierz(f"?near={lat_d},{lng_d}&radius_km=1")), 0)
+        self.assertEqual(len(self.pobierz(f"?near={lat_d},{lng_d}&radius_km=15")), 1)
+
+    def test_bledne_parametry_nie_wywalaja(self):
+        self.assertEqual(len(self.pobierz("?near=abc")), 1)
+        self.assertEqual(len(self.pobierz("?near=54.35")), 1)
+        self.assertEqual(len(self.pobierz("?near=999,999&radius_km=1")), 1)
+
+
+    def test_nieliczbowy_promien_to_blad(self):
+        odp = self.client.get("/api/apartments/?edu_types=Przedszkola&edu_radius=zle")
+        self.assertEqual(odp.status_code, 400)
+
+    def test_ujemny_promien_wraca_do_domyslnego(self):
+        self.assertEqual(len(self.pobierz("?edu_types=Podstawowe&edu_radius=-5")), 1)
+
+    def test_nieznany_typ_to_blad(self):
+        odp = self.client.get("/api/apartments/?edu_types=nieistniejacy")
+        self.assertEqual(odp.status_code, 400)
+
+    def test_typ_bez_polskich_znakow(self):
+        from django.contrib.gis.geos import Point
+
+        from api.models import EducationFacility
+
+        lat_s, lng_s = na_polnoc(self.lat, self.lng, 0.4)
+        EducationFacility.objects.create(
+            name="Liceum blisko",
+            facility_type="secondary",
+            location=Point(lng_s, lat_s, srid=4326),
+        )
+        self.assertEqual(len(self.pobierz("?edu_types=Srednie&edu_radius=1")), 1)
+        self.assertEqual(len(self.pobierz("?edu_types=%C5%9Arednie&edu_radius=1")), 1)
