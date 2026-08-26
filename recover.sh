@@ -6,7 +6,7 @@ set -a
 source .env
 set +a
 
-: "${DB_USER:?set POSTGRES_USER in .env}"
+: "${DB_USER:?set DB_USER in .env}"
 : "${DB_NAME:?set DB_NAME in .env}"
 
 docker compose up -d db
