@@ -4,7 +4,6 @@ import {
   MapContainer, 
   TileLayer, 
   Marker, 
-  Popup, 
   GeoJSON, 
   Circle, 
   Tooltip 
@@ -21,6 +20,7 @@ import { useAppContext } from '../../context/AppContext.tsx';
 // Własne komponenty (Podkomponenty mapy i UI)
 import FixMapSize from './FixMapSize';
 import VectorNoiseLayer from './VectorNoiseLayer';
+import ClusteredBuildings from './ClusteredBuildings';
 import MapController from '../MapController/MapController.tsx';
 import RightSidePanel from '../RightSidePanel/RightSidePanel.tsx';
 
@@ -31,8 +31,6 @@ import { useMapFilters } from './useMapFilters';
 // Narzędzia i stylizacje
 import { getDistanceInKm, normalizeName } from './utils.ts';
 import { 
-  buildingMarkerIcon, 
-  getBuildingMarkerIconHovered, 
   educationMarkerIcon, 
   getSafetyLabel, 
   getColor, 
@@ -286,27 +284,12 @@ export default function Map() {
         ))}
 
         {/* WARSTWA MIESZKAŃ: Znaczniki dostępnych nieruchomości */}
-        {filteredBuildings.map((building) => (
-          <Marker
-            key={building.id}
-            position={[building.lat, building.lng]}
-            icon={hoveredBuildingId === building.id ? getBuildingMarkerIconHovered(isDarkTheme) : buildingMarkerIcon}
-            zIndexOffset={hoveredBuildingId === building.id ? 2500 : 500}
-            eventHandlers={{
-              mouseover: () => setHoveredBuildingId(building.id),
-              mouseout: () => setHoveredBuildingId(null),
-            }}
-          >
-            <Popup>
-
-              <div>
-                <strong>{building.name}</strong><br />
-                {building.district}<br />
-                Cena: {building.price} zł
-              </div>
-            </Popup>
-          </Marker>
-        ))}
+        <ClusteredBuildings
+          buildings={filteredBuildings}
+          hoveredBuildingId={hoveredBuildingId}
+          setHoveredBuildingId={setHoveredBuildingId}
+          isDarkTheme={isDarkTheme}
+        />
       </MapContainer>
 
       {/* --- PRZEKAZUJEMY DANE DO SIDEBARA --- */}
