@@ -240,3 +240,75 @@ class FiltryPrzestrzenneTests(TestCase):
         )
         self.assertEqual(len(self.pobierz("?edu_types=Srednie&edu_radius=1")), 1)
         self.assertEqual(len(self.pobierz("?edu_types=%C5%9Arednie&edu_radius=1")), 1)
+
+
+class LoaderEdukacjiTests(TestCase):
+
+    def setUp(self):
+        from django.contrib.gis.geos import MultiPolygon, Polygon
+
+        from api.models import District
+
+        District.objects.create(
+            name="Dzielnica testowa",
+            geometry=MultiPolygon(
+                Polygon((
+                    (18.60, 54.34), (18.70, 54.34),
+                    (18.70, 54.37), (18.60, 54.37), (18.60, 54.34),
+                ))
+            ),
+        )
+
+        self.katalog = tempfile.mkdtemp()
+        self.sciezka = Path(self.katalog) / "edukacja.csv"
+        with self.sciezka.open("w", encoding="utf-8", newline="") as f:
+            writer = csv.DictWriter(
+                f, fieldnames=["@lat", "@lon", "name", "amenity", "school", "isced:level"]
+            )
+            writer.writeheader()
+            writer.writerow({
+                "@lat": "54.3520", "@lon": "18.6466",
+                "name": "Przedszkole nr 1", "amenity": "kindergarten",
+                "school": "", "isced:level": "",
+            })
+            writer.writerow({
+                "@lat": "54.3600", "@lon": "18.6500",
+                "name": "Szkola Podstawowa nr 2", "amenity": "school",
+                "school": "primary", "isced:level": "1",
+            })
+
+    def wczytaj(self):
+        call_command("load_education", path=str(self.sciezka), verbosity=0)
+
+    def test_loader_jest_idempotentny(self):
+        from api.models import EducationFacility
+
+        self.wczytaj()
+        self.assertEqual(EducationFacility.objects.count(), 2)
+        self.assertEqual(EducationFacility.objects.filter(district__isnull=False).count(), 2)
+
+        self.wczytaj()
+        self.wczytaj()
+        self.assertEqual(EducationFacility.objects.count(), 2)
+
+    def test_loader_aktualizuje_zmienione_dane(self):
+        from api.models import EducationFacility
+
+        self.wczytaj()
+
+        with self.sciezka.open("w", encoding="utf-8", newline="") as f:
+            writer = csv.DictWriter(
+                f, fieldnames=["@lat", "@lon", "name", "amenity", "school", "isced:level"]
+            )
+            writer.writeheader()
+            writer.writerow({
+                "@lat": "54.3520", "@lon": "18.6466",
+                "name": "Przedszkole nr 1 po remoncie", "amenity": "kindergarten",
+                "school": "", "isced:level": "",
+            })
+        self.wczytaj()
+
+        self.assertEqual(EducationFacility.objects.count(), 2)
+        self.assertTrue(
+            EducationFacility.objects.filter(name="Przedszkole nr 1 po remoncie").exists()
+        )

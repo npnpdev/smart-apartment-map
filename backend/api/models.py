@@ -216,6 +216,11 @@ class EducationFacility(models.Model):
     )
 
     class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["location"], name="uniq_education_location"
+            ),
+        ]
         indexes = [
             models.Index(fields=["facility_type"]),
         ]

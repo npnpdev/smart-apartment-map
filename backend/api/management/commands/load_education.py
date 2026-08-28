@@ -94,9 +94,18 @@ class Command(BaseCommand):
                     location=point,
                 ))
 
-        EducationFacility.objects.bulk_create(facilities, batch_size=500)
+        EducationFacility.objects.bulk_create(
+            facilities,
+            batch_size=500,
+            update_conflicts=True,
+            unique_fields=["location"],
+            update_fields=[
+                "name", "facility_type",
+                "raw_amenity", "raw_school_tag", "raw_isced",
+            ],
+        )
 
-        EducationFacility.objects.filter(district__isnull=True).update(
+        EducationFacility.objects.update(
             district=Subquery(
                 District.objects.filter(
                     geometry__contains=Cast(
