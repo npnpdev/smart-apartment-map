@@ -123,3 +123,36 @@
   top: auto;
   left: 30px;
 }
+.cluster {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--glass-bg-strong);
+  backdrop-filter: var(--blur);
+  border: 2px solid var(--accent);
+  box-shadow: var(--shadow-medium);
+  color: var(--text-primary);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  transition: transform 0.15s ease;
+}
+
+.cluster:hover {
+  transform: scale(1.08);
+}
+
+.clusterSmall {
+  font-size: 0.8rem;
+}
+
+.clusterMedium {
+  font-size: 0.9rem;
+}
+
+.clusterLarge {
+  font-size: 1rem;
+  border-width: 3px;
+}

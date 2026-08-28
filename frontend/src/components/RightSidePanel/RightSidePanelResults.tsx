@@ -29,6 +29,7 @@ interface Props {
 
   expandedBuildingId: number | string | null;
   setExpandedBuildingId: (id: number | string | null) => void;
+  isLoadingBuildings?: boolean;
 }
 
 export function RightSidePanelResults(props: Props) {
@@ -51,6 +52,7 @@ export function RightSidePanelResults(props: Props) {
 
     expandedBuildingId,
     setExpandedBuildingId,
+    isLoadingBuildings = false,
   } = props;
 
   if (view !== "list") return null;
@@ -71,7 +73,7 @@ export function RightSidePanelResults(props: Props) {
       ) : (
         <div className={styles.listWrapper}>
           <div className={styles.resultsCount}>
-            Znaleziono: {buildings.length} ofert
+            {isLoadingBuildings ? 'Szukam ofert...' : `Znaleziono: ${buildings.length} ofert`}
           </div>
 
           {visibleBuildings.map((building) => {

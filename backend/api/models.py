@@ -76,7 +76,7 @@ class Apartment(models.Model):
     year_built = models.PositiveSmallIntegerField(null=True, blank=True)
     has_elevator = models.BooleanField(null=True)
     is_accessible = models.BooleanField(null=True,)
-    location = gis_models.PointField(srid=4326, spatial_index=True)
+    location = gis_models.PointField(srid=4326, geography=True, spatial_index=True)
     address = models.CharField(max_length=500, blank=True)
     district = models.ForeignKey(
         District,
@@ -207,7 +207,7 @@ class EducationFacility(models.Model):
     raw_school_tag = models.CharField(max_length=50, blank=True)
     raw_isced = models.CharField(max_length=20, blank=True)
 
-    location = gis_models.PointField(srid=4326, spatial_index=True)
+    location = gis_models.PointField(srid=4326, geography=True, spatial_index=True)
     district = models.ForeignKey(
         District,
         on_delete=models.SET_NULL,
@@ -216,6 +216,11 @@ class EducationFacility(models.Model):
     )
 
     class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["location"], name="uniq_education_location"
+            ),
+        ]
         indexes = [
             models.Index(fields=["facility_type"]),
         ]

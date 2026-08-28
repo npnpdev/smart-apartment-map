@@ -252,5 +252,4 @@ logs/
 *.dump
 backup.dump
 
-# Lokalne notatki robocze
-CLAUDE.md
+/.dev-state/last-import.sha256
