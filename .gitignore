@@ -252,3 +252,4 @@ logs/
 *.dump
 backup.dump
 
+/.dev-state/last-import.sha256

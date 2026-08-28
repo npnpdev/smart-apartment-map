@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     # local apps
     "api",
     "accounts",
+    "chatbot",
 ]
 
 MIDDLEWARE = [
@@ -155,3 +156,5 @@ REST_FRAMEWORK = {
 #czasy zycia tokenow - narazie domyslne
 
 AUTH_USER_MODEL = "accounts.User"
+
+ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
