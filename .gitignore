@@ -252,5 +252,3 @@ logs/
 *.dump
 backup.dump
 
-# Lokalne notatki robocze
-CLAUDE.md

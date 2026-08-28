@@ -92,8 +92,9 @@ export default function Map() {
     buildings, 
     educationData, 
     safetyRange, 
-    initialSafetyThreshold 
-  } = useMapData();
+    initialSafetyThreshold,
+    isLoadingBuildings
+  } = useMapData(eduTypes, eduRadius);
 
   const [safetyThreshold, setSafetyThreshold] = useState<number>(APP_CONFIG.FALLBACK_SAFETY_THRESHOLD);
 
@@ -327,6 +328,7 @@ export default function Map() {
         educationDetails={educationDetails}
         educationData={educationData}
         getDistanceInKm={getDistanceInKm}
+        isLoadingBuildings={isLoadingBuildings}
       />
     </div>
   );
