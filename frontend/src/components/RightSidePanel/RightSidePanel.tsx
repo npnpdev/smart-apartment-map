@@ -1,5 +1,4 @@
 import SidePanel from "../SidePanel/SidePanel.tsx";
-import stylesSidePanel from "../SidePanel/SidePanel.module.css";
 import styles from "./RightSidePanel.module.css";
 import { useState, useEffect, useMemo } from "react";
 import type { Dispatch, SetStateAction } from "react";
@@ -48,6 +47,7 @@ interface RightSidePanelProps {
   
   educationData?: any[];
   getDistanceInKm?: (lat1: number, lon1: number, lat2: number, lon2: number) => number;
+  isLoadingBuildings?: boolean;
 }
 
 export default function RightSidePanel({
@@ -67,6 +67,7 @@ export default function RightSidePanel({
   educationDetails = {},
   educationData = [],
   getDistanceInKm = () => 0,
+  isLoadingBuildings = false,
 }: RightSidePanelProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [view, setView] = useState<'list' | 'filters'>('list');
@@ -357,6 +358,7 @@ export default function RightSidePanel({
         eduRadius={eduRadius}
         expandedBuildingId={expandedBuildingId}
         setExpandedBuildingId={setExpandedBuildingId}
+        isLoadingBuildings={isLoadingBuildings}
       />
     </SidePanel>
   );

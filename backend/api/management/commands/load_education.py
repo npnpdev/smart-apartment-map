@@ -3,6 +3,9 @@ from pathlib import Path
 
 from django.contrib.gis.geos import Point
 from django.core.management.base import BaseCommand, CommandError
+from django.contrib.gis.db.models import PointField
+from django.db.models import OuterRef, Subquery
+from django.db.models.functions import Cast
 
 from api.models import District, EducationFacility
 
@@ -42,13 +45,6 @@ def classify(row):
     return "other"
 
 
-def find_district(point, districts):
-    for d in districts:
-        if d.geometry.contains(point):
-            return d
-    return None
-
-
 class Command(BaseCommand):
     help = "Wgrywa placowki edukacyjne z CSV do tabeli EducationFacility."
 
@@ -66,9 +62,7 @@ class Command(BaseCommand):
             EducationFacility.objects.all().delete()
             self.stdout.write(f"Skasowano {count} placowek edukacyjnych.")
 
-        # Ladujemy wszystkie dzielnice raz, do spatial join in-memory
-        districts = list(District.objects.all())
-        if not districts:
+        if not District.objects.exists():
             self.stderr.write(self.style.WARNING(
                 "Brak dzielnic w bazie. Najpierw odpal load_districts."
             ))
@@ -90,9 +84,6 @@ class Command(BaseCommand):
 
                 # Point(x, y) ; w GIS x=longitude, y=latitude
                 point = Point(lng, lat, srid=4326)
-                district = find_district(point, districts)
-                if district is None:
-                    no_district += 1
 
                 facilities.append(EducationFacility(
                     name=(row.get("name") or "").strip(),
@@ -101,10 +92,29 @@ class Command(BaseCommand):
                     raw_school_tag=(row.get("school") or "").strip(),
                     raw_isced=(row.get("isced:level") or "").strip(),
                     location=point,
-                    district=district,
                 ))
 
-        EducationFacility.objects.bulk_create(facilities, batch_size=500)
+        EducationFacility.objects.bulk_create(
+            facilities,
+            batch_size=500,
+            update_conflicts=True,
+            unique_fields=["location"],
+            update_fields=[
+                "name", "facility_type",
+                "raw_amenity", "raw_school_tag", "raw_isced",
+            ],
+        )
+
+        EducationFacility.objects.update(
+            district=Subquery(
+                District.objects.filter(
+                    geometry__contains=Cast(
+                        OuterRef("location"), PointField(srid=4326)
+                    )
+                ).values("id")[:1]
+            )
+        )
+        no_district = EducationFacility.objects.filter(district__isnull=True).count()
 
         self.stdout.write(self.style.SUCCESS(
             f"Wgrano {len(facilities)} placowek "

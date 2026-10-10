@@ -3,5 +3,6 @@ export const APP_CONFIG = {
     DEFAULT_NOISE_LIMIT: 80,
     DEFAULT_EDU_RADIUS: 5,
     AVAILABLE_EDU_TYPES: ["Przedszkola", "Podstawowe", "Średnie", "Uczelnie"],
-    FALLBACK_SAFETY_THRESHOLD: 10
+    FALLBACK_SAFETY_THRESHOLD: 10,
+    FILTER_DEBOUNCE_MS: 300
 };
