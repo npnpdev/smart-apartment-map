@@ -7,6 +7,14 @@ type City = {
   center: [number, number];
 };
 
+export type FavoriteItem = {
+  id: number;
+  name: string;
+  district: string | null;
+  price: number;
+  noise_db?: string;
+};
+
 type AppContextType = {
   email: string | null;
   setEmail: (login: string | null) => void;
@@ -15,6 +23,9 @@ type AppContextType = {
   changeCity: (cityName: string) => void;
   fontSize: FontSize;
   setFontSize: (size: FontSize) => void;
+  favorites: Map<number, FavoriteItem>;
+  toggleFavorite: (item: FavoriteItem) => void;
+  isFavorite: (id: number) => boolean;
 };
 
 const FONT_SIZES: Record<FontSize, string> = {
@@ -37,14 +48,43 @@ const AppContext = createContext<AppContextType>({
   changeCity: () => {},
   fontSize: "normal",
   setFontSize: () => {},
+  favorites: new Map(),
+  toggleFavorite: () => {},
+  isFavorite: () => false,
 });
 
 export function AppContextProvider({ children }: { children: React.ReactNode }) {
-  const [email, setEmail] = useState<string | null>(null);
+  const [email, setEmailRaw] = useState<string | null>(
+    () => localStorage.getItem("userEmail")
+  );
   const [currentCity, setCurrentCity] = useState<City>(cities[0]);
   const [fontSize, setFontSize] = useState<FontSize>(
     () => (localStorage.getItem("fontSize") as FontSize) || "normal"
   );
+  const [favorites, setFavorites] = useState<Map<number, FavoriteItem>>(() => {
+    const saved = localStorage.getItem("userEmail");
+    if (!saved) return new Map();
+    try {
+      const stored = localStorage.getItem(`favorites_${saved}`);
+      const items: FavoriteItem[] = stored ? JSON.parse(stored) : [];
+      return new Map(items.map(item => [item.id, item]));
+    } catch { return new Map(); }
+  });
+
+  const setEmail = (newEmail: string | null) => {
+    if (newEmail) {
+      localStorage.setItem("userEmail", newEmail);
+      try {
+        const stored = localStorage.getItem(`favorites_${newEmail}`);
+        const items: FavoriteItem[] = stored ? JSON.parse(stored) : [];
+        setFavorites(new Map(items.map(item => [item.id, item])));
+      } catch { setFavorites(new Map()); }
+    } else {
+      localStorage.removeItem("userEmail");
+      setFavorites(new Map());
+    }
+    setEmailRaw(newEmail);
+  };
 
   useEffect(() => {
     document.documentElement.style.setProperty("--font-size-base", FONT_SIZES[fontSize]);
@@ -56,11 +96,27 @@ export function AppContextProvider({ children }: { children: React.ReactNode }) 
     if (newCity) setCurrentCity(newCity);
   };
 
+  const toggleFavorite = (item: FavoriteItem) => {
+    if (!email) return;
+    setFavorites(prev => {
+      const next = new Map(prev);
+      if (next.has(item.id)) next.delete(item.id);
+      else next.set(item.id, item);
+      try {
+        localStorage.setItem(`favorites_${email}`, JSON.stringify([...next.values()]));
+      } catch {}
+      return next;
+    });
+  };
+
+  const isFavorite = (id: number) => favorites.has(id);
+
   return (
     <AppContext.Provider value={{
       email, setEmail,
       cities, currentCity, changeCity,
       fontSize, setFontSize,
+      favorites, toggleFavorite, isFavorite,
     }}>
       {children}
     </AppContext.Provider>

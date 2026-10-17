@@ -243,6 +243,24 @@
   border-color: var(--border-strong);
 }
 
+@media (max-width: 1600px) {
+  .right {
+    width: 460px !important;
+  }
+}
+
+@media (max-width: 1440px) {
+  .right {
+    width: 400px !important;
+  }
+}
+
+@media (max-width: 1280px) {
+  .right {
+    width: 360px !important;
+  }
+}
+
 @media (max-width: 768px) {
   .right {
     width: 100vw !important;

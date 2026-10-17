@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import stylesSidePanel from "../SidePanel/SidePanel.module.css";
 import styles from "./RightSidePanel.module.css";
 import { type Building } from "./RightSidePanel";
@@ -55,6 +56,12 @@ export function RightSidePanelResults(props: Props) {
     isLoadingBuildings = false,
   } = props;
 
+  useEffect(() => {
+    if (!expandedBuildingId) return;
+    const el = document.getElementById(`building-card-${expandedBuildingId}`);
+    el?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, [expandedBuildingId, currentPage]);
+
   if (view !== "list") return null;
 
   return (
@@ -81,25 +88,26 @@ export function RightSidePanelResults(props: Props) {
             const isExpanded = expandedBuildingId === building.id;
 
             return (
-              <BuildingCard
-                key={building.id}
-                building={building}
-                isHovered={isHovered}
-                isExpanded={isExpanded}
-                onToggleExpand={() =>
-                  setExpandedBuildingId(isExpanded ? null : building.id)
-                }
-                onMouseEnter={() =>
-                  setHoveredBuildingId && setHoveredBuildingId(building.id)
-                }
-                onMouseLeave={() =>
-                  setHoveredBuildingId && setHoveredBuildingId(null)
-                }
-                eduTypes={eduTypes}
-                educationData={educationData}
-                getDistanceInKm={getDistanceInKm}
-                eduRadius={eduRadius}
-              />
+              <div key={building.id} id={`building-card-${building.id}`}>
+                <BuildingCard
+                  building={building}
+                  isHovered={isHovered}
+                  isExpanded={isExpanded}
+                  onToggleExpand={() =>
+                    setExpandedBuildingId(isExpanded ? null : building.id)
+                  }
+                  onMouseEnter={() =>
+                    setHoveredBuildingId && setHoveredBuildingId(building.id)
+                  }
+                  onMouseLeave={() =>
+                    setHoveredBuildingId && setHoveredBuildingId(null)
+                  }
+                  eduTypes={eduTypes}
+                  educationData={educationData}
+                  getDistanceInKm={getDistanceInKm}
+                  eduRadius={eduRadius}
+                />
+              </div>
             );
           })}
 

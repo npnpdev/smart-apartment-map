@@ -56,6 +56,7 @@ export default function SidePanel({
     localStorage.setItem(storageKey, JSON.stringify(collapsed));
   }, [collapsed, storageKey]);
 
+
   const panelClassName = [
     styles.panel,
     side === 'left' ? styles.left : styles.right,
