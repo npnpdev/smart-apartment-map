@@ -71,6 +71,13 @@
   color: #1a9850;
 }
 
+.cardHeaderRight {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
 .cardDistrict {
   font-size: 0.75rem;
   text-transform: uppercase;
@@ -108,6 +115,45 @@
   color: var(--text-primary);
   border-color: var(--text-primary);
   background: rgba(255,255,255,0.05);
+}
+
+.favoriteBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: 2px 4px;
+  color: var(--text-muted);
+  transition: color 0.15s, transform 0.15s;
+  flex-shrink: 0;
+}
+
+.favoriteBtn:hover {
+  transform: scale(1.2);
+  color: #e05;
+}
+
+.favoriteBtnActive {
+  color: #e05;
+}
+
+.favoriteBtnLocked {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: 2px 4px;
+  color: var(--text-muted);
+  opacity: 0.35;
+  transition: opacity 0.15s, transform 0.15s;
+  flex-shrink: 0;
+}
+
+.favoriteBtnLocked:hover {
+  opacity: 0.6;
+  transform: scale(1.1);
 }
 
 /* --- NOWE STYLE DLA PANELU FILTRÓW (ROZWIJANIE I SUWAK) --- */
