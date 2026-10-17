@@ -91,6 +91,31 @@ export function AppContextProvider({ children }: { children: React.ReactNode }) 
     localStorage.setItem("fontSize", fontSize);
   }, [fontSize]);
 
+  useEffect(() => {
+    if (!email) return;
+
+    const TIMEOUT_MS = 30 * 60 * 1000;
+    let timer: ReturnType<typeof setTimeout>;
+
+    const reset = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        localStorage.removeItem("userEmail");
+        setFavorites(new Map());
+        setEmailRaw(null);
+      }, TIMEOUT_MS);
+    };
+
+    const events = ['mousedown', 'keydown', 'scroll', 'touchstart'] as const;
+    events.forEach(e => window.addEventListener(e, reset, { passive: true }));
+    reset();
+
+    return () => {
+      clearTimeout(timer);
+      events.forEach(e => window.removeEventListener(e, reset));
+    };
+  }, [email]);
+
   const changeCity = (cityName: string) => {
     const newCity = cities.find(city => city.name === cityName);
     if (newCity) setCurrentCity(newCity);
