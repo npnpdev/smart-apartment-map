@@ -9,11 +9,9 @@ export default function MostLikedPage() {
     return (
       <div className={styles.page}>
         <div className={styles.empty}>
-          <div className={styles.emptyHeart}>🔒</div>
-          <h2 className={styles.emptyTitle}>Tylko dla zalogowanych</h2>
-          <p className={styles.emptyDesc}>
-            Zaloguj się lub załóż darmowe konto, aby zapisywać ulubione mieszkania i wracać do nich w dowolnym momencie.
-          </p>
+          <h2 className={styles.emptyTitle}>
+            Zaloguj się lub załóż konto, aby móc zapisywać ulubione mieszkania.
+          </h2>
           <Link to="/login" className={styles.emptyBtn}>
             Zaloguj się / Zarejestruj
           </Link>
@@ -29,7 +27,8 @@ export default function MostLikedPage() {
           <div className={styles.emptyHeart}>♡</div>
           <h2 className={styles.emptyTitle}>Brak polubionych mieszkań</h2>
           <p className={styles.emptyDesc}>
-            Przeglądaj oferty na mapie i klikaj ♡ przy tych, które Ci się spodobają.
+            Przeglądaj oferty na mapie, klikaj ♡ przy tych, które Ci się
+            spodobają.
           </p>
           <Link to="/map" className={styles.emptyBtn}>
             Przejdź do mapy
@@ -47,7 +46,11 @@ export default function MostLikedPage() {
         <h1 className={styles.title}>Moje ulubione</h1>
         <span className={styles.count}>
           {apartments.length}{' '}
-          {apartments.length === 1 ? 'oferta' : apartments.length < 5 ? 'oferty' : 'ofert'}
+          {apartments.length === 1
+            ? 'oferta'
+            : apartments.length < 5
+              ? 'oferty'
+              : 'ofert'}
         </span>
       </div>
 
@@ -76,7 +79,10 @@ export default function MostLikedPage() {
             <div className={styles.cardTitle}>{apt.name}</div>
 
             <div className={styles.cardFooter}>
-              <Link to={`/map?highlight=${apt.id}`} className={styles.cardMapBtn}>
+              <Link
+                to={`/map?highlight=${apt.id}`}
+                className={styles.cardMapBtn}
+              >
                 Pokaż na mapie
               </Link>
             </div>

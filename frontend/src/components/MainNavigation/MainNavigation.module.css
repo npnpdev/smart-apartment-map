@@ -125,7 +125,7 @@
 }
 
 .dropdownTrigger:hover,
-.dropdownTrigger[aria-expanded='true'] {
+.dropdownTrigger[aria-expanded="true"] {
   background: var(--glass-elevated);
   color: var(--text-primary);
 }
