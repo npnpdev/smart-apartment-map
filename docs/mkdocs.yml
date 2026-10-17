@@ -60,6 +60,8 @@ nav:
   - Zalozenia projektu: index.md
   - Frontend:
       - Stylizacja i Motywy: frontend/styling.md
+      - Rozmiary czcionek: frontend/font_size.md
+      - AppContext, Ulubione i Auto-logout: frontend/app_context.md
   - Backend & API:
       - Architektura Danych: backend/api.md
   - Scraper:
