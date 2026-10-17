@@ -68,6 +68,12 @@ body,
   font-size: var(--font-size-base, 16px);
 }
 
+/* Wyłącza "odbijanie" strony za krawędź (macOS/iOS) i pull-to-refresh */
+html,
+body {
+  overscroll-behavior-y: none;
+}
+
 body {
   min-width: 320px;
   min-height: 100vh;
