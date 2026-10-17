@@ -1,0 +1,361 @@
+.hero {
+    position: relative;
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    background-color: #1f3a5f;
+    background-image: url('/gdansk2.jpg');
+    background-size: cover;
+    background-position: center;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+}
+
+.heroContent {
+    position: relative;
+    width: 100%;
+    max-width: 720px;
+    text-align: center;
+    color: #fff;
+}
+
+.title {
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    margin: 0 0 0.5rem;
+}
+
+.subtitle {
+    font-size: clamp(1rem, 2.2vw, 1.25rem);
+    margin: 0 0 1.5rem;
+}
+
+.search {
+    display: flex;
+    gap: 0.5rem;
+    background: var(--glass-bg-strong);
+    backdrop-filter: var(--blur);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-soft);
+    padding: 0.5rem;
+    border-radius: var(--radius-md);
+}
+
+.search input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--text-primary);
+    font-size: 1rem;
+    padding: 0.75rem;
+}
+
+.search input::placeholder {
+    color: var(--text-muted);
+}
+
+.search button {
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 0.75rem 1.5rem;
+    background: var(--accent);
+    color: var(--accent-contrast);
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.search button:hover {
+    opacity: 0.85;
+}
+
+.search button:active {
+    transform: scale(0.97);
+}
+
+.search button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.content {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 3rem 1rem;
+}
+
+.section + .section {
+    margin-top: 3rem;
+}
+
+/* Tytuł sekcji wyśrodkowany między dwiema liniami */
+.section h2 {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    font-size: clamp(1.25rem, 3vw, 1.6rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+    text-align: center;
+    margin: 0 0 1.75rem;
+}
+
+.section h2::before,
+.section h2::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--divider);
+}
+
+.tiles {
+    display: grid;
+    /* 3 kolumny albo 1 (poniżej 860px), bez pośredniego układu 2+1 */
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+}
+
+.tile {
+    position: relative;
+    background: var(--glass-bg-strong);
+    backdrop-filter: var(--blur);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    padding: 1.75rem 1.5rem;
+    box-shadow: var(--shadow-soft);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    animation: fadeIn 0.4s ease-out;
+}
+
+/* Przedłuża obszar hovera pod kafelkiem, żeby po uniesieniu
+   nie uciekał spod kursora (migotanie przy dolnej krawędzi) */
+.tile::after {
+    content: '';
+    position: absolute;
+    inset: 0 0 -6px 0;
+}
+
+.tile:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
+}
+
+.tileHeader {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    margin-bottom: 0.75rem;
+}
+
+.tileIcon {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-sm);
+    background: var(--accent-soft);
+    color: var(--text-primary);
+    transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+.tile:hover .tileIcon {
+    background: var(--accent);
+    color: var(--accent-contrast);
+}
+
+.tile h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.tile p {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* --- Oś kroków "Jak to działa" --- */
+.steps {
+    position: relative;
+    max-width: 640px;
+    margin: 0 auto;
+}
+
+/* Szara linia od środka pierwszej do środka ostatniej kropki (kropka = 44px) */
+.stepsLine {
+    position: absolute;
+    left: 21px;
+    top: 22px;
+    bottom: 22px;
+    width: 2px;
+    border-radius: 2px;
+    background: var(--divider);
+    overflow: hidden;
+}
+
+.stepsLineFill {
+    height: 100%;
+    background: var(--accent);
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform var(--fill-duration) linear;
+}
+
+.stepsPlaying .stepsLineFill {
+    transform: scaleY(1);
+}
+
+.stepList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+}
+
+.step {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.25rem;
+}
+
+.stepDot {
+    position: relative;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--bg-base);
+    border: 2px solid var(--border-strong);
+    color: var(--text-muted);
+    transition: background-color 0.3s ease, border-color 0.3s ease,
+        color 0.3s ease, transform 0.3s ease;
+    transition-delay: var(--step-delay);
+}
+
+.stepsPlaying .stepDot {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-contrast);
+    transform: scale(1.08);
+}
+
+.stepBody {
+    padding-top: 0.45rem;
+    opacity: 0.45;
+    transition: opacity 0.3s ease;
+    transition-delay: var(--step-delay);
+}
+
+.stepsPlaying .stepBody {
+    opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .stepsLineFill,
+    .stepDot,
+    .stepBody {
+        transition: none;
+    }
+}
+
+.stepBody h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+    margin: 0 0 0.35rem;
+}
+
+.stepBody p {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.footer {
+    display: flex;
+    justify-content: space-between;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    font-size: 0.875rem;
+    color: #777;
+}
+
+/* Jedna kolumna: kafelki są szerokie, więc dostają więcej miejsca i większy tekst */
+@media (max-width: 860px) {
+    .tiles {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .tile {
+        padding: 2rem 1.75rem;
+    }
+
+    .tileIcon {
+        width: 48px;
+        height: 48px;
+    }
+
+    .tileIcon svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    .tile h3 {
+        font-size: 1.4rem;
+    }
+
+    .tile p {
+        font-size: 1.05rem;
+        line-height: 1.6;
+    }
+}
+
+@media (max-width: 600px) {
+    .tile {
+        padding: 1.5rem 1.25rem;
+    }
+
+    .tile h3 {
+        font-size: 1.25rem;
+    }
+
+    .tile p {
+        font-size: 1rem;
+    }
+
+    .hero {
+        min-height: 55vh;
+    }
+
+    .search {
+        flex-direction: column;
+    }
+}
