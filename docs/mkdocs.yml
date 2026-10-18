@@ -62,6 +62,7 @@ nav:
       - Stylizacja i Motywy: frontend/styling.md
   - Backend & API:
       - Architektura Danych: backend/api.md
+      - Konto i reset hasła: backend/auth.md
   - Scraper:
       - Baza danych projektu: scraper/data.md
   - Poradnik tworzenia dokumentacji: how-to-use.md
