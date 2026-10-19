@@ -29,6 +29,7 @@ cp .env.example "$STAGING/.env.example"
 mkdir -p "$STAGING/certs"
 mkdir -p "$STAGING/data"
 cp -r scraper "$STAGING/scraper"
+cp -r backend/data "$STAGING/static-data"
 
 cat > "$STAGING/install.sh" << 'INSTALL_SCRIPT'
 #!/usr/bin/env bash
@@ -53,6 +54,8 @@ cp .env.example "$APP_DIR/.env.example"
 cp scrape.sh "$APP_DIR/scrape.sh" && chmod +x "$APP_DIR/scrape.sh"
 rm -rf "$APP_DIR/scraper"
 cp -r scraper "$APP_DIR/scraper"
+rm -rf "$APP_DIR/static-data"
+cp -r static-data "$APP_DIR/static-data"
 mkdir -p "$APP_DIR/data"
 if [ ! -f "$APP_DIR/.env" ]; then
     cp .env.example "$APP_DIR/.env"

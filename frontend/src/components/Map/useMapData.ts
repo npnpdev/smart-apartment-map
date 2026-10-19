@@ -1,49 +1,42 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { normalizeName } from './utils';
 import { APP_CONFIG, API_BASE } from '../../constants';
 
 interface MapDataResult {
   safetyData: Record<string, number>;
+  safetyRange: { min: number; max: number };
+  initialSafetyThreshold: number;
   geoJsonData: any;
   buildings: any[];
   educationData: any[];
-  safetyRange: { min: number; max: number };
-  initialSafetyThreshold: number;
   isLoadingBuildings: boolean;
 }
 
-export function useMapData(
-  eduTypes: string[] = [],
-  eduRadius: number = APP_CONFIG.DEFAULT_EDU_RADIUS
-): MapDataResult {
+export function useSafetyData(showLayer: boolean): {
+  safetyData: Record<string, number>;
+  safetyRange: { min: number; max: number };
+  initialSafetyThreshold: number;
+} {
   const [safetyData, setSafetyData] = useState<Record<string, number>>({});
-  const [geoJsonData, setGeoJsonData] = useState<any>(null);
-  const [buildings, setBuildings] = useState<any[]>([]);
-  const [educationData, setEducationData] = useState<any[]>([]);
-  const [isLoadingBuildings, setIsLoadingBuildings] = useState<boolean>(true);
-
   const [safetyRange, setSafetyRange] = useState<{ min: number; max: number }>({ min: 0, max: 100 });
   const [initialSafetyThreshold, setInitialSafetyThreshold] = useState<number>(1000);
+  const loaded = useRef(false);
 
   useEffect(() => {
+    if (!showLayer || loaded.current) return;
+    loaded.current = true;
+
     fetch(`${API_BASE}/api/safety/`)
       .then((res) => res.json())
       .then((data) => {
         const dict: Record<string, number> = {};
         const values: number[] = [];
-
         data.forEach((item: any) => {
           const cleanName = normalizeName(item.dzielnica);
           const val = parseFloat(item.wskaznik_przestepstw);
-
-          if (!isNaN(val)) {
-            dict[cleanName] = val;
-            values.push(val);
-          }
+          if (!isNaN(val)) { dict[cleanName] = val; values.push(val); }
         });
-
         setSafetyData(dict);
-
         if (values.length > 0) {
           const minVal = Math.floor(Math.min(...values));
           const maxVal = Math.ceil(Math.max(...values));
@@ -52,7 +45,21 @@ export function useMapData(
         }
       })
       .catch((err) => console.error('Błąd API Bezpieczeństwo:', err));
+  }, [showLayer]);
 
+  return { safetyData, safetyRange, initialSafetyThreshold };
+}
+
+export function useMapData(
+  eduTypes: string[] = [],
+  eduRadius: number = APP_CONFIG.DEFAULT_EDU_RADIUS
+): MapDataResult {
+  const [geoJsonData, setGeoJsonData] = useState<any>(null);
+  const [buildings, setBuildings] = useState<any[]>([]);
+  const [educationData, setEducationData] = useState<any[]>([]);
+  const [isLoadingBuildings, setIsLoadingBuildings] = useState<boolean>(true);
+
+  useEffect(() => {
     fetch('/data/gdansk_dzielnice.geojson')
       .then((res) => res.json())
       .then((data) => {
@@ -110,12 +117,12 @@ export function useMapData(
   }, [eduTypesKey, eduRadius]);
 
   return {
-    safetyData,
+    safetyData: {},
+    safetyRange: { min: 0, max: 100 },
+    initialSafetyThreshold: 1000,
     geoJsonData,
     buildings,
     educationData,
-    safetyRange,
-    initialSafetyThreshold,
     isLoadingBuildings,
   };
 }
