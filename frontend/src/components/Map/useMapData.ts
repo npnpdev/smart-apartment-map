@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import { normalizeName } from './utils';
-import { APP_CONFIG } from '../../constants';
-
-const API_BASE = 'http://localhost:8000';
+import { APP_CONFIG, API_BASE } from '../../constants';
 
 interface MapDataResult {
   safetyData: Record<string, number>;

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { API_BASE } from '../../constants';
 import styles from './ChatWidget.module.css';
 
 interface ChatFilters {
@@ -47,7 +48,7 @@ export default function ChatWidget({ onFiltersReceived }: ChatWidgetProps) {
 
     try {
       const history = messages.map(m => ({ role: m.role, content: m.content }));
-      const res = await fetch('http://localhost:8000/api/chatbot/chat/', {
+      const res = await fetch(`${API_BASE}/api/chatbot/chat/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: trimmed, history }),

@@ -7,3 +7,4 @@ psycopg[binary]==3.3.4
 openpyxl==3.1.5
 requests==2.33.1
 anthropic==0.40.0
+gunicorn==23.0.0
