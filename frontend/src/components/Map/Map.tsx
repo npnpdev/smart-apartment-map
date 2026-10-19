@@ -25,7 +25,7 @@ import MapController from '../MapController/MapController.tsx';
 import RightSidePanel from '../RightSidePanel/RightSidePanel.tsx';
 
 // Custom Hooki (Logika, dane i filtry)
-import { useMapData } from './useMapData';
+import { useMapData, useSafetyData } from './useMapData';
 import { useMapFilters } from './useMapFilters';
 
 // Narzędzia i stylizacje
@@ -86,13 +86,12 @@ function Map() {
     return wskaznik <= safetyThreshold;
   };
 
+  const { safetyData, safetyRange, initialSafetyThreshold } = useSafetyData(showSafetyLayer);
+
   const {
-    safetyData,
     geoJsonData,
     buildings,
     educationData,
-    safetyRange,
-    initialSafetyThreshold,
     isLoadingBuildings
   } = useMapData(eduTypes, eduRadius);
 
