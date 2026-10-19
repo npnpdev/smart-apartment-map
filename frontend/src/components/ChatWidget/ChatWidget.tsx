@@ -1,21 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
-import { API_BASE } from '../../constants';
+import ReactMarkdown from 'react-markdown';
 import styles from './ChatWidget.module.css';
-
-interface ChatFilters {
-  safety_threshold?: number;
-  noise_threshold?: number;
-  edu_types?: string[];
-  edu_radius?: number;
-}
-
-interface Message {
-  role: 'user' | 'assistant';
-  content: string;
-}
+import { useAppContext } from '../../context/AppContext';
 
 interface ChatWidgetProps {
-  onFiltersReceived: (filters: ChatFilters) => void;
+  // pytanie do wysłania od razu po otwarciu mapy (np. z wyszukiwarki na stronie głównej)
+  initialMessage?: string | null;
 }
 
 const QUICK_TOPICS = [
@@ -25,51 +15,35 @@ const QUICK_TOPICS = [
   'Co mogę tu znaleźć?',
 ];
 
-export default function ChatWidget({ onFiltersReceived }: ChatWidgetProps) {
-  const [open, setOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
+export default function ChatWidget({ initialMessage }: ChatWidgetProps) {
+  const {
+    chatMessages: messages,
+    chatLoading: loading,
+    sendChatMessage,
+  } = useAppContext();
+  const [open, setOpen] = useState(Boolean(initialMessage));
+  const initialSent = useRef(false);
   const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, loading]);
+  }, [messages, loading, open]);
 
-  const sendMessage = async (text: string) => {
-    const trimmed = text.trim();
-    if (!trimmed || loading) return;
-
-    const userMsg: Message = { role: 'user', content: trimmed };
-    const nextMessages = [...messages, userMsg];
-    setMessages(nextMessages);
+  const sendMessage = (text: string) => {
+    if (!text.trim() || loading) return;
     setInput('');
-    setLoading(true);
-
-    try {
-      const history = messages.map(m => ({ role: m.role, content: m.content }));
-      const res = await fetch(`${API_BASE}/api/chatbot/chat/`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: trimmed, history }),
-      });
-
-      const data = await res.json();
-
-      if (data.filters) {
-        onFiltersReceived(data.filters);
-      }
-
-      setMessages(prev => [...prev, { role: 'assistant', content: data.reply }]);
-    } catch {
-      setMessages(prev => [
-        ...prev,
-        { role: 'assistant', content: 'Wystąpił błąd połączenia. Spróbuj ponownie.' },
-      ]);
-    } finally {
-      setLoading(false);
-    }
+    sendChatMessage(text);
   };
+
+  useEffect(() => {
+    // ref chroni przed podwójnym wysłaniem (StrictMode uruchamia efekty dwa razy)
+    if (!initialMessage || initialSent.current) return;
+    initialSent.current = true;
+    sendMessage(initialMessage);
+    // tylko przy pierwszym initialMessage; sendMessage zmienia się co render, a ref i tak blokuje ponowne wysłanie
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialMessage]);
 
   return (
     <>
@@ -106,7 +80,18 @@ export default function ChatWidget({ onFiltersReceived }: ChatWidgetProps) {
 
             {messages.map((m, i) => (
               <div key={i} className={`${styles.msg} ${m.role === 'user' ? styles.msgUser : styles.msgBot}`}>
-                {m.content}
+                {m.role === 'assistant' ? (
+                  // odpowiedzi modelu są w Markdownie (**pogrubienie**, listy)
+                  <ReactMarkdown
+                    components={{
+                      a: (props) => <a {...props} target="_blank" rel="noreferrer" />,
+                    }}
+                  >
+                    {m.content}
+                  </ReactMarkdown>
+                ) : (
+                  m.content
+                )}
               </div>
             ))}
 
