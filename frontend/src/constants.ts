@@ -1,3 +1,5 @@
+export const API_BASE = import.meta.env.VITE_API_BASE ?? '';
+
 export const APP_CONFIG = {
     ITEMS_PER_PAGE: 3,
     DEFAULT_NOISE_LIMIT: 80,

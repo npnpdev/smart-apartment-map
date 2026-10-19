@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Form, useActionData, useNavigate, useNavigation } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
+import { API_BASE } from '../constants';
 import styles from './LoginPage.module.css';
 
 type ActionData = {
@@ -148,7 +149,7 @@ export async function action({ request }: { request: Request }) {
         return { error: 'Hasła nie są identyczne!' };
       }
 
-      const registerRes = await fetch('http://localhost:8000/api/auth/register/', {
+      const registerRes = await fetch(`${API_BASE}/api/auth/register/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -186,7 +187,7 @@ export async function action({ request }: { request: Request }) {
     }
 
     // 2. OBSŁUGA LOGOWANIA
-    const loginRes = await fetch('http://localhost:8000/api/auth/login/', {
+    const loginRes = await fetch(`${API_BASE}/api/auth/login/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
