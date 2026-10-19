@@ -16,11 +16,21 @@ fi
 if [ "$IMPORT_ONLY" -eq 1 ]; then
     echo "[IMPORT] Pomijam scrapowanie — importuje istniejacy plik CSV"
 fi
+if [[ "${1:-}" == "--test" ]]; then
+    TEST_MODE=1
+    echo "[TEST] Tryb testowy: 1 strona, 10 ogloszen"
+fi
 
 APP_DIR="$HOME/smart-app"
 SCRAPER_DIR="$APP_DIR/scraper"
 DATA_DIR="$APP_DIR/data"
 VENV_DIR="$APP_DIR/scraper-venv"
+
+if [ ! -d "$SCRAPER_DIR" ]; then
+    echo "Blad: katalog scrapera nie istnieje: $SCRAPER_DIR"
+    echo "Uruchom najpierw install.sh"
+    exit 1
+fi
 
 if [ ! -f "$APP_DIR/docker-compose.yml" ]; then
     echo "Blad: brak docker-compose.yml w $APP_DIR"

@@ -158,4 +158,15 @@ REST_FRAMEWORK = {
 
 AUTH_USER_MODEL = "accounts.User"
 
+EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend")
+EMAIL_HOST = os.getenv("EMAIL_HOST", "mailpit")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", "1025"))
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "False").lower() in ("1", "true", "tak")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "Smart Apartment Map <no-reply@smart-apartment-map.local>")
+
+PASSWORD_RESET_TIMEOUT = 60 * 60
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
+
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")

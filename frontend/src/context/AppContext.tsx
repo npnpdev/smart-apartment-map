@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useCallback, useContext, useState, useEffect } from 'react';
 
 type FontSize = "normal" | "large" | "xlarge";
 
@@ -14,6 +14,17 @@ export type FavoriteItem = {
   price: number;
   noise_db?: string;
 };
+export type ChatFilters = {
+  safety_threshold?: number;
+  noise_threshold?: number;
+  edu_types?: string[];
+  edu_radius?: number;
+};
+
+export type ChatMessage = {
+  role: 'user' | 'assistant';
+  content: string;
+};
 
 type AppContextType = {
   email: string | null;
@@ -26,6 +37,13 @@ type AppContextType = {
   favorites: Map<number, FavoriteItem>;
   toggleFavorite: (item: FavoriteItem) => void;
   isFavorite: (id: number) => boolean;
+  // --- chatbot ---
+  chatMessages: ChatMessage[];
+  chatLoading: boolean;
+  // suma filtrów ustawionych przez chat; mapa stosuje je ponownie po powrocie na nią
+  chatFilters: ChatFilters | null;
+  sendChatMessage: (text: string) => Promise<void>;
+  clearChat: () => void;
 };
 
 const FONT_SIZES: Record<FontSize, string> = {
@@ -33,6 +51,30 @@ const FONT_SIZES: Record<FontSize, string> = {
   large:  "20px",
   xlarge: "24px",
 };
+
+const CHAT_API_URL = 'http://localhost:8000/api/chatbot/chat/';
+const CHAT_MESSAGES_KEY = 'chat.messages';
+const CHAT_FILTERS_KEY = 'chat.filters';
+
+// sessionStorage: rozmowa przetrwa przejścia między stronami i odświeżenie,
+// znika po zamknięciu karty
+function loadSession<T>(key: string, fallback: T): T {
+  try {
+    const raw = sessionStorage.getItem(key);
+    return raw ? (JSON.parse(raw) as T) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function saveSession(key: string, value: unknown) {
+  try {
+    if (value === null) sessionStorage.removeItem(key);
+    else sessionStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    // brak dostępu do storage (np. tryb prywatny) - rozmowa działa tylko w pamięci
+  }
+}
 
 const cities: City[] = [
   { name: 'Gdańsk', center: [54.352,   18.6466] },
@@ -51,6 +93,11 @@ const AppContext = createContext<AppContextType>({
   favorites: new Map(),
   toggleFavorite: () => {},
   isFavorite: () => false,
+  chatMessages: [],
+  chatLoading: false,
+  chatFilters: null,
+  sendChatMessage: async () => {},
+  clearChat: () => {},
 });
 
 export function AppContextProvider({ children }: { children: React.ReactNode }) {
@@ -135,6 +182,56 @@ export function AppContextProvider({ children }: { children: React.ReactNode }) 
   };
 
   const isFavorite = (id: number) => favorites.has(id);
+  // --- CHATBOT ---
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>(
+    () => loadSession(CHAT_MESSAGES_KEY, [])
+  );
+  const [chatFilters, setChatFilters] = useState<ChatFilters | null>(
+    () => loadSession(CHAT_FILTERS_KEY, null)
+  );
+  const [chatLoading, setChatLoading] = useState(false);
+
+  useEffect(() => saveSession(CHAT_MESSAGES_KEY, chatMessages), [chatMessages]);
+  useEffect(() => saveSession(CHAT_FILTERS_KEY, chatFilters), [chatFilters]);
+
+  const sendChatMessage = useCallback(async (text: string) => {
+    const trimmed = text.trim();
+    if (!trimmed || chatLoading) return;
+
+    const history = chatMessages.map(m => ({ role: m.role, content: m.content }));
+    setChatMessages(prev => [...prev, { role: 'user', content: trimmed }]);
+    setChatLoading(true);
+
+    try {
+      const res = await fetch(CHAT_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: trimmed, history }),
+      });
+      const data = await res.json();
+
+      if (data.filters) {
+        setChatFilters(prev => ({ ...prev, ...data.filters }));
+      }
+
+      setChatMessages(prev => [
+        ...prev,
+        { role: 'assistant', content: data.reply ?? data.error ?? 'Wystąpił błąd. Spróbuj ponownie.' },
+      ]);
+    } catch {
+      setChatMessages(prev => [
+        ...prev,
+        { role: 'assistant', content: 'Wystąpił błąd połączenia. Spróbuj ponownie.' },
+      ]);
+    } finally {
+      setChatLoading(false);
+    }
+  }, [chatMessages, chatLoading]);
+
+  const clearChat = useCallback(() => {
+    setChatMessages([]);
+    setChatFilters(null);
+  }, []);
 
   return (
     <AppContext.Provider value={{
@@ -142,6 +239,7 @@ export function AppContextProvider({ children }: { children: React.ReactNode }) 
       cities, currentCity, changeCity,
       fontSize, setFontSize,
       favorites, toggleFavorite, isFavorite,
+      chatMessages, chatLoading, chatFilters, sendChatMessage, clearChat,
     }}>
       {children}
     </AppContext.Provider>
