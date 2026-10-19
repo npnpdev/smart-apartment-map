@@ -1,19 +1,18 @@
 import os
 import csv
 import time
-import requests
+import cloudscraper
 import json
 from bs4 import BeautifulSoup
+
+_scraper = cloudscraper.create_scraper()
 
 def fetch_raw_json(page=1):
     """
     Pobiera surowy JSON Next.js dla konkretnej strony wyników wyszukiwania.
     """
     url = f"https://www.otodom.pl/pl/wyniki/wynajem/mieszkanie/pomorskie/gdansk/gdansk/gdansk?page={page}"
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-    }
-    response = requests.get(url, headers=headers)
+    response = _scraper.get(url)
     soup = BeautifulSoup(response.text, 'html.parser')
     script_tag = soup.find('script', id='__NEXT_DATA__')
     
@@ -88,21 +87,24 @@ def save_to_csv(apartments, folder_name="data", file_name="listings.csv"):
 
 if __name__ == "__main__":
     print("[INFO] Starting discovery phase...")
-    
-    # 1. Fetch page 1 to analyze total page count dynamically
+
     first_page_data = fetch_raw_json(page=1)
-    
+
     if not first_page_data:
         print("[ERROR] Failed to fetch first page. Aborting.")
         exit(1)
-        
+
     try:
         total_pages = first_page_data['props']['pageProps']['tracking']['listing']['page_count']
         print(f"[INFO] Auto-detected total pages to scrape: {total_pages}")
     except KeyError:
-        # Fallback value in case JSON structure path changes
         total_pages = 5
         print(f"[WARNING] Could not detect page count. Falling back to default: {total_pages} pages.")
+
+    max_pages = int(os.environ.get("MAX_PAGES", total_pages))
+    if max_pages < total_pages:
+        print(f"[INFO] Ograniczono do {max_pages} stron (MAX_PAGES)")
+        total_pages = max_pages
     
     all_mapped_apartments = []
     
