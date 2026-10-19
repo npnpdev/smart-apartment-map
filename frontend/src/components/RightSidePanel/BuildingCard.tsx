@@ -1,5 +1,7 @@
+import { useNavigate } from "react-router-dom";
 import styles from "./RightSidePanel.module.css";
 import type { Building } from "./RightSidePanel";
+import { useAppContext } from "../../context/AppContext";
 
 interface Props {
   building: Building;
@@ -31,6 +33,10 @@ export function BuildingCard({
   getDistanceInKm,
   eduRadius,
 }: Props) {
+  const { email, isFavorite, toggleFavorite } = useAppContext();
+  const navigate = useNavigate();
+  const liked = isFavorite(building.id);
+
   const getFacilitiesForBuilding = (b: Building) => {
     if (eduTypes.length === 0 || educationData.length === 0) return [];
 
@@ -73,7 +79,28 @@ export function BuildingCard({
     >
       <div className={styles.cardHeader}>
         <span className={styles.cardPrice}>{building.price} zł</span>
-        <span className={styles.cardDistrict}>{building.district}</span>
+        <div className={styles.cardHeaderRight}>
+          <span className={styles.cardDistrict}>{building.district}</span>
+          {email ? (
+            <button
+              className={`${styles.favoriteBtn} ${liked ? styles.favoriteBtnActive : ""}`}
+              onClick={(e) => { e.stopPropagation(); toggleFavorite({ id: building.id, name: building.name, district: building.district, price: building.price, noise_db: building.noise_db }); }}
+              title={liked ? "Usuń z ulubionych" : "Dodaj do ulubionych"}
+              aria-label={liked ? "Usuń z ulubionych" : "Dodaj do ulubionych"}
+            >
+              {liked ? "♥" : "♡"}
+            </button>
+          ) : (
+            <button
+              className={styles.favoriteBtnLocked}
+              onClick={(e) => { e.stopPropagation(); navigate("/login"); }}
+              title="Zaloguj się, aby dodać do ulubionych"
+              aria-label="Zaloguj się, aby dodać do ulubionych"
+            >
+              ♡
+            </button>
+          )}
+        </div>
       </div>
 
       <div className={styles.cardTitle}>{building.name}</div>

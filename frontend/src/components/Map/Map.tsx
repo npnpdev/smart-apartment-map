@@ -4,12 +4,12 @@ import {
   MapContainer, 
   TileLayer, 
   Marker, 
-  Popup, 
   GeoJSON, 
   Circle, 
   Tooltip 
 } from 'react-leaflet';
 import L from 'leaflet';
+import { useSearchParams } from 'react-router-dom';
 import 'leaflet.vectorgrid';
 
 // Konfiguracja
@@ -21,6 +21,7 @@ import { useAppContext } from '../../context/AppContext.tsx';
 // Własne komponenty (Podkomponenty mapy i UI)
 import FixMapSize from './FixMapSize';
 import VectorNoiseLayer from './VectorNoiseLayer';
+import ClusteredBuildings from './ClusteredBuildings';
 import MapController from '../MapController/MapController.tsx';
 import RightSidePanel from '../RightSidePanel/RightSidePanel.tsx';
 
@@ -31,8 +32,6 @@ import { useMapFilters } from './useMapFilters';
 // Narzędzia i stylizacje
 import { getDistanceInKm, normalizeName } from './utils.ts';
 import { 
-  buildingMarkerIcon, 
-  getBuildingMarkerIconHovered, 
   educationMarkerIcon, 
   getSafetyLabel, 
   getColor, 
@@ -42,8 +41,24 @@ import {
 // Style CSS
 import styles from './Map.module.css';
 
-export default function Map() {
-  const { currentCity } = useAppContext();
+import ChatWidget from '../ChatWidget/ChatWidget';
+
+function Map() {
+  const { currentCity, chatFilters } = useAppContext();
+
+  // --- ZAPYTANIE ZE STRONY GŁÓWNEJ (?q=...) -> wysyłane do chatu ---
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [initialChatQuery] = useState(() => searchParams.get('q')?.trim() || null);
+
+  useEffect(() => {
+    // usuwamy q z adresu, żeby odświeżenie strony nie wysłało pytania ponownie
+    if (searchParams.has('q')) {
+      setSearchParams(params => {
+        params.delete('q');
+        return params;
+      }, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   // --- STAN HOVERA MIESZKAŃ ---
   const [hoveredBuildingId, setHoveredBuildingId] = useState<number | string | null>(null);
@@ -63,7 +78,7 @@ export default function Map() {
   const [noiseThreshold, setNoiseThreshold] = useState<number>(APP_CONFIG.DEFAULT_NOISE_LIMIT);
 
   // --- LOGIKA FILTRÓW: EDUKACJA ---
-  const[eduTypes, setEduTypes] = useState<string[]>([]);
+  const [eduTypes, setEduTypes] = useState<string[]>([]);
   const [eduRadius, setEduRadius] = useState<number>(APP_CONFIG.DEFAULT_EDU_RADIUS);
 
   // --- ZAPAMIĘTYWANIE WARSTW (localStorage) ---
@@ -75,10 +90,10 @@ export default function Map() {
   useEffect(() => {
     localStorage.setItem('map_show_safety_layer', JSON.stringify(showSafetyLayer));
   }, [showSafetyLayer]);
-  
+
   const [showNoiseLayer, setShowNoiseLayer] = useState<boolean>(false);
 
-  const geoJsonRef = useRef<any>(null);
+  const geoJsonRef = useRef<L.GeoJSON | null>(null);
 
   // --- HELPER DO FILTRÓW ---
   const isDistrictVisible = (wskaznik?: number) => {
@@ -86,27 +101,29 @@ export default function Map() {
     return wskaznik <= safetyThreshold;
   };
 
-  const { 
-    safetyData, 
-    geoJsonData, 
-    buildings, 
-    educationData, 
-    safetyRange, 
-    initialSafetyThreshold 
-  } = useMapData();
+  const {
+    safetyData,
+    geoJsonData,
+    buildings,
+    educationData,
+    safetyRange,
+    initialSafetyThreshold,
+    isLoadingBuildings
+  } = useMapData(eduTypes, eduRadius);
 
-  const [safetyThreshold, setSafetyThreshold] = useState<number>(APP_CONFIG.FALLBACK_SAFETY_THRESHOLD);
+  const [safetyOverride, setSafetyOverride] = useState<number | null>(null);
+  const safetyThreshold = safetyOverride ?? initialSafetyThreshold;
+  const setSafetyThreshold = (action: number | ((prev: number) => number)) => {
+    setSafetyOverride(prev => {
+      const current = prev ?? initialSafetyThreshold;
+      return typeof action === 'function' ? action(current) : action;
+    });
+  };
 
-  useEffect(() => {
-    if (initialSafetyThreshold !== APP_CONFIG.FALLBACK_SAFETY_THRESHOLD) {
-      setSafetyThreshold(initialSafetyThreshold);
-    }
-  }, [initialSafetyThreshold]);
-
-  const { 
-    filteredBuildings, 
-    educationDetails, 
-    visibleEducationFacilities 
+  const {
+    filteredBuildings,
+    educationDetails,
+    visibleEducationFacilities
   } = useMapFilters({
     buildings,
     educationData,
@@ -120,9 +137,24 @@ export default function Map() {
 
   const activeBuilding = filteredBuildings.find(b => b.id === hoveredBuildingId);
 
+  // Filtry z chatu (zapisane w kontekście) - stosowane po odpowiedzi chatu
+  // i ponownie po powrocie na mapę z innej strony
+  useEffect(() => {
+    if (!chatFilters) return;
+    if (chatFilters.safety_threshold !== undefined) setSafetyThreshold(chatFilters.safety_threshold);
+    if (chatFilters.noise_threshold !== undefined) setNoiseThreshold(chatFilters.noise_threshold);
+    if (chatFilters.edu_types !== undefined) setEduTypes(chatFilters.edu_types);
+    if (chatFilters.edu_radius !== undefined) setEduRadius(chatFilters.edu_radius);
+    // settery z useState są stabilne; setSafetyThreshold to wrapper na setSafetyOverride
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chatFilters]);
+
+  type FeatureLayer = L.Path & { feature?: GeoJSON.Feature };
+
   // --- STYLE GEOJSON (Generowanie kolorów i ukrywanie dzielnic poza limitem) ---
-  const geoJsonStyle = (feature: any) => {
-    const rawName = feature.properties?.name || feature.properties?.nazwa;
+  const geoJsonStyle = (feature?: GeoJSON.Feature) => {
+    const props = feature?.properties ?? {};
+    const rawName = (props['name'] as string | undefined) || (props['nazwa'] as string | undefined) || '';
     const cleanName = normalizeName(rawName);
     const wskaznik = safetyData[cleanName];
 
@@ -149,9 +181,10 @@ export default function Map() {
     };
   };
 
-    const highlightFeature = (e: any) => {
-    const layer = e.target;
-    const rawName = layer.feature?.properties?.name || layer.feature?.properties?.nazwa;
+  const highlightFeature = (e: L.LeafletMouseEvent) => {
+    const layer = e.target as FeatureLayer;
+    const props = layer.feature?.properties ?? {};
+    const rawName = (props['name'] as string | undefined) || (props['nazwa'] as string | undefined) || '';
     const cleanName = normalizeName(rawName);
     const wskaznik = safetyData[cleanName];
 
@@ -161,20 +194,19 @@ export default function Map() {
     }
 
     layer.setStyle({ weight: 3, color: '#111111', fillOpacity: 0.75 });
-    
+
     if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
       layer.bringToFront();
     }
   };
 
-  const resetHighlight = (e: any) => {
-    if (geoJsonRef.current) {
-      geoJsonRef.current.resetStyle(e.target);
-    }
+  const resetHighlight = (e: L.LeafletMouseEvent) => {
+    geoJsonRef.current?.resetStyle(e.target as L.Layer);
   };
 
-  const onEachFeature = (feature: any, layer: any) => {
-    const rawName = feature.properties?.name || feature.properties?.nazwa;
+  const onEachFeature = (feature: GeoJSON.Feature, layer: L.Layer) => {
+    const props = feature.properties ?? {};
+    const rawName = (props['name'] as string | undefined) || (props['nazwa'] as string | undefined) || '';
     const cleanName = normalizeName(rawName);
     const wskaznik = safetyData[cleanName];
 
@@ -253,12 +285,12 @@ export default function Map() {
           <Circle
             center={[activeBuilding.lat, activeBuilding.lng]}
             radius={eduRadius * 1000} // radius w Leaflet jest w metrach, dlatego * 1000
-            pathOptions={{ 
-              color: '#3b82f6', 
-              fillColor: '#3b82f6', 
-              fillOpacity: 0.05, 
-              weight: 1.5, 
-              dashArray: '5, 5' 
+            pathOptions={{
+              color: '#3b82f6',
+              fillColor: '#3b82f6',
+              fillOpacity: 0.05,
+              weight: 1.5,
+              dashArray: '5, 5'
             }}
           />
         )}
@@ -269,7 +301,7 @@ export default function Map() {
             key={`edu-${idx}-${facility.lat}-${facility.lng}`}
             position={[facility.lat, facility.lng]}
             icon={educationMarkerIcon}
-            zIndexOffset={1500} 
+            zIndexOffset={1500}
           >
             <Tooltip direction="top" offset={[0, -10]} opacity={0.95}>
               <div style={{ textAlign: 'center', fontFamily: 'sans-serif' }}>
@@ -285,31 +317,18 @@ export default function Map() {
         ))}
 
         {/* WARSTWA MIESZKAŃ: Znaczniki dostępnych nieruchomości */}
-        {filteredBuildings.map((building) => (
-          <Marker
-            key={building.id}
-            position={[building.lat, building.lng]}
-            icon={hoveredBuildingId === building.id ? getBuildingMarkerIconHovered(isDarkTheme) : buildingMarkerIcon}
-            zIndexOffset={hoveredBuildingId === building.id ? 2500 : 500}
-            eventHandlers={{
-              mouseover: () => setHoveredBuildingId(building.id),
-              mouseout: () => setHoveredBuildingId(null),
-            }}
-          >
-            <Popup>
-
-              <div>
-                <strong>{building.name}</strong><br />
-                {building.district}<br />
-                Cena: {building.price} zł
-              </div>
-            </Popup>
-          </Marker>
-        ))}
+        <ClusteredBuildings
+          buildings={filteredBuildings}
+          hoveredBuildingId={hoveredBuildingId}
+          setHoveredBuildingId={setHoveredBuildingId}
+          isDarkTheme={isDarkTheme}
+        />
       </MapContainer>
 
+      <ChatWidget initialMessage={initialChatQuery} />
+
       {/* --- PRZEKAZUJEMY DANE DO SIDEBARA --- */}
-        <RightSidePanel
+      <RightSidePanel
         cityName={currentCity.name}
         buildings={filteredBuildings}
         safetyThreshold={safetyThreshold}
@@ -327,7 +346,10 @@ export default function Map() {
         educationDetails={educationDetails}
         educationData={educationData}
         getDistanceInKm={getDistanceInKm}
+        isLoadingBuildings={isLoadingBuildings}
       />
     </div>
   );
 }
+
+export default Map;

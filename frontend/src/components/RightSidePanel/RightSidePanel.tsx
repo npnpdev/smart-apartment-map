@@ -1,14 +1,14 @@
-import SidePanel from "../SidePanel/SidePanel.tsx";
-import stylesSidePanel from "../SidePanel/SidePanel.module.css";
-import styles from "./RightSidePanel.module.css";
-import { useState, useEffect, useMemo } from "react";
-import type { Dispatch, SetStateAction } from "react";
+import SidePanel from '../SidePanel/SidePanel.tsx';
+import styles from './RightSidePanel.module.css';
+import { useState, useEffect, useMemo } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useAppContext } from '../../context/AppContext.tsx';
 
-import { RightSidePanelResults } from "./RightSidePanelResults";
+import { RightSidePanelResults } from './RightSidePanelResults';
 
 // Konfiguracja
-import { APP_CONFIG } from "../../constants";
+import { APP_CONFIG } from '../../constants';
 
 // Definicja typu danych o budynku
 export interface Building {
@@ -43,11 +43,17 @@ interface RightSidePanelProps {
 
   hoveredBuildingId?: number | string | null;
   setHoveredBuildingId?: (id: number | string | null) => void;
-  
+
   educationDetails?: Record<string, { count: number; names: string[] }>;
-  
+
   educationData?: any[];
-  getDistanceInKm?: (lat1: number, lon1: number, lat2: number, lon2: number) => number;
+  getDistanceInKm?: (
+    lat1: number,
+    lon1: number,
+    lat2: number,
+    lon2: number
+  ) => number;
+  isLoadingBuildings?: boolean;
 }
 
 export default function RightSidePanel({
@@ -56,41 +62,65 @@ export default function RightSidePanel({
   setSafetyThreshold,
   safetyMin,
   safetyMax,
-  noiseThreshold,        
-  setNoiseThreshold,      
+  noiseThreshold,
+  setNoiseThreshold,
   eduTypes,
   setEduTypes,
   eduRadius,
   setEduRadius,
-  hoveredBuildingId,      
+  hoveredBuildingId,
   setHoveredBuildingId,
   educationDetails = {},
   educationData = [],
   getDistanceInKm = () => 0,
+  isLoadingBuildings = false,
 }: RightSidePanelProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [view, setView] = useState<'list' | 'filters'>('list');
 
   const { cities, currentCity, changeCity } = useAppContext();
-  
+  const [searchParams, setSearchParams] = useSearchParams();
+
   // Stan do obsługi błędu suwaka edukacji, gdy nie wybrano żadnego typu placówki
   const [sliderError, setSliderError] = useState<string | null>(null);
 
-  const [expandedBuildingId, setExpandedBuildingId] = useState<number | string | null>(null);
+  const [expandedBuildingId, setExpandedBuildingId] = useState<
+    number | string | null
+  >(null);
 
-    useEffect(() => {
+  useEffect(() => {
     setCurrentPage(1);
     setExpandedBuildingId(null);
   }, [safetyThreshold, eduTypes, eduRadius]);
 
+  // ?highlight=ID — przechodzi do strony z zadanym ogłoszeniem i je rozwija
+  useEffect(() => {
+    const highlightId = searchParams.get('highlight');
+    if (!highlightId || buildings.length === 0) return;
+    const id = Number(highlightId);
+    const idx = buildings.findIndex((b) => b.id === id);
+    if (idx === -1) return;
+    const page = Math.floor(idx / APP_CONFIG.ITEMS_PER_PAGE) + 1;
+    setCurrentPage(page);
+    setExpandedBuildingId(id);
+    setSearchParams({}, { replace: true });
+  }, [searchParams, buildings]);
+
   const totalPages = Math.ceil(buildings.length / APP_CONFIG.ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * APP_CONFIG.ITEMS_PER_PAGE;
-  const visibleBuildings = buildings.slice(startIndex, startIndex + APP_CONFIG.ITEMS_PER_PAGE);
+  const visibleBuildings = buildings.slice(
+    startIndex,
+    startIndex + APP_CONFIG.ITEMS_PER_PAGE
+  );
 
-  const handlePageChange = (e: React.MouseEvent, direction: 'prev' | 'next') => {
+  const handlePageChange = (
+    e: React.MouseEvent,
+    direction: 'prev' | 'next'
+  ) => {
     e.stopPropagation();
-    if (direction === 'prev' && currentPage > 1) setCurrentPage(p => p - 1);
-    if (direction === 'next' && currentPage < totalPages) setCurrentPage(p => p + 1);
+    if (direction === 'prev' && currentPage > 1) setCurrentPage((p) => p - 1);
+    if (direction === 'next' && currentPage < totalPages)
+      setCurrentPage((p) => p + 1);
     setExpandedBuildingId(null);
   };
 
@@ -116,8 +146,10 @@ export default function RightSidePanel({
 
   const toggleEduType = (type: string) => {
     setEduTypes((prev) => {
-      const newTypes = prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type];
-      
+      const newTypes = prev.includes(type)
+        ? prev.filter((t) => t !== type)
+        : [...prev, type];
+
       // Jeśli użytkownik wybiera jakikolwiek typ, usuwamy komunikat błędu suwaka
       if (newTypes.length > 0) {
         setSliderError(null);
@@ -129,7 +161,9 @@ export default function RightSidePanel({
   // Obsługa kliknięcia nieaktywnego suwaka edukacji
   const handleSliderContainerClick = () => {
     if (eduTypes.length === 0) {
-      setSliderError("Najpierw wybierz rodzaj placówki (np. Przedszkola) by użyć promienia.");
+      setSliderError(
+        'Najpierw wybierz rodzaj placówki (np. Przedszkola) by użyć promienia.'
+      );
     }
   };
 
@@ -357,6 +391,7 @@ export default function RightSidePanel({
         eduRadius={eduRadius}
         expandedBuildingId={expandedBuildingId}
         setExpandedBuildingId={setExpandedBuildingId}
+        isLoadingBuildings={isLoadingBuildings}
       />
     </SidePanel>
   );

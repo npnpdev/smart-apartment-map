@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import stylesSidePanel from "../SidePanel/SidePanel.module.css";
 import styles from "./RightSidePanel.module.css";
 import { type Building } from "./RightSidePanel";
@@ -29,6 +30,7 @@ interface Props {
 
   expandedBuildingId: number | string | null;
   setExpandedBuildingId: (id: number | string | null) => void;
+  isLoadingBuildings?: boolean;
 }
 
 export function RightSidePanelResults(props: Props) {
@@ -51,7 +53,14 @@ export function RightSidePanelResults(props: Props) {
 
     expandedBuildingId,
     setExpandedBuildingId,
+    isLoadingBuildings = false,
   } = props;
+
+  useEffect(() => {
+    if (!expandedBuildingId) return;
+    const el = document.getElementById(`building-card-${expandedBuildingId}`);
+    el?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, [expandedBuildingId, currentPage]);
 
   if (view !== "list") return null;
 
@@ -71,7 +80,7 @@ export function RightSidePanelResults(props: Props) {
       ) : (
         <div className={styles.listWrapper}>
           <div className={styles.resultsCount}>
-            Znaleziono: {buildings.length} ofert
+            {isLoadingBuildings ? 'Szukam ofert...' : `Znaleziono: ${buildings.length} ofert`}
           </div>
 
           {visibleBuildings.map((building) => {
@@ -79,25 +88,26 @@ export function RightSidePanelResults(props: Props) {
             const isExpanded = expandedBuildingId === building.id;
 
             return (
-              <BuildingCard
-                key={building.id}
-                building={building}
-                isHovered={isHovered}
-                isExpanded={isExpanded}
-                onToggleExpand={() =>
-                  setExpandedBuildingId(isExpanded ? null : building.id)
-                }
-                onMouseEnter={() =>
-                  setHoveredBuildingId && setHoveredBuildingId(building.id)
-                }
-                onMouseLeave={() =>
-                  setHoveredBuildingId && setHoveredBuildingId(null)
-                }
-                eduTypes={eduTypes}
-                educationData={educationData}
-                getDistanceInKm={getDistanceInKm}
-                eduRadius={eduRadius}
-              />
+              <div key={building.id} id={`building-card-${building.id}`}>
+                <BuildingCard
+                  building={building}
+                  isHovered={isHovered}
+                  isExpanded={isExpanded}
+                  onToggleExpand={() =>
+                    setExpandedBuildingId(isExpanded ? null : building.id)
+                  }
+                  onMouseEnter={() =>
+                    setHoveredBuildingId && setHoveredBuildingId(building.id)
+                  }
+                  onMouseLeave={() =>
+                    setHoveredBuildingId && setHoveredBuildingId(null)
+                  }
+                  eduTypes={eduTypes}
+                  educationData={educationData}
+                  getDistanceInKm={getDistanceInKm}
+                  eduRadius={eduRadius}
+                />
+              </div>
             );
           })}
 

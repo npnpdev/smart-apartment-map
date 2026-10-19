@@ -1,20 +1,37 @@
 services:
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.dev.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - backend
+      - frontend
+
   db:
     image: postgis/postgis:16-3.4
     restart: unless-stopped
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     environment:
-      POSTGRES_DB: ${DB_NAME?set DB_NAME in .env}
-      POSTGRES_USER: ${DB_USER?set POSTGRES_USER in .env}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${DB_NAME:?set DB_NAME in .env}
+      POSTGRES_USER: ${DB_USER:?set DB_USER in .env}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
       interval: 5s
       timeout: 5s
       retries: 5
+
+  mailpit:
+    image: axllent/mailpit:v1.21.0
+    restart: unless-stopped
+    ports:
+      - "8025:8025"
 
   docs:
     build:
@@ -32,13 +49,15 @@ services:
     volumes:
       - ./backend:/app
       - ./data:/app/scraped_data
-    ports:
-      - "8000:8000"
+    expose:
+      - "8000"
     env_file:
       - .env
     depends_on:
       db:
         condition: service_healthy
+      mailpit:
+        condition: service_started
 
   frontend:
     build:
@@ -46,8 +65,8 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    ports:
-      - "5173:5173"
+    expose:
+      - "5173"
     command: [ "npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5173" ]
     environment:
       CHOKIDAR_USEPOLLING: true

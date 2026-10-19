@@ -2,11 +2,11 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  /* Odejmujemy orientacyjną wysokość headera, żeby wyśrodkować na ekranie */
-  min-height: calc(100vh - 80px); 
-  padding: 2rem;
+  min-height: 100vh;
+  padding: 96px 2rem 2rem;
   background: var(--bg-base);
   animation: fadeIn 0.4s ease-out;
+  box-sizing: border-box;
 }
 
 .authCard {
