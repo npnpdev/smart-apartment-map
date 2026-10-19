@@ -3,7 +3,7 @@ import unicodedata
 import django_filters
 from django.contrib.gis.geos import Point
 from django.contrib.gis.measure import D
-from django.db.models import Exists, OuterRef
+from django.db.models import Exists, OuterRef, Q, Subquery
 from rest_framework.serializers import ValidationError
 
 from .models import Apartment, EducationFacility, SafetyData
@@ -11,6 +11,14 @@ from .serializers import EDU_TYPE_LABELS
 
 
 DEFAULT_RADIUS_KM = 5
+
+
+def latest_crimes_per_1000(district_ref):
+    return (
+        SafetyData.objects.filter(district=district_ref)
+        .order_by("-year")
+        .values("crimes_per_1000")[:1]
+    )
 
 
 def uprosc(tekst):
@@ -51,6 +59,13 @@ def parse_point(value):
 class ApartmentFilter(django_filters.FilterSet):
     price_min = django_filters.NumberFilter(field_name="price", lookup_expr="gte")
     price_max = django_filters.NumberFilter(field_name="price", lookup_expr="lte")
+    area_min = django_filters.NumberFilter(field_name="area", lookup_expr="gte")
+    area_max = django_filters.NumberFilter(field_name="area", lookup_expr="lte")
+    rooms_min = django_filters.NumberFilter(field_name="rooms", lookup_expr="gte")
+    rooms_max = django_filters.NumberFilter(field_name="rooms", lookup_expr="lte")
+    # brak danych o halasie = nie odrzucamy (tak samo jak na froncie)
+    noise_max = django_filters.NumberFilter(method="filter_noise_max")
+    safety_max = django_filters.NumberFilter(method="filter_safety_max")
     district = django_filters.CharFilter(
         field_name="district__name", lookup_expr="iexact"
     )
@@ -75,6 +90,20 @@ class ApartmentFilter(django_filters.FilterSet):
 
     def filter_noop(self, queryset, name, value):
         return queryset
+
+    def filter_noise_max(self, queryset, name, value):
+        return queryset.filter(
+            Q(noise_db_max__isnull=True) | Q(noise_db_max__lte=value)
+        )
+
+    def filter_safety_max(self, queryset, name, value):
+        # najnowszy rok statystyk dla dzielnicy; brak danych = nie odrzucamy
+        queryset = queryset.annotate(
+            crimes_per_1000=Subquery(latest_crimes_per_1000(OuterRef("district")))
+        )
+        return queryset.filter(
+            Q(crimes_per_1000__isnull=True) | Q(crimes_per_1000__lte=value)
+        )
 
     def filter_near(self, queryset, name, value):
         punkt = parse_point(value)

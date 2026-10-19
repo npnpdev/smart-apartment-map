@@ -9,6 +9,7 @@ import {
   Tooltip 
 } from 'react-leaflet';
 import L from 'leaflet';
+import { useSearchParams } from 'react-router-dom';
 import 'leaflet.vectorgrid';
 
 // Konfiguracja
@@ -43,7 +44,21 @@ import styles from './Map.module.css';
 import ChatWidget from '../ChatWidget/ChatWidget';
 
 function Map() {
-  const { currentCity } = useAppContext();
+  const { currentCity, chatFilters } = useAppContext();
+
+  // --- ZAPYTANIE ZE STRONY GŁÓWNEJ (?q=...) -> wysyłane do chatu ---
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [initialChatQuery] = useState(() => searchParams.get('q')?.trim() || null);
+
+  useEffect(() => {
+    // usuwamy q z adresu, żeby odświeżenie strony nie wysłało pytania ponownie
+    if (searchParams.has('q')) {
+      setSearchParams(params => {
+        params.delete('q');
+        return params;
+      }, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   // --- STAN HOVERA MIESZKAŃ ---
   const [hoveredBuildingId, setHoveredBuildingId] = useState<number | string | null>(null);
@@ -122,17 +137,17 @@ function Map() {
 
   const activeBuilding = filteredBuildings.find(b => b.id === hoveredBuildingId);
 
-  const applyFiltersFromChat = (filters: {
-    safety_threshold?: number;
-    noise_threshold?: number;
-    edu_types?: string[];
-    edu_radius?: number;
-  }) => {
-    if (filters.safety_threshold !== undefined) setSafetyThreshold(filters.safety_threshold);
-    if (filters.noise_threshold !== undefined) setNoiseThreshold(filters.noise_threshold);
-    if (filters.edu_types !== undefined) setEduTypes(filters.edu_types);
-    if (filters.edu_radius !== undefined) setEduRadius(filters.edu_radius);
-  };
+  // Filtry z chatu (zapisane w kontekście) - stosowane po odpowiedzi chatu
+  // i ponownie po powrocie na mapę z innej strony
+  useEffect(() => {
+    if (!chatFilters) return;
+    if (chatFilters.safety_threshold !== undefined) setSafetyThreshold(chatFilters.safety_threshold);
+    if (chatFilters.noise_threshold !== undefined) setNoiseThreshold(chatFilters.noise_threshold);
+    if (chatFilters.edu_types !== undefined) setEduTypes(chatFilters.edu_types);
+    if (chatFilters.edu_radius !== undefined) setEduRadius(chatFilters.edu_radius);
+    // settery z useState są stabilne; setSafetyThreshold to wrapper na setSafetyOverride
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chatFilters]);
 
   type FeatureLayer = L.Path & { feature?: GeoJSON.Feature };
 
@@ -310,7 +325,7 @@ function Map() {
         />
       </MapContainer>
 
-      <ChatWidget onFiltersReceived={applyFiltersFromChat} />
+      <ChatWidget initialMessage={initialChatQuery} />
 
       {/* --- PRZEKAZUJEMY DANE DO SIDEBARA --- */}
       <RightSidePanel

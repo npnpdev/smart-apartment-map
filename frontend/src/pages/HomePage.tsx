@@ -113,7 +113,8 @@ export default function HomePage() {
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    navigate(query ? `/map?q=${encodeURIComponent(query)}` : '/map');
+    const trimmed = query.trim();
+    navigate(trimmed ? `/map?q=${encodeURIComponent(trimmed)}` : '/map');
   }
 
   return (
@@ -125,7 +126,7 @@ export default function HomePage() {
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Dzielnica, np. Wrzeszcz"
+              placeholder="Opisz czego szukasz"
               aria-label="Szukaj mieszkania"
             />
             <button type="submit">Szukaj</button>

@@ -117,6 +117,33 @@
   border-bottom-right-radius: var(--radius-sm);
 }
 
+.msgBot p,
+.msgBot ul,
+.msgBot ol {
+  margin: 0 0 0.5em;
+}
+
+.msgBot > :last-child {
+  margin-bottom: 0;
+}
+
+.msgBot ul,
+.msgBot ol {
+  padding-left: 1.2em;
+}
+
+.msgBot li + li {
+  margin-top: 0.25em;
+}
+
+.msgBot strong {
+  font-weight: 700;
+}
+
+.msgBot a {
+  text-decoration: underline;
+}
+
 .msgBot {
   align-self: flex-start;
   background: var(--glass-elevated);
