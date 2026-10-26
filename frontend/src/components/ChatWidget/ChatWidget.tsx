@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from 'react';
-import { API_BASE } from '../../constants';
 import ReactMarkdown from 'react-markdown';
 import styles from './ChatWidget.module.css';
 import { useAppContext } from '../../context/AppContext';
@@ -34,31 +33,7 @@ export default function ChatWidget({ initialMessage }: ChatWidgetProps) {
   const sendMessage = (text: string) => {
     if (!text.trim() || loading) return;
     setInput('');
-    setLoading(true);
-
-    try {
-      const history = messages.map(m => ({ role: m.role, content: m.content }));
-      const res = await fetch(`${API_BASE}/api/chatbot/chat/`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: trimmed, history }),
-      });
-
-      const data = await res.json();
-
-      if (data.filters) {
-        onFiltersReceived(data.filters);
-      }
-
-      setMessages(prev => [...prev, { role: 'assistant', content: data.reply }]);
-    } catch {
-      setMessages(prev => [
-        ...prev,
-        { role: 'assistant', content: 'Wystąpił błąd połączenia. Spróbuj ponownie.' },
-      ]);
-    } finally {
-      setLoading(false);
-    }
+    sendChatMessage(text);
   };
 
   useEffect(() => {
@@ -73,7 +48,11 @@ export default function ChatWidget({ initialMessage }: ChatWidgetProps) {
   return (
     <>
       {!open && (
-        <button className={styles.fab} onClick={() => setOpen(true)} title="Asystent wyszukiwania">
+        <button
+          className={styles.fab}
+          onClick={() => setOpen(true)}
+          title="Asystent wyszukiwania"
+        >
           💬
         </button>
       )}
@@ -82,16 +61,19 @@ export default function ChatWidget({ initialMessage }: ChatWidgetProps) {
         <div className={styles.panel}>
           <div className={styles.header}>
             <span>Asystent wyszukiwania</span>
-            <button className={styles.closeBtn} onClick={() => setOpen(false)}>✕</button>
+            <button className={styles.closeBtn} onClick={() => setOpen(false)}>
+              ✕
+            </button>
           </div>
 
           <div className={styles.body}>
             {messages.length === 0 && (
               <>
                 <p className={styles.intro}>
-                  Opisz czego szukasz, a zaktualizuję filtry na mapie. Możesz też wybrać temat:
+                  Opisz czego szukasz, a zaktualizuję filtry na mapie. Możesz
+                  też wybrać temat:
                 </p>
-                {QUICK_TOPICS.map(topic => (
+                {QUICK_TOPICS.map((topic) => (
                   <button
                     key={topic}
                     className={styles.topic}
@@ -104,12 +86,17 @@ export default function ChatWidget({ initialMessage }: ChatWidgetProps) {
             )}
 
             {messages.map((m, i) => (
-              <div key={i} className={`${styles.msg} ${m.role === 'user' ? styles.msgUser : styles.msgBot}`}>
+              <div
+                key={i}
+                className={`${styles.msg} ${m.role === 'user' ? styles.msgUser : styles.msgBot}`}
+              >
                 {m.role === 'assistant' ? (
                   // odpowiedzi modelu są w Markdownie (**pogrubienie**, listy)
                   <ReactMarkdown
                     components={{
-                      a: (props) => <a {...props} target="_blank" rel="noreferrer" />,
+                      a: (props) => (
+                        <a {...props} target="_blank" rel="noreferrer" />
+                      ),
                     }}
                   >
                     {m.content}
@@ -121,7 +108,9 @@ export default function ChatWidget({ initialMessage }: ChatWidgetProps) {
             ))}
 
             {loading && (
-              <div className={`${styles.msg} ${styles.msgBot} ${styles.loading}`}>
+              <div
+                className={`${styles.msg} ${styles.msgBot} ${styles.loading}`}
+              >
                 <span />
                 <span />
                 <span />
@@ -134,12 +123,15 @@ export default function ChatWidget({ initialMessage }: ChatWidgetProps) {
           <div className={styles.inputBar}>
             <input
               value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && sendMessage(input)}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && sendMessage(input)}
               placeholder="Wpisz czego szukasz…"
               disabled={loading}
             />
-            <button onClick={() => sendMessage(input)} disabled={loading || !input.trim()}>
+            <button
+              onClick={() => sendMessage(input)}
+              disabled={loading || !input.trim()}
+            >
               ➤
             </button>
           </div>
