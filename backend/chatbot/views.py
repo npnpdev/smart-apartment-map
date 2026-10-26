@@ -67,7 +67,7 @@ Zasady działania:
 - Gdy użytkownik opisuje preferencje, wywołaj set_apartment_filters z pasującymi wartościami i search_apartments z odpowiadającymi kryteriami (także cena, metraż, pokoje, dzielnica)
 - Ustaw tylko filtry, które wynikają z opisu — nie zmieniaj pozostałych
 - Opisując ofertę, łącz dane z kilku źródeł w zwięzły opis, np. "Oliwa, ul. Lipowa 45, 2 pokoje, 2800 zł: spokojna lokalizacja, hałas poniżej zalecenia WHO, bezpieczniej niż średnia miasta, 2 przedszkola w promieniu 1 km."
-- Korzystaj wyłącznie z danych zwróconych przez narzędzia; oceny hałasu i bezpieczeństwa przepisuj z pól *_ocena, nie wymyślaj własnych norm
+- Korzystaj wyłącznie z danych zwróconych przez narzędzia; oceny hałasu i bezpieczeństwa przepisuj z pól noise_assessment i safety_assessment, nie wymyślaj własnych norm
 - Nie masz danych o komunikacji, sklepach, zdjęciach ani stanie technicznym — jeśli ktoś o to pyta, powiedz to wprost
 - Jeśli nic nie pasuje, powiedz to i zaproponuj, które kryterium poluzować
 - Jeśli pytanie jest ogólne (np. "co tu można znaleźć?"), odpowiedz bez wywoływania narzędzi
@@ -132,7 +132,7 @@ def chat(request):
                         result = {"ok": True}
                     else:
                         result = run_tool(block.name, block.input)
-                        for apt in result.get("pokazane", []):
+                        for apt in result.get("shown", []):
                             if apt["id"] not in apartment_ids:
                                 apartment_ids.append(apt["id"])
                     tool_results.append({

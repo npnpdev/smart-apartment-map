@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react';
 import { normalizeName } from './utils';
 import { APP_CONFIG, API_BASE } from '../../constants';
+import {
+  type ApartmentFilters,
+  DEFAULT_APARTMENT_FILTERS,
+  apartmentFiltersToParams,
+} from '../RightSidePanel/filters/apartmentFilters';
 
 interface MapDataResult {
   safetyData: Record<string, number>;
@@ -14,7 +19,8 @@ interface MapDataResult {
 
 export function useMapData(
   eduTypes: string[] = [],
-  eduRadius: number = APP_CONFIG.DEFAULT_EDU_RADIUS
+  eduRadius: number = APP_CONFIG.DEFAULT_EDU_RADIUS,
+  apartmentFilters: ApartmentFilters = DEFAULT_APARTMENT_FILTERS
 ): MapDataResult {
   const [safetyData, setSafetyData] = useState<Record<string, number>>({});
   const [geoJsonData, setGeoJsonData] = useState<any>(null);
@@ -22,8 +28,12 @@ export function useMapData(
   const [educationData, setEducationData] = useState<any[]>([]);
   const [isLoadingBuildings, setIsLoadingBuildings] = useState<boolean>(true);
 
-  const [safetyRange, setSafetyRange] = useState<{ min: number; max: number }>({ min: 0, max: 100 });
-  const [initialSafetyThreshold, setInitialSafetyThreshold] = useState<number>(1000);
+  const [safetyRange, setSafetyRange] = useState<{ min: number; max: number }>({
+    min: 0,
+    max: 100,
+  });
+  const [initialSafetyThreshold, setInitialSafetyThreshold] =
+    useState<number>(1000);
 
   useEffect(() => {
     fetch(`${API_BASE}/api/safety/`)
@@ -57,7 +67,8 @@ export function useMapData(
       .then((res) => res.json())
       .then((data) => {
         const onlyPolygons = data.features.filter(
-          (f: any) => f.geometry.type === 'Polygon' || f.geometry.type === 'MultiPolygon'
+          (f: any) =>
+            f.geometry.type === 'Polygon' || f.geometry.type === 'MultiPolygon'
         );
         setGeoJsonData({ ...data, features: onlyPolygons });
       })
@@ -73,17 +84,20 @@ export function useMapData(
 
   const eduTypesKey = eduTypes.join(',');
 
+  // Zapytanie budowane poza efektem - efekt reaguje na zmianę tekstu zapytania
+  const queryParams = new URLSearchParams();
+  if (eduTypesKey) {
+    queryParams.set('edu_types', eduTypesKey);
+    queryParams.set('edu_radius', String(eduRadius));
+  }
+  apartmentFiltersToParams(apartmentFilters, queryParams);
+  const query = queryParams.toString();
+
   useEffect(() => {
     const controller = new AbortController();
 
     const opoznienie = setTimeout(() => {
       setIsLoadingBuildings(true);
-      const params = new URLSearchParams();
-      if (eduTypesKey) {
-        params.set('edu_types', eduTypesKey);
-        params.set('edu_radius', String(eduRadius));
-      }
-      const query = params.toString();
 
       fetch(`${API_BASE}/api/apartments/${query ? `?${query}` : ''}`, {
         signal: controller.signal,
@@ -107,7 +121,7 @@ export function useMapData(
       clearTimeout(opoznienie);
       controller.abort();
     };
-  }, [eduTypesKey, eduRadius]);
+  }, [query]);
 
   return {
     safetyData,

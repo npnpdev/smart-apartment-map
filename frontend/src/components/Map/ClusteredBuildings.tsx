@@ -16,106 +16,105 @@ export type BuildingMarker = {
   lng: number;
 };
 
+type BuildingId = number | string;
+
 interface Props {
   buildings: BuildingMarker[];
-  hoveredBuildingId: number | string | null;
-  setHoveredBuildingId: (id: number | string | null) => void;
+  hoveredBuildingId: BuildingId | null;
+  setHoveredBuildingId: (id: BuildingId | null) => void;
+  selectedBuildingId: BuildingId | null;
+  // kliknięcie znacznika wybiera mieszkanie (panel pokazuje jego szczegóły)
+  onSelectBuilding: (id: BuildingId) => void;
   isDarkTheme: boolean;
 }
 
-function rozmiarKlastra(liczba: number) {
-  if (liczba < 10) return { klasa: styles.clusterSmall, px: 36 };
-  if (liczba < 100) return { klasa: styles.clusterMedium, px: 44 };
-  return { klasa: styles.clusterLarge, px: 52 };
+function clusterSize(count: number) {
+  if (count < 10) return { className: styles.clusterSmall, px: 36 };
+  if (count < 100) return { className: styles.clusterMedium, px: 44 };
+  return { className: styles.clusterLarge, px: 52 };
 }
 
-function ikonaKlastra(cluster: L.MarkerCluster) {
-  const liczba = cluster.getChildCount();
-  const { klasa, px } = rozmiarKlastra(liczba);
+function clusterIcon(cluster: L.MarkerCluster) {
+  const count = cluster.getChildCount();
+  const { className, px } = clusterSize(count);
 
   return L.divIcon({
-    html: `<div class="${styles.cluster} ${klasa}"><span>${liczba}</span></div>`,
+    html: `<div class="${styles.cluster} ${className}"><span>${count}</span></div>`,
     className: '',
     iconSize: L.point(px, px),
   });
-}
-
-function trescPopupu(building: BuildingMarker) {
-  return `
-    <div>
-      <strong>${building.name ?? 'Oferta'}</strong><br />
-      ${building.district ?? 'brak dzielnicy'}<br />
-      Cena: ${building.price ?? '-'} zł
-    </div>
-  `;
 }
 
 export default function ClusteredBuildings({
   buildings,
   hoveredBuildingId,
   setHoveredBuildingId,
+  selectedBuildingId,
+  onSelectBuilding,
   isDarkTheme,
 }: Props) {
   const map = useMap();
-  const grupaRef = useRef<L.MarkerClusterGroup | null>(null);
-  const markeryRef = useRef<Map<number | string, L.Marker>>(new Map());
+  const groupRef = useRef<L.MarkerClusterGroup | null>(null);
+  const markersRef = useRef<Map<BuildingId, L.Marker>>(new Map());
 
   useEffect(() => {
-    const grupa = L.markerClusterGroup({
+    const group = L.markerClusterGroup({
       maxClusterRadius: 60,
       disableClusteringAtZoom: 17,
       showCoverageOnHover: false,
       spiderfyOnMaxZoom: true,
       removeOutsideVisibleBounds: true,
       chunkedLoading: true,
-      iconCreateFunction: ikonaKlastra,
+      iconCreateFunction: clusterIcon,
     });
 
-    const markery = markeryRef.current;
-    grupaRef.current = grupa;
-    map.addLayer(grupa);
+    const markers = markersRef.current;
+    groupRef.current = group;
+    map.addLayer(group);
 
     return () => {
-      map.removeLayer(grupa);
-      grupaRef.current = null;
-      markery.clear();
+      map.removeLayer(group);
+      groupRef.current = null;
+      markers.clear();
     };
   }, [map]);
 
   useEffect(() => {
-    const grupa = grupaRef.current;
-    if (!grupa) return;
+    const group = groupRef.current;
+    if (!group) return;
 
-    grupa.clearLayers();
-    markeryRef.current.clear();
+    group.clearLayers();
+    markersRef.current.clear();
 
-    const markery = buildings
+    const markers = buildings
       .filter((b) => Number.isFinite(b.lat) && Number.isFinite(b.lng))
       .map((building) => {
         const marker = L.marker([building.lat, building.lng], {
           icon: buildingMarkerIcon,
+          title: building.name,
         });
 
-        marker.bindPopup(trescPopupu(building));
+        marker.on('click', () => onSelectBuilding(building.id));
         marker.on('mouseover', () => setHoveredBuildingId(building.id));
         marker.on('mouseout', () => setHoveredBuildingId(null));
 
-        markeryRef.current.set(building.id, marker);
+        markersRef.current.set(building.id, marker);
         return marker;
       });
 
-    grupa.addLayers(markery);
-  }, [buildings, setHoveredBuildingId]);
+    group.addLayers(markers);
+  }, [buildings, setHoveredBuildingId, onSelectBuilding]);
 
+  // wyróżnienie znacznika najechanego albo wybranego mieszkania
   useEffect(() => {
-    markeryRef.current.forEach((marker, id) => {
-      const aktywny = id === hoveredBuildingId;
+    markersRef.current.forEach((marker, id) => {
+      const active = id === hoveredBuildingId || id === selectedBuildingId;
       marker.setIcon(
-        aktywny ? getBuildingMarkerIconHovered(isDarkTheme) : buildingMarkerIcon
+        active ? getBuildingMarkerIconHovered(isDarkTheme) : buildingMarkerIcon
       );
-      marker.setZIndexOffset(aktywny ? 2500 : 500);
+      marker.setZIndexOffset(active ? 2500 : 500);
     });
-  }, [hoveredBuildingId, isDarkTheme]);
+  }, [hoveredBuildingId, selectedBuildingId, isDarkTheme, buildings]);
 
   return null;
 }

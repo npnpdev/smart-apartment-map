@@ -8,9 +8,10 @@
   -webkit-backdrop-filter: var(--blur);
   border: 1px solid var(--border);
   box-shadow: var(--shadow-medium);
-  border-radius: var(--radius-xl);
+  border-radius: 0;
   z-index: 3000;
-  overflow: hidden;
+  /* visible: uchwyt wystaje poza krawędź panelu; treść przewija się w .content */
+  overflow: visible;
   display: flex;
   flex-direction: column;
   opacity: 1;
@@ -28,7 +29,7 @@
   right: 0;
   top: 0;
   bottom: 0;
-  border-radius: var(--radius-xl) 0 0 var(--radius-xl);
+  border-radius: 0;
   transform-origin: right center;
   transform: translateX(0);
 }
@@ -38,13 +39,18 @@
   left: 0;
   top: 0;
   bottom: 0;
-  border-radius: 0 var(--radius-xl) var(--radius-xl) 0;
+  border-radius: 0;
   transform-origin: left center;
   transform: translateX(0);
 }
 
 .panelHidden {
   pointer-events: none;
+}
+
+/* Podczas przeciągania panel podąża za palcem bez animacji */
+.dragging {
+  transition: none !important;
 }
 
 .right.panelHidden {
@@ -145,6 +151,25 @@
   padding: 22px 30px 30px;
 }
 
+/* Stały pasek nad przewijaną treścią - część panelu, więc ma to samo tło */
+.toolbar {
+  flex-shrink: 0;
+  padding: 30px 30px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Stała stopka pod przewijaną treścią (paginacja) - nie przeskakuje */
+.footer {
+  flex-shrink: 0;
+  padding: 14px 30px 18px;
+  border-top: 1px solid var(--border);
+}
+
+/* Panel bez nagłówka: równy odstęp od góry jak po bokach */
+.contentNoHeader {
+  padding-top: 30px;
+}
+
 .chips {
   display: inline-flex;
   align-items: center;
@@ -209,68 +234,75 @@
 }
 
 
-/* --- EDGE TOGGLE (zawsze widoczny przycisk przy krawędzi) --- */
+/* --- EDGE TOGGLE (pasek na całą wysokość przy krawędzi panelu: klik + przeciąganie) --- */
 .edgeToggle {
-  position: fixed;
-  top: 50%;
-  transform: translateY(-50%);
+  position: absolute;
+  top: 0;
+  /* wysokość wprost: Safari/Firefox nie rozciągają <button> samym top/bottom */
+  height: 100%;
+  margin: 0;
+  -webkit-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
   z-index: 3200;
+  /* panel schowany ma pointer-events: none, a uchwyt musi zostać klikalny */
+  pointer-events: auto;
+  /* przeglądarka nie przewija/nie cofa strony gestem zaczętym na uchwycie */
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grab;
   width: 28px;
-  height: 56px;
-  border: 1px solid var(--border);
-  background: var(--glass-bg-strong);
-  backdrop-filter: var(--blur);
+  border: none;
+  border-radius: 0;
+  background: #ffffff;
   box-shadow: var(--shadow-soft);
   display: grid;
   place-items: center;
-  cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
+  transition: background-color 0.2s ease;
   padding: 0;
 }
 
+/* w trybie ciemnym biały pasek raziłby na tle mapy - pełne ciemne tło */
+:global(body.dark-theme) .edgeToggle {
+  background: #1e1e1e;
+}
+
+.dragging .edgeToggle {
+  cursor: grabbing;
+}
+
 .edgeToggleRight {
-  right: 0;
-  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+  right: 100%;
+  border-left: 1px solid var(--border-strong);
 }
 
 .edgeToggleLeft {
-  left: 0;
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  left: 100%;
+  border-right: 1px solid var(--border-strong);
 }
 
 .edgeToggle:hover {
-  background: var(--glass-elevated);
-  border-color: var(--border-strong);
+  background: #f4f2ee;
 }
 
-@media (max-width: 1600px) {
-  .right {
-    width: 460px !important;
-  }
+:global(body.dark-theme) .edgeToggle:hover {
+  background: #2a2a2a;
 }
 
-@media (max-width: 1440px) {
+/* Panel ma stałą szerokość (--panel-width), a na węższych ekranach od razu
+   przechodzi na cały ekran, zamiast stopniowo się zwężać */
+@media (max-width: 1024px) {
+  /* zostawiamy pasek na uchwyt, żeby otwarty panel dało się złapać i zsunąć */
   .right {
-    width: 400px !important;
-  }
-}
-
-@media (max-width: 1280px) {
-  .right {
-    width: 360px !important;
-  }
-}
-
-@media (max-width: 768px) {
-  .right {
-    width: 100vw !important;
+    width: calc(100vw - 28px) !important;
     top: 0;
     bottom: 0;
     border-radius: 0;
   }
 
   .left {
-    width: 100vw !important;
+    width: calc(100vw - 28px) !important;
     top: 0;
     bottom: 0;
     border-radius: 0;

@@ -1,8 +1,8 @@
 .fab {
   position: fixed;
-  bottom: 32px;
-  right: 32px;
-  z-index: 3500;
+  bottom: 156px;
+  left: 86px;
+  z-index: 2500;
   width: 52px;
   height: 52px;
   border-radius: var(--radius-pill);
@@ -25,11 +25,11 @@
 
 .panel {
   position: fixed;
-  bottom: 32px;
-  right: 32px;
+  bottom: 30px;
+  left: 20px;
   z-index: 3500;
-  width: 340px;
-  max-height: 520px;
+  width: min(340px, calc(100vw - 40px));
+  max-height: min(520px, calc(100vh - 120px));
   display: flex;
   flex-direction: column;
   border-radius: var(--radius-lg);

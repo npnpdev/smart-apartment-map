@@ -312,3 +312,85 @@ class LoaderEdukacjiTests(TestCase):
         self.assertTrue(
             EducationFacility.objects.filter(name="Przedszkole nr 1 po remoncie").exists()
         )
+
+
+class FiltryPaneluTests(TestCase):
+    """Filtry z panelu bocznego: pokoje, piętro, rok budowy, winda, cena za m², dzielnice."""
+
+    def setUp(self):
+        from django.contrib.gis.geos import MultiPolygon, Point, Polygon
+
+        from api.models import District
+
+        wersja = DataVersion.objects.create(version_number=1, source="test")
+
+        def dzielnica(nazwa):
+            return District.objects.create(
+                name=nazwa,
+                geometry=MultiPolygon(Polygon((
+                    (18.5, 54.3), (18.7, 54.3), (18.7, 54.4), (18.5, 54.4), (18.5, 54.3),
+                ))),
+            )
+
+        oliwa = dzielnica("Oliwa")
+        zaspa = dzielnica("Zaspa")
+
+        def mieszkanie(ext_id, **pola):
+            dane = dict(
+                external_id=ext_id, source_portal="test", title=ext_id,
+                price=3000, area=50, location=Point(18.6, 54.35, srid=4326),
+                first_seen_in=wersja, last_updated_in=wersja,
+            )
+            dane.update(pola)
+            return Apartment.objects.create(**dane)
+
+        # cena za m²: 2000/50 = 40, 3000/50 = 60, 6000/50 = 120
+        self.kawalerka = mieszkanie(
+            "kawalerka", rooms=1, floor=0, year_built=1930,
+            has_elevator=False, price=2000, district=oliwa,
+        )
+        self.dwupokojowe = mieszkanie(
+            "dwupokojowe", rooms=2, floor=2, year_built=2010,
+            has_elevator=True, district=zaspa,
+        )
+        self.duze = mieszkanie(
+            "duze", rooms=5, floor=7, year_built=2020,
+            has_elevator=True, price=6000, district=zaspa,
+        )
+        self.bez_danych = mieszkanie("bez_danych")
+
+    def ids(self, query):
+        odp = self.client.get(f"/api/apartments/{query}")
+        self.assertEqual(odp.status_code, 200, odp.content)
+        # ApartmentSerializer nie zwraca external_id - w testach title = external_id
+        return sorted(a["title"] for a in odp.json())
+
+    def test_pokoje_wielokrotny_wybor(self):
+        self.assertEqual(self.ids("?rooms=1,4%2B"), ["duze", "kawalerka"])
+        self.assertEqual(self.ids("?rooms=2"), ["dwupokojowe"])
+
+    def test_pietro(self):
+        self.assertEqual(self.ids("?floors=ground"), ["kawalerka"])
+        self.assertEqual(self.ids("?floors=1-3,4%2B"), ["duze", "dwupokojowe"])
+
+    def test_rok_budowy_pomija_oferty_bez_roku(self):
+        self.assertEqual(self.ids("?year_built=pre1945"), ["kawalerka"])
+        self.assertEqual(self.ids("?year_built=2000-2015,post2015"), ["duze", "dwupokojowe"])
+
+    def test_winda(self):
+        self.assertEqual(self.ids("?has_elevator=true"), ["duze", "dwupokojowe"])
+
+    def test_cena_za_m2(self):
+        self.assertEqual(self.ids("?price_per_m2_min=50&price_per_m2_max=100"),
+                         ["bez_danych", "dwupokojowe"])
+
+    def test_kilka_dzielnic(self):
+        self.assertEqual(self.ids("?districts=oliwa,Zaspa"), ["duze", "dwupokojowe", "kawalerka"])
+        self.assertEqual(self.ids("?districts=Oliwa"), ["kawalerka"])
+
+    def test_nieznana_opcja_to_blad(self):
+        odp = self.client.get("/api/apartments/?floors=piwnica")
+        self.assertEqual(odp.status_code, 400)
+
+    def test_filtry_sie_lacza(self):
+        self.assertEqual(self.ids("?has_elevator=true&rooms=2&districts=Zaspa"), ["dwupokojowe"])

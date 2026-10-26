@@ -24,8 +24,7 @@ class Command(BaseCommand):
             "load_districts",
             "load_noise",
             "load_education",
-            "load_safety",
-            "seed_apartments",
+            "load_safety"
         ]
 
         for name in loaders:

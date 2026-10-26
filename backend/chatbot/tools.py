@@ -1,29 +1,30 @@
-"""Narzedzia (tool use) dla chatbota: odczyt mieszkan i statystyk dzielnic.
+"""Narzędzia (tool use) dla chatbota: odczyt mieszkań i statystyk dzielnic.
 
-Model podaje tylko parametry w JSON; zapytania buduje ORM przez istniejacy
-ApartmentFilter
+Model podaje tylko parametry w JSON; zapytania buduje ORM przez istniejący
+ApartmentFilter. Klucze wyników są po angielsku, a teksty dla modelu
+(opisy, oceny, komunikaty) po polsku - z nich model buduje odpowiedź.
 """
 
 from django.contrib.gis.measure import D
 from django.db.models import Avg, Count, F, OuterRef, Q, Subquery
 from rest_framework.serializers import ValidationError
 
-from api.filters import ApartmentFilter, latest_crimes_per_1000, uprosc
+from api.filters import ApartmentFilter, latest_crimes_per_1000, simplify_text
 from api.models import Apartment, District, EducationFacility, SafetyData
 
 MAX_RESULTS = 10
 DEFAULT_RESULTS = 5
 NEARBY_EDU_KM = 1
 
-# WHO Environmental Noise Guidelines (2018), halas drogowy: 53 dB Lden
+# WHO Environmental Noise Guidelines (2018), hałas drogowy: 53 dB Lden
 WHO_ROAD_NOISE_DB = 53
 
 EDU_TYPES = ["Przedszkola", "Podstawowe", "Średnie", "Uczelnie"]
 EDU_COUNT_KEYS = {
-    "kindergarten": "przedszkola",
-    "primary": "podstawowe",
-    "secondary": "srednie",
-    "university": "uczelnie",
+    "kindergarten": "kindergartens",
+    "primary": "primary_schools",
+    "secondary": "secondary_schools",
+    "university": "universities",
 }
 
 SEARCH_TOOL = {
@@ -91,19 +92,19 @@ def district_names():
 def find_districts(name):
     """Dokładna nazwa albo wszystkie dzielnice zawierające podaną frazę
     (bez polskich znaków), np. 'wrzeszcz' -> Wrzeszcz Górny + Wrzeszcz Dolny."""
-    fraza = uprosc(name)
-    if not fraza:
+    phrase = simplify_text(name)
+    if not phrase:
         return []
     districts = list(District.objects.order_by("name"))
-    exact = [d for d in districts if uprosc(d.name) == fraza]
-    return exact or [d for d in districts if fraza in uprosc(d.name)]
+    exact = [d for d in districts if simplify_text(d.name) == phrase]
+    return exact or [d for d in districts if phrase in simplify_text(d.name)]
 
 
 def unknown_district(name):
     return {
         "error": f"Nie rozpoznano dzielnicy '{name}'.",
-        "dostepne_dzielnice": district_names(),
-        "wskazowka": (
+        "available_districts": district_names(),
+        "hint": (
             "Nie mów użytkownikowi o bazie ani liście. Dopasuj sam najbliższą nazwę "
             "i wyszukaj ponownie albo naturalnie dopytaj, o którą okolicę chodzi."
         ),
@@ -134,48 +135,51 @@ def safety_assessment(rate, city_avg):
     if city_avg is None:
         return f"{rate} przestępstw na 1000 mieszkańców"
     if rate <= city_avg * 0.75:
-        poziom = "wyraźnie bezpieczniej niż średnia miasta"
+        level = "wyraźnie bezpieczniej niż średnia miasta"
     elif rate <= city_avg:
-        poziom = "nieco bezpieczniej niż średnia miasta"
+        level = "nieco bezpieczniej niż średnia miasta"
     elif rate <= city_avg * 1.25:
-        poziom = "nieco powyżej średniej miasta"
+        level = "nieco powyżej średniej miasta"
     else:
-        poziom = "wyraźnie powyżej średniej miasta"
-    return f"{rate} na 1000 mieszkańców ({poziom}: {city_avg})"
+        level = "wyraźnie powyżej średniej miasta"
+    return f"{rate} na 1000 mieszkańców ({level}: {city_avg})"
+
+
+def count_facilities(facilities):
+    """Liczba placówek każdego typu, np. {'kindergartens': 3, 'primary_schools': 1, ...}."""
+    rows = facilities.values("facility_type").annotate(n=Count("id"))
+    counts = {key: 0 for key in EDU_COUNT_KEYS.values()}
+    for row in rows:
+        key = EDU_COUNT_KEYS.get(row["facility_type"])
+        if key:
+            counts[key] = row["n"]
+    return counts
 
 
 def nearby_education(location):
-    counts = (
+    return count_facilities(
         EducationFacility.objects.filter(location__dwithin=(location, D(km=NEARBY_EDU_KM)))
-        .values("facility_type")
-        .annotate(n=Count("id"))
     )
-    wynik = {klucz: 0 for klucz in EDU_COUNT_KEYS.values()}
-    for row in counts:
-        klucz = EDU_COUNT_KEYS.get(row["facility_type"])
-        if klucz:
-            wynik[klucz] = row["n"]
-    return wynik
 
 
 def describe_apartment(apt, city_avg):
     rate = float(apt.crimes_per_1000) if apt.crimes_per_1000 is not None else None
     return {
         "id": apt.id,
-        "tytul": apt.title,
-        "adres": apt.address or None,
-        "dzielnica": apt.district.name if apt.district else None,
-        "czynsz_pln": float(apt.price),
-        "metraz_m2": float(apt.area),
-        "pokoje": apt.rooms,
-        "pietro": apt.floor,
-        "rok_budowy": apt.year_built,
-        "winda": apt.has_elevator,
-        "halas_db": apt.noise_db_max,
-        "halas_ocena": noise_assessment(apt.noise_db_max),
-        "przestepczosc_ocena": safety_assessment(rate, city_avg),
-        f"placowki_w_promieniu_{NEARBY_EDU_KM}_km": nearby_education(apt.location),
-        "link": apt.source_url or None,
+        "title": apt.title,
+        "address": apt.address or None,
+        "district": apt.district.name if apt.district else None,
+        "rent_pln": float(apt.price),
+        "area_m2": float(apt.area),
+        "rooms": apt.rooms,
+        "floor": apt.floor,
+        "year_built": apt.year_built,
+        "has_elevator": apt.has_elevator,
+        "noise_db": apt.noise_db_max,
+        "noise_assessment": noise_assessment(apt.noise_db_max),
+        "safety_assessment": safety_assessment(rate, city_avg),
+        f"facilities_within_{NEARBY_EDU_KM}_km": nearby_education(apt.location),
+        "url": apt.source_url or None,
     }
 
 
@@ -201,11 +205,11 @@ def search_apartments(args):
 
     filterset = ApartmentFilter(data=params, queryset=base)
     if not filterset.is_valid():
-        return {"error": "Niepoprawne parametry.", "szczegoly": filterset.errors}
+        return {"error": "Niepoprawne parametry.", "details": filterset.errors}
     try:
         qs = filterset.qs
     except ValidationError as e:
-        return {"error": "Niepoprawne parametry.", "szczegoly": e.detail}
+        return {"error": "Niepoprawne parametry.", "details": e.detail}
 
     try:
         limit = int(args.get("limit") or DEFAULT_RESULTS)
@@ -214,7 +218,7 @@ def search_apartments(args):
     limit = max(1, min(limit, MAX_RESULTS))
 
     total = qs.count()
-    # filtr safety_max mogl juz dodac te adnotacje
+    # filtr safety_max mógł już dodać tę adnotację
     if "crimes_per_1000" not in qs.query.annotations:
         qs = qs.annotate(
             crimes_per_1000=Subquery(latest_crimes_per_1000(OuterRef("district")))
@@ -222,9 +226,9 @@ def search_apartments(args):
     apartments = qs.select_related("district").order_by("price")[:limit]
     city_avg = city_avg_crimes()
     return {
-        "dzielnice": [d.name for d in districts] or "cały Gdańsk",
-        "liczba_pasujacych": total,
-        "pokazane": [describe_apartment(apt, city_avg) for apt in apartments],
+        "districts": [d.name for d in districts] or "cały Gdańsk",
+        "total_matches": total,
+        "shown": [describe_apartment(apt, city_avg) for apt in apartments],
     }
 
 
@@ -233,42 +237,34 @@ def get_district_stats(args):
     if not districts:
         return unknown_district(args.get("district"))
     if len(districts) > 1:
-        return {"dzielnice": [district_stats(d) for d in districts[:4]]}
+        return {"districts": [district_stats(d) for d in districts[:4]]}
     return district_stats(districts[0])
 
 
+def round_or_none(value):
+    return round(float(value)) if value is not None else None
+
+
 def district_stats(district):
-    oferty = base_queryset().filter(district=district).aggregate(
-        liczba=Count("id"),
-        sredni_czynsz=Avg("price"),
-        srednia_za_m2=Avg(F("price") / F("area"), filter=Q(area__gt=0)),
-        sredni_halas=Avg("noise_db_max"),
+    offers = base_queryset().filter(district=district).aggregate(
+        count=Count("id"),
+        avg_rent=Avg("price"),
+        avg_rent_per_m2=Avg(F("price") / F("area"), filter=Q(area__gt=0)),
+        avg_noise=Avg("noise_db_max"),
     )
     safety = district.safety_records.order_by("-year").first()
     rate = float(safety.crimes_per_1000) if safety else None
-    placowki = (
-        district.education_facilities.values("facility_type").annotate(n=Count("id"))
-    )
-    edu = {klucz: 0 for klucz in EDU_COUNT_KEYS.values()}
-    for row in placowki:
-        klucz = EDU_COUNT_KEYS.get(row["facility_type"])
-        if klucz:
-            edu[klucz] = row["n"]
-
-    def zaokraglij(v):
-        return round(float(v)) if v is not None else None
-
-    sredni_halas = zaokraglij(oferty["sredni_halas"])
+    avg_noise = round_or_none(offers["avg_noise"])
     return {
-        "dzielnica": district.name,
-        "liczba_ofert": oferty["liczba"],
-        "sredni_czynsz_pln": zaokraglij(oferty["sredni_czynsz"]),
-        "sredni_czynsz_za_m2_pln": zaokraglij(oferty["srednia_za_m2"]),
-        "sredni_halas_db": sredni_halas,
-        "halas_ocena": noise_assessment(sredni_halas),
-        "przestepczosc_ocena": safety_assessment(rate, city_avg_crimes()),
-        "rok_statystyk": safety.year if safety else None,
-        "placowki_edukacyjne": edu,
+        "district": district.name,
+        "offer_count": offers["count"],
+        "avg_rent_pln": round_or_none(offers["avg_rent"]),
+        "avg_rent_per_m2_pln": round_or_none(offers["avg_rent_per_m2"]),
+        "avg_noise_db": avg_noise,
+        "noise_assessment": noise_assessment(avg_noise),
+        "safety_assessment": safety_assessment(rate, city_avg_crimes()),
+        "stats_year": safety.year if safety else None,
+        "education_facilities": count_facilities(district.education_facilities.all()),
     }
 
 
