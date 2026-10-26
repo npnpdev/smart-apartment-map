@@ -52,7 +52,7 @@ const FONT_SIZES: Record<FontSize, string> = {
   xlarge: "24px",
 };
 
-const CHAT_API_URL = 'http://localhost:8000/api/chatbot/chat/';
+const CHAT_API_URL = '${API_BASE}/api/chatbot/chat/';
 const CHAT_MESSAGES_KEY = 'chat.messages';
 const CHAT_FILTERS_KEY = 'chat.filters';
 

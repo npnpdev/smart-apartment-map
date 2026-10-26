@@ -26,7 +26,7 @@ import MapController from '../MapController/MapController.tsx';
 import RightSidePanel from '../RightSidePanel/RightSidePanel.tsx';
 
 // Custom Hooki (Logika, dane i filtry)
-import { useMapData } from './useMapData';
+import { useMapData, useSafetyData } from './useMapData';
 import { useMapFilters } from './useMapFilters';
 
 // Narzędzia i stylizacje
@@ -137,14 +137,13 @@ function Map() {
     DEFAULT_APARTMENT_FILTERS
   );
 
+  const { safetyData, safetyRange, initialSafetyThreshold } = useSafetyData(showSafetyLayer);
+
   const {
-    safetyData,
     geoJsonData,
     buildings,
     educationData,
-    safetyRange,
-    initialSafetyThreshold,
-    isLoadingBuildings,
+    isLoadingBuildings
   } = useMapData(eduTypes, eduRadius, apartmentFilters);
 
   const [safetyOverride, setSafetyOverride] = useState<number | null>(null);
