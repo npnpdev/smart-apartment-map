@@ -1,16 +1,14 @@
 import os
 import csv
 import time
-import requests
+import cloudscraper
 import json
 from bs4 import BeautifulSoup
 
+_scraper = cloudscraper.create_scraper()
+
 def fetch_detail_json(url):
-    # Nagłówki udające prawdziwą przeglądarkę
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-    }
-    response = requests.get(url, headers=headers)
+    response = _scraper.get(url)
     
     if response.status_code != 200:
         print(f"\n[ERROR] Błąd pobierania: {url}. Kod statusu: {response.status_code}")
@@ -140,9 +138,13 @@ if __name__ == "__main__":
         for row in reader:
             queue_listings.append(row)
 
+    max_details = int(os.environ.get("MAX_DETAILS", len(queue_listings)))
+    if max_details < len(queue_listings):
+        print(f"[INFO] Ograniczono do {max_details} ogloszen (MAX_DETAILS)")
+        queue_listings = queue_listings[:max_details]
+
     print(f"[INFO] Rozpoczynam pobieranie szczegółów dla {len(queue_listings)} ogłoszeń...")
-    
-    # 3. Pętla pobierająca szczegóły
+
     success_count = 0
     for index, listing in enumerate(queue_listings, start=1):
         external_id = listing["external_id"]

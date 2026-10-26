@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { API_BASE } from '../../constants';
 import ReactMarkdown from 'react-markdown';
 import styles from './ChatWidget.module.css';
 import { useAppContext } from '../../context/AppContext';
@@ -33,7 +34,31 @@ export default function ChatWidget({ initialMessage }: ChatWidgetProps) {
   const sendMessage = (text: string) => {
     if (!text.trim() || loading) return;
     setInput('');
-    sendChatMessage(text);
+    setLoading(true);
+
+    try {
+      const history = messages.map(m => ({ role: m.role, content: m.content }));
+      const res = await fetch(`${API_BASE}/api/chatbot/chat/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: trimmed, history }),
+      });
+
+      const data = await res.json();
+
+      if (data.filters) {
+        onFiltersReceived(data.filters);
+      }
+
+      setMessages(prev => [...prev, { role: 'assistant', content: data.reply }]);
+    } catch {
+      setMessages(prev => [
+        ...prev,
+        { role: 'assistant', content: 'Wystąpił błąd połączenia. Spróbuj ponownie.' },
+      ]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
