@@ -185,6 +185,14 @@
   font-weight: 600;
 }
 
+.navLabelFull { display: inline; }
+.navLabelIcon { display: none; }
+
+@media (max-width: 600px) {
+  .navLabelFull { display: none; }
+  .navLabelIcon { display: inline; }
+}
+
 /* Responsywnosc navu dla mniejszych ekranow */
 @media (max-width: 600px) {
   .header {
@@ -212,9 +220,27 @@
     display: none;
   }
 
-  /* Chowamy "Usuń konto" — dostępne z /delete-account */
   .deleteLink {
     display: none;
+  }
+
+  .fontSizeXlarge {
+    display: none;
+  }
+
+  .fontSizeSection {
+    display: none;
+  }
+
+
+  .dropdownMenu {
+    position: fixed;
+    top: 60px;
+    left: 12px;
+    right: 12px;
+    max-width: calc(100vw - 24px);
+    width: calc(100vw - 24px);
+    transform: none;
   }
 }
 
