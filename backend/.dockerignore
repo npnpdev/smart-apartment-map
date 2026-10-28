@@ -4,5 +4,7 @@ __pycache__
 db.sqlite3
 *.sqlite3
 data/
+!data/*.geojson
+!data/*.csv
 .git
 

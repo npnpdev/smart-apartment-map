@@ -12,6 +12,9 @@ import LoginPage, { action as loginAction } from './pages/LoginPage.tsx';
 import AppContextProvider from './context/AppContext.tsx';
 import LogoutPage from './pages/LogoutPage.tsx';
 import MostLikedPage from './pages/MostLiked.tsx';
+import ForgotPasswordPage from './pages/ForgotPasswordPage.tsx';
+import ResetPasswordPage from './pages/ResetPasswordPage.tsx';
+import DeleteAccountPage from './pages/DeleteAccountPage.tsx';
 
 //const router = createHashRouter([
 const router = createBrowserRouter([
@@ -49,6 +52,9 @@ const router = createBrowserRouter([
         action: loginAction,
         //
       },
+      { path: 'forgot-password', element: <ForgotPasswordPage /> },
+      { path: 'reset-password/:uid/:token', element: <ResetPasswordPage /> },
+      { path: 'delete-account', element: <DeleteAccountPage /> },
       { path: '*', element: <ErrorPage /> },
     ],
   },

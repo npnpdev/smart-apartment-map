@@ -21,18 +21,53 @@
 }
 
 .resultsContainer {
-  margin-top: 10px;
+  margin-top: 6px;
+  padding-top: 4px;
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+}
+
+/* Brak wyników: minimalistyczny napis*/
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 240px;
+  padding: 0 16px;
+  text-align: center;
+}
+
+.emptyStateTitle {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+}
+
+.emptyStateDesc {
+  margin: 0;
+  max-width: 300px;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* Stopka panelu: liczba ofert nad paginacją */
+.footerStack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
 }
 
 .resultsCount {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--text-secondary);
-  margin-bottom: 12px;
-  padding-left: 4px;
+  text-align: center;
   text-transform: uppercase;
   font-weight: 600;
 }
@@ -62,16 +97,30 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
   margin-bottom: 8px;
 }
 
 .cardPrice {
+  flex-shrink: 0;
+  white-space: nowrap;
   font-size: 1.1rem;
   font-weight: 700;
   color: #1a9850;
 }
 
+.cardHeaderRight {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
 .cardDistrict {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: 0.75rem;
   text-transform: uppercase;
   background: rgba(255, 255, 255, 0.1);
@@ -88,6 +137,113 @@
   margin-bottom: 16px;
 }
 
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  animation: fadeIn 0.2s ease;
+}
+
+.statGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr));
+  gap: 0.75rem 0.6rem;
+  margin: 0;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.statLabel {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  /* zabezpieczenie: długa etykieta nigdy nie wyjdzie poza kartę */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.statValue {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.statEmpty {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.detailsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.detailsTitle {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.detailsEmpty {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.facilityList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.facility {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.85rem;
+}
+
+.facilityName {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-primary);
+}
+
+.facilityDistance {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.facilityMore {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+
 .cardFooter {
   display: flex;
   justify-content: flex-end;
@@ -95,8 +251,8 @@
 
 .cardButton {
   background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text-secondary);
+  border: 1px solid var(--text-muted);
+  color: var(--text-primary);
   font-size: 0.8rem;
   padding: 8px 16px;
   border-radius: 6px;
@@ -110,11 +266,97 @@
   background: rgba(255,255,255,0.05);
 }
 
-/* --- NOWE STYLE DLA PANELU FILTRÓW (ROZWIJANIE I SUWAK) --- */
+.favoriteBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: 2px 4px;
+  color: var(--text-secondary);
+  transition: color 0.15s, transform 0.15s;
+  flex-shrink: 0;
+}
+
+.favoriteBtn:hover {
+  transform: scale(1.2);
+  color: #e05;
+}
+
+.favoriteBtnActive {
+  color: #e05;
+}
+
+.favoriteBtnLocked {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: 2px 4px;
+  color: var(--text-muted);
+  transition: color 0.15s, transform 0.15s;
+  flex-shrink: 0;
+}
+
+.favoriteBtnLocked:hover {
+  color: var(--text-secondary);
+  transform: scale(1.1);
+}
+
+
+
 
 .filtersWrapper {
-  margin-bottom: 20px;
-  min-height: 50px; /* Zapobiega skakaniu layoutu */
+  margin: 0;
+}
+
+/* Stały pasek panelu: wybór miasta nad przyciskiem Filtry / Pokaż oferty */
+.toolbarStack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.citySwitch {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--glass-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+}
+
+.citySwitchButton {
+  flex: 1;
+  min-height: 36px;
+  padding: 0 12px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-pill);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.citySwitchButton:hover:not(.citySwitchButtonActive) {
+  background: var(--glass-elevated);
+  color: var(--text-primary);
+}
+
+.citySwitchButtonActive {
+  background: var(--accent-soft);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* Pole poza zwijanymi sekcjami (Dzielnica) */
+.standaloneField {
+  padding: 6px 2px 22px;
+  border-bottom: 1px solid var(--border);
 }
 
 /* Główny układ - Widok Listy */
@@ -190,12 +432,10 @@
 .filtersPage {
   display: flex;
   flex-direction: column;
-  background: var(--glass-bg);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 20px;
   animation: fadeIn 0.3s ease;
 }
+
+
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-5px); }
@@ -333,9 +573,6 @@
   align-items: center;
   justify-content: center;
   gap: 16px;
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border);
 }
 
 .pageButton {

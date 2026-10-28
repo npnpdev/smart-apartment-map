@@ -1,0 +1,50 @@
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    restart: unless-stopped
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    image: smart-app-backend:latest
+    restart: unless-stopped
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             python manage.py load_districts &&
+             python manage.py load_noise &&
+             python manage.py load_safety &&
+             python manage.py load_education &&
+             gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3"
+    env_file:
+      - .env
+    expose:
+      - "8000"
+    volumes:
+      - ./data:/app/scraped_data
+      - ./static-data:/app/data:ro
+    depends_on:
+      db:
+        condition: service_healthy
+
+  nginx:
+    image: smart-app-nginx:latest
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx-certs:/etc/nginx/certs:ro
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

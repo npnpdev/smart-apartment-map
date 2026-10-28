@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import classes from './MainNavigation.module.css';
 import { useAppContext } from '../../context/AppContext';
 import { useState, useEffect, useRef } from 'react';
@@ -224,6 +224,15 @@ export default function MainNavigation() {
                 >
                   Wyloguj
                 </NavLink>
+                <Link
+                  to="/delete-account"
+                  className={classes.deleteLink}
+                  style={{ fontSize: '0.78rem', color: 'var(--text-muted)', textDecoration: 'none' }}
+                  onMouseEnter={e => (e.currentTarget.style.color = '#ef4444')}
+                  onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}
+                >
+                  Usuń konto
+                </Link>
               </li>
             )}
           </ul>

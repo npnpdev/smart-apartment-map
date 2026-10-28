@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
-import { Form, useActionData, useNavigate, useNavigation } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { Form, Link, useActionData, useNavigate, useNavigation } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
+import { API_BASE } from '../constants';
 import styles from './LoginPage.module.css';
 
 type ActionData = {
@@ -17,15 +18,16 @@ export default function LoginPage() {
   
   const isSubmitting = navigation.state === 'submitting';
   const [isLogin, setIsLogin] = useState(true);
+  const didNavigate = useRef(false);
 
   useEffect(() => {
-    if (actionData?.email && actionData?.token) {
+    if (actionData?.email && actionData?.token && !didNavigate.current) {
+      didNavigate.current = true;
       setEmail(actionData.email);
       localStorage.setItem('AccessToken', actionData.token);
-      // Cofa do poprzedniej strony (np. na mapę, jeśli stamtąd przyszliśmy)
-      navigate(-1);
+      navigate('/map');
     }
-  },[actionData, navigate, setEmail]);
+  }, [actionData, navigate, setEmail]);
 
   return (
     <div className={styles.pageWrapper}>
@@ -88,6 +90,14 @@ export default function LoginPage() {
             />
           </div>
 
+          {isLogin && (
+            <div style={{ textAlign: 'right', marginTop: '-0.5rem' }}>
+              <Link to="/forgot-password" className={styles.toggleBtn} style={{ fontSize: '0.85rem' }}>
+                Zapomniałem hasła
+              </Link>
+            </div>
+          )}
+
           {!isLogin && (
             <div className={styles.loginField}>
               <label className={styles.loginLabel} htmlFor="confirmPassword">
@@ -148,7 +158,7 @@ export async function action({ request }: { request: Request }) {
         return { error: 'Hasła nie są identyczne!' };
       }
 
-      const registerRes = await fetch('http://localhost:8000/api/auth/register/', {
+      const registerRes = await fetch(`${API_BASE}/api/auth/register/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -186,7 +196,7 @@ export async function action({ request }: { request: Request }) {
     }
 
     // 2. OBSŁUGA LOGOWANIA
-    const loginRes = await fetch('http://localhost:8000/api/auth/login/', {
+    const loginRes = await fetch(`${API_BASE}/api/auth/login/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
