@@ -663,7 +663,7 @@ def step_data(args, ctx: Ctx) -> None:
 def step_run(args, ctx: Ctx) -> None:
     hdr("4/4  Uruchomienie")
 
-    services = ["backend", "frontend"]
+    services = ["backend", "frontend", "nginx"]
     if args.docs:
         services.append("docs")
 
@@ -675,26 +675,26 @@ def step_run(args, ctx: Ctx) -> None:
     dc_run(*up_args, *services)
     ctx.started = True
 
-    backend_url = f"http://localhost:{mapped_port('backend', 8000, 8000)}"
-    frontend_url = f"http://localhost:{mapped_port('frontend', 5173, 5173)}"
+    nginx_port = mapped_port('nginx', 80, 80)
     docs_url = f"http://localhost:{mapped_port('docs', 8000, 8001)}"
 
     print(f"\n{D}{YEL}----- logi kontenerow -----{R}", flush=True)
     ctx.logs = subprocess.Popen([*DC, "logs", "-f", "--tail=15", *services])
 
     time.sleep(1)
-    wait_http("Backend", f"{backend_url}/api/health/", "backend")
-    wait_http("Frontend", frontend_url, "frontend")
+    wait_http("Backend", f"http://localhost:{nginx_port}/api/health/", "backend")
+    wait_http("Frontend", f"http://localhost:{nginx_port}/", "frontend")
 
+    app_url = f"http://localhost:{nginx_port}"
     lines = [
         "",
         f"{B}{GRN}============================================================={R}",
         f"  {B}Srodowisko dziala{R}",
         "",
-        f"  Frontend    {B}{CYA}{frontend_url}{R}",
-        f"  Backend     {B}{CYA}{backend_url}{R}",
-        f"  API health  {D}{backend_url}/api/health/{R}",
-        f"  Admin       {D}{backend_url}/admin/{R}",
+        f"  Aplikacja   {B}{CYA}{app_url}{R}",
+        f"  API health  {D}{app_url}/api/health/{R}",
+        f"  Admin       {D}{app_url}/admin/{R}",
+        f"  Mailpit     {D}http://localhost:8025{R}",
     ]
     if args.docs:
         lines.append(f"  Docs        {D}{docs_url}{R}")

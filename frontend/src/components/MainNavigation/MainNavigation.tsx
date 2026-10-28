@@ -71,7 +71,12 @@ export default function MainNavigation() {
                     isActive ? classes.active : undefined
                   }
                 >
-                  {link.label}
+                  {link.path === '/most-liked' ? (
+                    <>
+                      <span className={classes.navLabelFull}>{link.label}</span>
+                      <span className={classes.navLabelIcon} aria-label="Ulubione">♥</span>
+                    </>
+                  ) : link.label}
                 </NavLink>
               </li>
             ))}
@@ -91,7 +96,7 @@ export default function MainNavigation() {
               </button>
 
               {isCityDropdownOpen && (
-                <ul className={classes.dropdownMenu} style={{ minWidth: 180 }}>
+                <ul className={classes.dropdownMenu}>
                   {/* Ciemny motyw */}
                   <li>
                     <button
@@ -150,7 +155,7 @@ export default function MainNavigation() {
                     />
                   </li>
 
-                  <li style={{ padding: '6px 14px' }}>
+                  <li style={{ padding: '6px 14px' }} className={classes.fontSizeSection}>
                     <span
                       style={{
                         fontSize: '0.75rem',
@@ -167,6 +172,7 @@ export default function MainNavigation() {
                           <button
                             key={size}
                             onClick={() => setFontSize(size)}
+                            className={size === 'xlarge' ? classes.fontSizeXlarge : undefined}
                             style={{
                               flex: 1,
                               padding: '6px 0',
