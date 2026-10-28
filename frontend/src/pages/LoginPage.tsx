@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Form, useActionData, useNavigate, useNavigation } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { Form, Link, useActionData, useNavigate, useNavigation } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { API_BASE } from '../constants';
 import styles from './LoginPage.module.css';
@@ -18,15 +18,16 @@ export default function LoginPage() {
   
   const isSubmitting = navigation.state === 'submitting';
   const [isLogin, setIsLogin] = useState(true);
+  const didNavigate = useRef(false);
 
   useEffect(() => {
-    if (actionData?.email && actionData?.token) {
+    if (actionData?.email && actionData?.token && !didNavigate.current) {
+      didNavigate.current = true;
       setEmail(actionData.email);
       localStorage.setItem('AccessToken', actionData.token);
-      // Cofa do poprzedniej strony (np. na mapę, jeśli stamtąd przyszliśmy)
-      navigate(-1);
+      navigate('/map');
     }
-  },[actionData, navigate, setEmail]);
+  }, [actionData, navigate, setEmail]);
 
   return (
     <div className={styles.pageWrapper}>
@@ -88,6 +89,14 @@ export default function LoginPage() {
               required
             />
           </div>
+
+          {isLogin && (
+            <div style={{ textAlign: 'right', marginTop: '-0.5rem' }}>
+              <Link to="/forgot-password" className={styles.toggleBtn} style={{ fontSize: '0.85rem' }}>
+                Zapomniałem hasła
+              </Link>
+            </div>
+          )}
 
           {!isLogin && (
             <div className={styles.loginField}>

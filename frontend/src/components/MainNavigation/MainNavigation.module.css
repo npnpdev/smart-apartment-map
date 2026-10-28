@@ -1,10 +1,10 @@
 .header {
   position: fixed;
   top: 18px;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 24px;
   z-index: 2000;
   pointer-events: none;
+  max-width: calc(100vw - 48px);
 }
 
 .pill {
@@ -17,6 +17,7 @@
   border: 1px solid var(--border);
   box-shadow: var(--shadow-soft);
   border-radius: var(--radius-lg);
+  max-width: 100%;
 }
 
 .list {
@@ -26,6 +27,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
+  flex-wrap: nowrap;
 }
 
 .list a {
@@ -141,8 +143,7 @@
 .dropdownMenu {
   position: absolute;
   top: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
   min-width: 130px;
   background: var(--glass-bg-strong);
   backdrop-filter: blur(50px);
@@ -185,6 +186,38 @@
 }
 
 /* Responsywnosc navu dla mniejszych ekranow */
+@media (max-width: 600px) {
+  .header {
+    left: 12px;
+    top: 12px;
+    max-width: calc(100vw - 24px);
+  }
+
+  .pill {
+    padding: 5px;
+  }
+
+  .list {
+    gap: 2px;
+  }
+
+  .list a,
+  .dropdownTrigger {
+    padding: 0 7px;
+    font-size: 0.78rem;
+    min-height: 34px;
+  }
+
+  .userEmail {
+    display: none;
+  }
+
+  /* Chowamy "Usuń konto" — dostępne z /delete-account */
+  .deleteLink {
+    display: none;
+  }
+}
+
 @media (max-width: 1600px) {
   .list a,
   .dropdownTrigger {
@@ -216,10 +249,10 @@
 @keyframes fadeInDown {
   from {
     opacity: 0;
-    transform: translate(-50%, -10px);
+    transform: translateY(-10px);
   }
   to {
     opacity: 1;
-    transform: translate(-50%, 0);
+    transform: translateY(0);
   }
 }
