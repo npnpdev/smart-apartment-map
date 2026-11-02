@@ -2,23 +2,22 @@ import { NavLink, Link } from 'react-router-dom';
 import classes from './MainNavigation.module.css';
 import { useAppContext } from '../../context/AppContext';
 import { useState, useEffect, useRef } from 'react';
-import { Heart, House, LogOut, Map as MapIcon, Moon, Settings, Sun, User, UserX } from 'lucide-react';
-import { t } from '../../locales';
 
 const NAV_LINKS = [
-  { path: "/", label: t.nav.home, exact: true, icon: <House size={17} /> },
-  { path: "/map", label: t.nav.map, icon: <MapIcon size={17} /> },
-  { path: "/most-liked", label: t.nav.favorites, icon: <Heart size={17} /> },
+  { path: "/", label: "Home", exact: true },
+  { path: "/map", label: "Mapa" },
+  { path: "/most-liked", label: "Ulubione" },
 ];
 
 export default function MainNavigation() {
-  const { email, fontSize, setFontSize } = useAppContext();
-
+  const { email, fontSize, setFontSize /*cities, currentCity, changeCity*/ } =
+    useAppContext();
+  
   // Dark mode z pamięcią w localStorage
   const [isDark, setIsDark] = useState(() => {
     return localStorage.getItem('theme') === 'dark';
   });
-
+  
   const [isCityDropdownOpen, setIsCityDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLLIElement>(null);
 
@@ -30,11 +29,12 @@ export default function MainNavigation() {
         setIsCityDropdownOpen(false);
       }
     };
-
+    
     // Optymalizacja: nasłuchujemy tylko kiedy dropdown jest faktycznie otwarty
     if (isCityDropdownOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     }
+    
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
@@ -49,7 +49,7 @@ export default function MainNavigation() {
       document.body.classList.remove('dark-theme');
       localStorage.setItem('theme', 'light');
     }
-
+    
     // Funkcja sprzątająca, gdyby komponent przestał istnieć
     return () => {
       document.body.classList.remove('dark-theme');
@@ -71,8 +71,12 @@ export default function MainNavigation() {
                     isActive ? classes.active : undefined
                   }
                 >
-                  <span className={classes.navLabelFull}>{link.label}</span>
-                  <span className={classes.navLabelIcon} aria-label={link.label} data-label={link.label}>{link.icon}</span>
+                  {link.path === '/most-liked' ? (
+                    <>
+                      <span className={classes.navLabelFull}>{link.label}</span>
+                      <span className={classes.navLabelIcon} aria-label="Ulubione">♥</span>
+                    </>
+                  ) : link.label}
                 </NavLink>
               </li>
             ))}
@@ -86,10 +90,9 @@ export default function MainNavigation() {
                 className={classes.dropdownTrigger}
                 onClick={() => setIsCityDropdownOpen((p) => !p)}
                 aria-expanded={isCityDropdownOpen}
-                aria-label={t.nav.settings}
+                aria-label="Ustawienia"
               >
-                <span className={classes.navLabelFull}>{t.nav.settings}</span>
-                <span className={classes.navLabelIcon} data-label={t.nav.settings}><Settings size={17} /></span>
+                Ustawienia
               </button>
 
               {isCityDropdownOpen && (
@@ -100,44 +103,100 @@ export default function MainNavigation() {
                       className={`${classes.dropdownItem} ${isDark ? classes.activeItem : ''}`}
                       onClick={() => setIsDark((p) => !p)}
                     >
-                      <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        {isDark ? <Moon size={15} /> : <Sun size={15} />}
-                        {isDark ? t.nav.darkMode : t.nav.lightMode}
+                      <span
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 10,
+                        }}
+                      >
+                        {isDark ? (
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="15"
+                            height="15"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+                          </svg>
+                        ) : (
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="15"
+                            height="15"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <circle cx="12" cy="12" r="4" />
+                            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+                          </svg>
+                        )}
+                        {isDark ? 'Tryb ciemny' : 'Tryb jasny'}
                       </span>
                     </button>
                   </li>
 
                   <li>
-                    <div style={{ height: 1, background: 'var(--divider)', margin: '4px 0' }} />
+                    <div
+                      style={{
+                        height: 1,
+                        background: 'var(--divider)',
+                        margin: '4px 0',
+                      }}
+                    />
                   </li>
 
                   <li style={{ padding: '6px 14px' }} className={classes.fontSizeSection}>
-                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-                      {t.nav.textSize}
+                    <span
+                      style={{
+                        fontSize: '0.75rem',
+                        color: 'var(--text-muted)',
+                        letterSpacing: '0.05em',
+                        textTransform: 'uppercase',
+                      }}
+                    >
+                      Rozmiar tekstu
                     </span>
                     <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
-                      {(['normal', 'large', 'xlarge'] as const).map((size, i) => (
-                        <button
-                          key={size}
-                          onClick={() => setFontSize(size)}
-                          className={size === 'xlarge' ? classes.fontSizeXlarge : undefined}
-                          style={{
-                            flex: 1,
-                            padding: '6px 0',
-                            background: fontSize === size ? 'var(--accent)' : 'var(--glass-elevated)',
-                            color: fontSize === size ? 'var(--accent-contrast)' : 'var(--text-secondary)',
-                            border: 'none',
-                            borderRadius: 'var(--radius-sm)',
-                            fontSize: `${13 + i * 4}px`,
-                            fontWeight: fontSize === size ? 700 : 400,
-                            cursor: 'pointer',
-                            transition: 'all 0.2s',
-                          }}
-                          aria-pressed={fontSize === size}
-                        >
-                          A
-                        </button>
-                      ))}
+                      {(['normal', 'large', 'xlarge'] as const).map(
+                        (size, i) => (
+                          <button
+                            key={size}
+                            onClick={() => setFontSize(size)}
+                            className={size === 'xlarge' ? classes.fontSizeXlarge : undefined}
+                            style={{
+                              flex: 1,
+                              padding: '6px 0',
+                              background:
+                                fontSize === size
+                                  ? 'var(--accent)'
+                                  : 'var(--glass-elevated)',
+                              color:
+                                fontSize === size
+                                  ? 'var(--accent-contrast)'
+                                  : 'var(--text-secondary)',
+                              border: 'none',
+                              borderRadius: 'var(--radius-sm)',
+                              fontSize: `${13 + i * 4}px`,
+                              fontWeight: fontSize === size ? 700 : 400,
+                              cursor: 'pointer',
+                              transition: 'all 0.2s',
+                            }}
+                            aria-pressed={fontSize === size}
+                          >
+                            A
+                          </button>
+                        )
+                      )}
                     </div>
                   </li>
                 </ul>
@@ -153,10 +212,11 @@ export default function MainNavigation() {
               <li>
                 <NavLink
                   to="/login"
-                  className={({ isActive }) => isActive ? classes.active : undefined}
+                  className={({ isActive }) =>
+                    isActive ? classes.active : undefined
+                  }
                 >
-                  <span className={classes.navLabelFull}>{t.nav.login}</span>
-                  <span className={classes.navLabelIcon} aria-label={t.nav.login} data-label={t.nav.login}><User size={17} /></span>
+                  Zaloguj
                 </NavLink>
               </li>
             ) : (
@@ -164,10 +224,11 @@ export default function MainNavigation() {
                 <span className={classes.userEmail}>{email}</span>
                 <NavLink
                   to="/logout"
-                  className={({ isActive }) => isActive ? classes.active : undefined}
+                  className={({ isActive }) =>
+                    isActive ? classes.active : undefined
+                  }
                 >
-                  <span className={classes.navLabelFull}>{t.nav.logout}</span>
-                  <span className={classes.navLabelIcon} aria-label={t.nav.logout} data-label={t.nav.logout}><LogOut size={17} /></span>
+                  Wyloguj
                 </NavLink>
                 <Link
                   to="/delete-account"
@@ -176,8 +237,7 @@ export default function MainNavigation() {
                   onMouseEnter={e => (e.currentTarget.style.color = '#ef4444')}
                   onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}
                 >
-                  <span className={classes.navLabelFull}>{t.nav.deleteAccount}</span>
-                  <span className={classes.navLabelIcon} aria-label={t.nav.deleteAccount} data-label={t.nav.deleteAccount}><UserX size={17} /></span>
+                  Usuń konto
                 </Link>
               </li>
             )}

@@ -186,44 +186,11 @@
 }
 
 .navLabelFull { display: inline; }
-.navLabelIcon {
-  display: none;
-  position: relative;
-}
-
-/* Tooltip tylko na urzadzeniach z mysza */
-@media (hover: hover) {
-  .navLabelIcon[data-label]::after {
-    content: attr(data-label);
-    position: absolute;
-    top: calc(100% + 8px);
-    left: 50%;
-    transform: translateX(-50%) translateY(-4px);
-    background: var(--glass-bg-strong, rgba(20, 20, 20, 0.92));
-    backdrop-filter: blur(12px);
-    color: var(--text-primary);
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 0.72rem;
-    font-weight: 500;
-    white-space: nowrap;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.15s ease, transform 0.15s ease;
-    border: 1px solid var(--border);
-    z-index: 9999;
-  }
-
-  a:hover .navLabelIcon[data-label]::after,
-  button:hover .navLabelIcon[data-label]::after {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-}
+.navLabelIcon { display: none; }
 
 @media (max-width: 600px) {
   .navLabelFull { display: none; }
-  .navLabelIcon { display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  .navLabelIcon { display: inline; }
 }
 
 /* Responsywnosc navu dla mniejszych ekranow */
@@ -250,6 +217,10 @@
   }
 
   .userEmail {
+    display: none;
+  }
+
+  .deleteLink {
     display: none;
   }
 

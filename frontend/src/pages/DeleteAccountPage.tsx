@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { API_BASE } from '../constants';
-import { t, translateApiError } from '../locales';
 import styles from './LoginPage.module.css';
 
 export default function DeleteAccountPage() {
@@ -41,11 +40,11 @@ export default function DeleteAccountPage() {
         navigate('/');
       } else {
         const data = await res.json();
-        const rawMsg = data.password?.[0] ?? data.detail ?? t.errors.generic;
-        setError(translateApiError(rawMsg));
+        const msg = data.password?.[0] ?? data.detail ?? 'Wystąpił błąd.';
+        setError(msg);
       }
     } catch {
-      setError(t.errors.noConnection);
+      setError('Brak połączenia z serwerem.');
     } finally {
       setLoading(false);
     }
