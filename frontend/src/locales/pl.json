@@ -1,0 +1,25 @@
+{
+  "nav": {
+    "home": "Strona Główna",
+    "map": "Mapa",
+    "favorites": "Ulubione",
+    "settings": "Ustawienia",
+    "darkMode": "Tryb ciemny",
+    "lightMode": "Tryb jasny",
+    "textSize": "Rozmiar tekstu",
+    "login": "Zaloguj",
+    "logout": "Wyloguj",
+    "deleteAccount": "Usuń konto"
+  },
+  "errors": {
+    "generic": "Wystąpił błąd.",
+    "noConnection": "Brak połączenia z serwerem."
+  },
+  "apiErrors": {
+    "Given token not valid for any token type": "Sesja wygasła. Zaloguj się ponownie.",
+    "Token is expired": "Sesja wygasła. Zaloguj się ponownie.",
+    "Token is invalid or expired": "Sesja wygasła. Zaloguj się ponownie.",
+    "Authentication credentials were not provided.": "Brak danych uwierzytelniających.",
+    "No active account found with the given credentials": "Nieprawidłowe dane logowania."
+  }
+}
