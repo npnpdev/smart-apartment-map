@@ -13,8 +13,8 @@ from api.models import (
     ApartmentHistory,
     DataVersion,
     District,
-    NoiseZone,
 )
+from api.services.spatial import assign_district_and_noise
 
 
 DEFAULT_PATH = "/app/scraped_data/complete_listings.csv"
@@ -82,16 +82,6 @@ def parse_location(value):
             return geom
     except Exception:
         pass
-    return None
-
-
-def find_containing(point, candidates):
-    """Spatial join in-memory."""
-    if point is None:
-        return None
-    for c in candidates:
-        if c.geometry.contains(point):
-            return c
     return None
 
 
@@ -172,9 +162,7 @@ class Command(BaseCommand):
         else:
             self.stdout.write(f"[DRY] Symulacja DataVersion v{next_number}.")
 
-        districts = list(District.objects.all())
-        noise_zones = list(NoiseZone.objects.all())
-        if not districts:
+        if not District.objects.exists():
             self.stderr.write(self.style.WARNING(
                 "Brak dzielnic. Najpierw load_districts."
             ))
@@ -188,6 +176,7 @@ class Command(BaseCommand):
         stats = {
             "new": 0, "updated": 0, "unchanged": 0,
             "skipped": 0, "suspicious": 0, "invalid": 0,
+            "no_district": 0,
         }
 
         with path.open(encoding="utf-8") as f:
@@ -212,8 +201,6 @@ class Command(BaseCommand):
                     stats["suspicious"] += 1
 
                 location = parse_location(row.get("location"))
-                district = find_containing(location, districts)
-                zone = find_containing(location, noise_zones)
 
                 fields = {
                     "source_url": (row.get("source_url") or "").strip(),
@@ -229,9 +216,6 @@ class Command(BaseCommand):
                     "is_accessible": parse_bool(row.get("is_accessible")),
                     "location": location,
                     "address": (row.get("address") or "").strip()[:500],
-                    "district": district,
-                    "noise_db_min": zone.min_db if zone else None,
-                    "noise_db_max": zone.max_db if zone else None,
                     "is_active": True,
                     "validation_status": val_status,
                     "validation_notes": val_notes,
@@ -307,6 +291,15 @@ class Command(BaseCommand):
             gone += 1
 
         if not opts["dry_run"]:
+            portals = {p for _, p in seen_keys}
+            located = Apartment.objects.filter(
+                source_portal__in=portals, location__isnull=False
+            )
+            assign_district_and_noise(located)
+            stats["no_district"] = located.filter(
+                is_active=True, district__isnull=True
+            ).count()
+
             version.items_seen = len(seen_keys)
             version.items_new = stats["new"]
             version.items_updated = stats["updated"]
@@ -323,6 +316,7 @@ class Command(BaseCommand):
             f"  zniknele:      {gone}\n"
             f"  suspicious:    {stats['suspicious']}\n"
             f"  invalid:       {stats['invalid']}\n"
+            f"  bez dzielnicy: {stats['no_district']}\n"
             f"  pominiete:     {stats['skipped']}\n"
         ))
 

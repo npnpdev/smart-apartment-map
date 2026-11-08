@@ -3,11 +3,9 @@ from pathlib import Path
 
 from django.contrib.gis.geos import Point
 from django.core.management.base import BaseCommand, CommandError
-from django.contrib.gis.db.models import PointField
-from django.db.models import OuterRef, Subquery
-from django.db.models.functions import Cast
 
 from api.models import District, EducationFacility
+from api.services.spatial import containing_district
 
 
 
@@ -106,13 +104,7 @@ class Command(BaseCommand):
         )
 
         EducationFacility.objects.update(
-            district=Subquery(
-                District.objects.filter(
-                    geometry__contains=Cast(
-                        OuterRef("location"), PointField(srid=4326)
-                    )
-                ).values("id")[:1]
-            )
+            district=containing_district()
         )
         no_district = EducationFacility.objects.filter(district__isnull=True).count()
 
