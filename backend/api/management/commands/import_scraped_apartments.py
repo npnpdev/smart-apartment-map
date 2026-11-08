@@ -173,7 +173,7 @@ class Command(BaseCommand):
         stats = {
             "new": 0, "updated": 0, "unchanged": 0,
             "skipped": 0, "suspicious": 0, "invalid": 0,
-            "no_district": 0,
+            "no_district": 0, "no_location": 0,
         }
 
         with path.open(encoding="utf-8") as f:
@@ -198,6 +198,9 @@ class Command(BaseCommand):
                     stats["suspicious"] += 1
 
                 location = parse_location(row.get("location"))
+                if location is None:
+                    stats["no_location"] += 1
+                    continue
 
                 fields = {
                     "source_url": (row.get("source_url") or "").strip(),
@@ -313,6 +316,7 @@ class Command(BaseCommand):
             f"  zniknele:      {gone}\n"
             f"  suspicious:    {stats['suspicious']}\n"
             f"  invalid:       {stats['invalid']}\n"
+            f"  bez lokalizacji (niezapisane): {stats['no_location']}\n"
             f"  bez dzielnicy: {stats['no_district']}\n"
             f"  pominiete:     {stats['skipped']}\n"
         ))

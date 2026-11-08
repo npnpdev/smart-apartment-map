@@ -123,6 +123,25 @@ class ImportRollbackTests(TestCase):
         self.assertTrue(Apartment.objects.get(external_id="1").is_active)
         self.assertFalse(Apartment.objects.get(external_id="2").is_active)
 
+    def test_oferta_bez_lokalizacji_nie_przerywa_importu(self):
+        self.importuj([oferta("1"), dict(oferta("2"), location="")])
+
+        self.assertEqual(DataVersion.objects.count(), 1)
+        self.assertEqual(list(Apartment.objects.values_list("external_id", flat=True)), ["1"])
+
+    def test_utrata_lokalizacji_zachowuje_poprzedni_stan(self):
+        self.importuj([oferta(price="1000")])
+        przed = Apartment.objects.get()
+
+        self.importuj([dict(oferta(price="2000"), location="")])
+
+        apt = Apartment.objects.get()
+        self.assertEqual(apt.location, przed.location)
+        self.assertEqual(apt.price, Decimal("1000"))
+        self.assertTrue(apt.is_active)
+        self.assertEqual(apt.last_updated_in.version_number, 1)
+        self.assertEqual(ApartmentHistory.objects.count(), 0)
+
     def test_rollback_tylko_najnowszej_wersji(self):
         self.importuj([oferta(price="1000")])
         self.importuj([oferta(price="2000")])
