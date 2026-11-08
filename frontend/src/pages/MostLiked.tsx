@@ -59,7 +59,9 @@ export default function MostLikedPage() {
           <div key={apt.id} className={styles.card}>
             <div className={styles.cardHeader}>
               <span className={styles.cardPrice}>
-                {Number(apt.price).toLocaleString('pl-PL')} zł
+                {apt.price != null
+                  ? `${Number(apt.price).toLocaleString('pl-PL')} zł`
+                  : 'brak ceny'}
               </span>
               {apt.district && (
                 <span className={styles.cardDistrict}>

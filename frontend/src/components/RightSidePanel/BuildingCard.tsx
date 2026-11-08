@@ -120,7 +120,9 @@ export function BuildingCard({
       }
     >
       <div className={styles.cardHeader}>
-        <span className={styles.cardPrice}>{building.price} zł</span>
+        <span className={styles.cardPrice}>
+          {building.price != null ? `${building.price} zł` : 'brak ceny'}
+        </span>
         <div className={styles.cardHeaderRight}>
           <span className={styles.cardDistrict} title={building.district}>
             {building.district}

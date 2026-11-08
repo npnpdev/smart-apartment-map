@@ -122,6 +122,9 @@ def validate(row):
         elif area > 500:
             notes.append("area > 500 m2")
             status = "suspicious"
+    else:
+        notes.append("no area")
+        status = "suspicious"
 
     return status, notes
 
@@ -207,8 +210,8 @@ class Command(BaseCommand):
                     "title": (row.get("title") or "").strip()[:500],
                     "description": (row.get("description") or "").strip(),
                     "offer_type": (row.get("offer_type") or "rent").strip(),
-                    "price": parse_decimal(row.get("price")) or Decimal("0"),
-                    "area": parse_decimal(row.get("area")) or Decimal("0"),
+                    "price": parse_decimal(row.get("price")),
+                    "area": parse_decimal(row.get("area")),
                     "rooms": parse_rooms(row.get("rooms")),
                     "floor": parse_int(row.get("floor")),
                     "year_built": parse_int(row.get("year_built")),

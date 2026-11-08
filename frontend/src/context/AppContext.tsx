@@ -12,7 +12,7 @@ export type FavoriteItem = {
   id: number;
   name: string;
   district: string | null;
-  price: number;
+  price: number | string | null;
   noise_db?: string;
 };
 export type ChatFilters = {

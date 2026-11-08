@@ -34,7 +34,7 @@ export interface Building {
   id: number;
   name: string;
   district: string;
-  price: number;
+  price: number | string | null;
   lat: number;
   lng: number;
   noise_db?: string;

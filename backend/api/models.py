@@ -69,8 +69,8 @@ class Apartment(models.Model):
         default="rent",
     )
 
-    price = models.DecimalField(max_digits=12, decimal_places=2)
-    area = models.DecimalField(max_digits=8, decimal_places=2)
+    price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+    area = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
     rooms = models.PositiveSmallIntegerField(null=True, blank=True)
     floor = models.SmallIntegerField(null=True, blank=True)
     year_built = models.PositiveSmallIntegerField(null=True, blank=True)
@@ -134,7 +134,7 @@ class Apartment(models.Model):
 
     @property
     def price_per_m2(self):
-        if self.area and self.area > 0:
+        if self.price is not None and self.area and self.area > 0:
             return round(float(self.price) / float(self.area), 2)
         return None
 
@@ -147,8 +147,8 @@ class ApartmentHistory(models.Model):
     )
     version = models.ForeignKey(DataVersion, on_delete=models.PROTECT)
 
-    price = models.DecimalField(max_digits=12, decimal_places=2)
-    area = models.DecimalField(max_digits=8, decimal_places=2)
+    price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+    area = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
     rooms = models.PositiveSmallIntegerField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
     validation_status = models.CharField(max_length=20)
