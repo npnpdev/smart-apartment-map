@@ -91,42 +91,36 @@ def validate(row):
     status: "valid" | "suspicious" | "invalid"
     notes: list[str] z powodami
     """
-    notes = []
-    status = "valid"
+    errors = []
+    warnings = []
 
     price = parse_decimal(row.get("price"))
     area = parse_decimal(row.get("area"))
 
     if not row.get("external_id"):
-        notes.append("missing external_id")
-        status = "invalid"
+        errors.append("missing external_id")
     if not parse_location(row.get("location")):
-        notes.append("missing or invalid location")
-        status = "invalid"
+        errors.append("missing or invalid location")
 
-    if price is not None:
-        if price <= 0:
-            notes.append("price <= 0")
-            status = "suspicious"
-        elif price > 50000:
-            notes.append("price > 50000 (czy to nie sprzedaz?)")
-            status = "suspicious"
-    else:
-        notes.append("no price")
-        status = "suspicious"
+    if price is None:
+        warnings.append("no price")
+    elif price <= 0:
+        warnings.append("price <= 0")
+    elif price > 50000:
+        warnings.append("price > 50000 (czy to nie sprzedaz?)")
 
-    if area is not None:
-        if area <= 0:
-            notes.append("area <= 0")
-            status = "suspicious"
-        elif area > 500:
-            notes.append("area > 500 m2")
-            status = "suspicious"
-    else:
-        notes.append("no area")
-        status = "suspicious"
+    if area is None:
+        warnings.append("no area")
+    elif area <= 0:
+        warnings.append("area <= 0")
+    elif area > 500:
+        warnings.append("area > 500 m2")
 
-    return status, notes
+    if errors:
+        return "invalid", errors + warnings
+    if warnings:
+        return "suspicious", warnings
+    return "valid", []
 
 
 class Command(BaseCommand):
